@@ -1,0 +1,24 @@
+{
+  "name": "sentry-skills",
+  "owner": {
+    "name": "Sentry"
+  },
+  "metadata": {
+    "description": "Sentry-specific agent skills for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "sentry-skills",
+      "source": ".",
+      "description": "Sentry-specific agent skills for code review, commits, and more",
+      "version": "1.0.0",
+      "author": {
+        "name": "Sentry"
+      },
+      "repository": "https://github.com/getsentry/sentry-skills",
+      "license": "Apache-2.0",
+      "keywords": ["sentry", "code-review", "commits"],
+      "category": "productivity"
+    }
+  ]
+}
