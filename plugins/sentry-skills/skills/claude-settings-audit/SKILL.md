@@ -135,6 +135,22 @@ Only include commands for tools actually detected in the project.
 | `*.tf` files | `terraform --version`, `terraform providers`, `terraform state list` |
 | `Makefile` | `make --version`, `make -n` |
 
+### Skills (for Sentry Projects)
+
+If this is a Sentry project (or sentry-skills plugin is installed), include:
+
+```json
+[
+  "Skill(sentry-skills:commit)",
+  "Skill(sentry-skills:create-pr)",
+  "Skill(sentry-skills:code-review)",
+  "Skill(sentry-skills:find-bugs)",
+  "Skill(sentry-skills:deslop)",
+  "Skill(sentry-skills:iterate-pr)",
+  "Skill(sentry-skills:claude-settings-audit)"
+]
+```
+
 ### WebFetch Domains
 
 #### Always Include (Sentry Projects)
