@@ -8,10 +8,10 @@ Agent skills for Sentry employees, following the [Agent Skills](https://agentski
 
 ```bash
 # Add the marketplace
-/plugin marketplace add getsentry/sentry-skills
+claude plugin marketplace add getsentry/sentry-skills
 
 # Install the plugin
-/plugin install sentry-skills@sentry-skills
+claude plugin install sentry-skills@sentry-skills
 ```
 
 ### Claude Code (from local clone)
@@ -21,7 +21,7 @@ Agent skills for Sentry employees, following the [Agent Skills](https://agentski
 git clone git@github.com:getsentry/sentry-skills.git ~/sentry-skills
 
 # Install the plugin directly
-/plugin install ~/sentry-skills
+claude plugin install ~/sentry-skills
 ```
 
 After installation, restart Claude Code. The skills will be automatically invoked when relevant to your task.
