@@ -48,6 +48,7 @@ Copy the `skills/` directory to your agent's skills location, or reference the S
 |-------|-------------|
 | [code-review](plugins/sentry-skills/skills/code-review/SKILL.md) | Sentry code review guidelines and checklist |
 | [commit](plugins/sentry-skills/skills/commit/SKILL.md) | Sentry commit message conventions |
+| [create-pr](plugins/sentry-skills/skills/create-pr/SKILL.md) | Create pull requests following Sentry conventions |
 | [deslop](plugins/sentry-skills/skills/deslop/SKILL.md) | Remove AI-generated code slop from branch changes |
 | [find-bugs](plugins/sentry-skills/skills/find-bugs/SKILL.md) | Find bugs and security vulnerabilities in branch changes |
 
