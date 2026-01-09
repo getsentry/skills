@@ -17,10 +17,9 @@ Check the diff against the base branch and remove all AI-generated slop introduc
 
 ## Process
 
-1. Detect the base branch and get the diff:
+1. Get the diff against the default branch:
    ```bash
-   BASE=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main")
-   git diff $BASE...HEAD
+   git diff $(gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name')...HEAD
    ```
 2. Review each changed file for slop patterns
 3. Remove identified slop while preserving legitimate changes
