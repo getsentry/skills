@@ -25,15 +25,18 @@ If the output shows any uncommitted changes (modified, added, or untracked files
 ### Step 1: Verify Branch State
 
 ```bash
+# Detect the default branch
+BASE=$(gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name')
+
 # Check current branch and status
 git status
-git log main..HEAD --oneline
+git log $BASE..HEAD --oneline
 ```
 
 Ensure:
 - All changes are committed
 - Branch is up to date with remote
-- Changes are rebased on main if needed
+- Changes are rebased on the base branch if needed
 
 ### Step 2: Analyze Changes
 
@@ -41,10 +44,10 @@ Review what will be included in the PR:
 
 ```bash
 # See all commits that will be in the PR
-git log main..HEAD
+git log $BASE..HEAD
 
 # See the full diff
-git diff main...HEAD
+git diff $BASE...HEAD
 ```
 
 Understand the scope and purpose of all changes before writing the description.
