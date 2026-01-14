@@ -1,7 +1,8 @@
 <!--
-Source: https://github.com/anthropics/claude-plugins-official/blob/main/plugins/code-simplifier/agents/code-simplifier.md
-Author: Anthropic
-License: See https://github.com/anthropics/claude-plugins-official
+Based on prior art from Anthropic's code-simplifier subagent:
+https://github.com/anthropics/claude-plugins-official/blob/main/plugins/code-simplifier/agents/code-simplifier.md
+
+No license information available in source repository.
 -->
 
 ---
