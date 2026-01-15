@@ -166,10 +166,10 @@ If you need to update a PR after creation, use `gh api` instead of `gh pr edit`:
 
 ```bash
 # Update PR description
-gh api -X PATCH repos/{owner}/{repo}/pulls/PR_NUMBER -f body='$(cat <<'EOF'
+gh api -X PATCH repos/{owner}/{repo}/pulls/PR_NUMBER -f body="$(cat <<'EOF'
 Updated description here
 EOF
-)'
+)"
 
 # Update PR title
 gh api -X PATCH repos/{owner}/{repo}/pulls/PR_NUMBER -f title='new: Title here'
