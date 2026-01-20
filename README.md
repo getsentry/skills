@@ -57,6 +57,7 @@ Copy the `skills/` directory to your agent's skills location, or reference the S
 | [claude-settings-audit](plugins/sentry-skills/skills/claude-settings-audit/SKILL.md) | Analyze repo and generate recommended Claude Code settings.json permissions |
 | [agents-md](plugins/sentry-skills/skills/agents-md/SKILL.md) | Maintain AGENTS.md with concise agent instructions |
 | [brand-guidelines](plugins/sentry-skills/skills/brand-guidelines/SKILL.md) | Write copy following Sentry brand guidelines |
+| [doc-coauthoring](plugins/sentry-skills/skills/doc-coauthoring/SKILL.md) | Structured workflow for co-authoring documentation, proposals, and specs |
 
 ## Available Subagents
 
