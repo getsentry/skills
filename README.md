@@ -150,6 +150,50 @@ allowed-tools: Read Grep Glob
 ---
 ```
 
+## Where Skills Belong
+
+Skills should live in the appropriate location based on their scope:
+
+| Scope | Location | Example |
+|-------|----------|---------|
+| **Global** - Used across Sentry | `sentry-skills` plugin | `commit`, `code-review`, `create-pr` |
+| **Domain-specific** - Used by a team or domain | Dedicated plugin in this repo (e.g., `infra-skills`) | `gcp-logs`, `terraform-review` |
+| **Repo-specific** - Only relevant to one repo | The repository itself (`.claude/skills/`) | Project-specific workflows |
+
+When deciding where to place a skill:
+- If most Sentry engineers would benefit, add it to `sentry-skills`
+- If only a specific team needs it, create or use a domain-specific plugin
+- If it only makes sense in one repo, keep it in that repo
+
+### Marketplace Structure
+
+This repository is a Claude Code **marketplace** - a collection of plugins that can be installed independently. The marketplace manifest (`.claude-plugin/marketplace.json`) lists all available plugins:
+
+```json
+{
+  "plugins": [
+    { "name": "sentry-skills", "source": "./plugins/sentry-skills" },
+    { "name": "infra-skills", "source": "./plugins/infra-skills" }
+  ]
+}
+```
+
+Each plugin lives in its own directory under `plugins/` with its own `plugin.json` manifest. Users can install individual plugins:
+
+```bash
+# Install just the global skills
+claude plugin install sentry-skills@sentry-skills
+
+# Install domain-specific skills
+claude plugin install infra-skills@sentry-skills
+```
+
+To add a new domain-specific plugin:
+
+1. Create `plugins/<plugin-name>/.claude-plugin/plugin.json`
+2. Add skills under `plugins/<plugin-name>/skills/`
+3. Register the plugin in `.claude-plugin/marketplace.json`
+
 ## Vendoring Skills
 
 We vendor (copy) skills and agents that we use regularly into this repository rather than depending on external sources at runtime. This approach:
