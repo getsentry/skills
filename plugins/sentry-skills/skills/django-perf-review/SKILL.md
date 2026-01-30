@@ -364,7 +364,6 @@ If the answer to any is "no" - remove the finding.
 - Tables with <1000 rows that won't grow
 - Patterns in cold paths (rarely executed code)
 - Micro-optimizations (exists vs count, only/defer without evidence)
-- Missing select_related on single object fetches (2 queries vs 1 is not worth reporting)
 
 ### False Positives to Avoid
 
@@ -388,11 +387,11 @@ N+1 requires a loop that triggers additional queries. A single `list()` call is 
 
 **Missing select_related on single object fetch is not N+1:**
 ```python
-# This is 2 queries, not N+1 - don't report it
+# This is 2 queries, not N+1 - report as LOW at most
 state = AutofixState.objects.filter(pr_id=pr_id).first()
 project_id = state.request.project_id  # second query
 ```
-N+1 requires a loop. A single object doing 2 queries instead of 1 is a micro-optimization not worth reporting.
+N+1 requires a loop. A single object doing 2 queries instead of 1 can be reported as LOW if relevant, but never as CRITICAL/HIGH.
 
 **Style preferences are not performance issues:**
 If your only suggestion is "combine these two lines" or "rename this variable" - that's style, not performance. Don't report it.
