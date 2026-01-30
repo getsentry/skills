@@ -27,8 +27,7 @@ Issues are organized by impact. Focus on CRITICAL and HIGH - these cause real pr
 | 2 | Unbounded Querysets | **CRITICAL** - Memory exhaustion, OOM kills |
 | 3 | Missing Indexes | **HIGH** - Full table scans on large tables |
 | 4 | Write Loops | **HIGH** - Lock contention, slow requests |
-| 5 | Missing Prefetch (single object) | **MEDIUM** - Extra query on single fetch |
-| 6 | Inefficient Patterns | **LOW** - Usually not worth reporting |
+| 5 | Inefficient Patterns | **LOW** - Rarely worth reporting |
 
 ---
 
@@ -253,31 +252,7 @@ queryset.delete()
 
 ---
 
-## Priority 5: Missing Prefetch on Single Object (MEDIUM)
-
-**Impact:** 2 queries instead of 1.
-
-**This is NOT N+1.** N+1 requires a loop. This is just a missing JOIN on a single object fetch.
-
-### Rule: Add select_related when accessing related fields on single objects
-
-```python
-# SUBOPTIMAL: 2 queries (1 for state, 1 for request)
-state = AutofixState.objects.filter(pr_id=pr_id).first()
-project_id = state.request.project_id  # ← triggers second query
-
-# BETTER: 1 query (JOIN)
-state = AutofixState.objects.filter(pr_id=pr_id).select_related('request').first()
-project_id = state.request.project_id  # ← already loaded
-```
-
-### When to report
-- Only if you're already reporting other issues
-- Not worth a report on its own unless in a genuinely hot path
-
----
-
-## Priority 6: Inefficient Patterns (LOW)
+## Priority 5: Inefficient Patterns (LOW)
 
 **Rarely worth reporting.** Include only as minor notes if you're already reporting real issues.
 
@@ -389,6 +364,7 @@ If the answer to any is "no" - remove the finding.
 - Tables with <1000 rows that won't grow
 - Patterns in cold paths (rarely executed code)
 - Micro-optimizations (exists vs count, only/defer without evidence)
+- Missing select_related on single object fetches (2 queries vs 1 is not worth reporting)
 
 ### False Positives to Avoid
 
@@ -409,6 +385,14 @@ Querysets are lazy. Assigning to a variable doesn't execute anything.
 projects = list(Project.objects.filter(org=org))
 ```
 N+1 requires a loop that triggers additional queries. A single `list()` call is fine.
+
+**Missing select_related on single object fetch is not N+1:**
+```python
+# This is 2 queries, not N+1 - don't report it
+state = AutofixState.objects.filter(pr_id=pr_id).first()
+project_id = state.request.project_id  # second query
+```
+N+1 requires a loop. A single object doing 2 queries instead of 1 is a micro-optimization not worth reporting.
 
 **Style preferences are not performance issues:**
 If your only suggestion is "combine these two lines" or "rename this variable" - that's style, not performance. Don't report it.
