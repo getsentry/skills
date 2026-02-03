@@ -37,6 +37,12 @@ The `bucket` field categorizes state into: `pass`, `fail`, `pending`, `skipping`
 
 These bots may post additional feedback comments once their checks complete. Waiting avoids duplicate work.
 
+**Optional:** For structured failure data, run the helper script:
+```bash
+python scripts/fetch_pr_checks.py
+```
+This returns JSON with check status and extracted failure snippets. If the script is unavailable, fall back to the standard `gh` commands.
+
 ### Step 3: Gather Review Feedback
 
 Once CI checks have completed (or at least the bot-related checks), gather human and bot feedback:
@@ -57,6 +63,12 @@ gh api repos/{owner}/{repo}/issues/{pr_number}/comments
 ```
 
 Look for bot comments from: Sentry, Codecov, Cursor, Bugbot, Seer, and other automated tools.
+
+**Optional:** For categorized feedback, run the helper script:
+```bash
+python scripts/fetch_pr_feedback.py
+```
+This returns JSON with feedback categorized as `blocking`, `suggestion`, `bot`, or `resolved`. If the script is unavailable, fall back to the standard `gh` commands.
 
 ### Step 4: Investigate Failures
 
@@ -81,11 +93,42 @@ For each piece of feedback (CI failure or review comment):
 3. **Check if already addressed** - The issue may have been fixed in a subsequent commit
 4. **Skip invalid feedback** - If the concern is not legitimate, move on
 
-### Step 6: Address Valid Issues
+### Step 6: Handle Subjective Feedback
 
-Make minimal, targeted code changes. Only fix what is actually broken.
+Not all feedback requires action. Categorize feedback before addressing:
 
-### Step 7: Commit and Push
+**Auto-fix (no prompt needed):**
+- CI failures (tests, linting, type errors)
+- Security issues
+- Bugs or incorrect behavior
+- Changes explicitly requested by reviewers
+
+**Prompt user for direction:**
+- Style suggestions ("consider renaming...")
+- Nitpicks ("nit: could use a list comprehension")
+- Optional improvements ("might want to add a docstring")
+- Subjective design feedback
+
+When encountering suggestion-type feedback, present it to the user:
+
+```
+Found N suggestions (non-blocking):
+1. [style] "Consider renaming this variable" - @reviewer in api.py:42
+2. [nit] "Could use a list comprehension here" - @reviewer in utils.py:18
+3. [suggestion] "Might want to add a docstring" - @reviewer in models.py:55
+
+Which would you like to address? (e.g., "1,3" or "all" or "none")
+```
+
+**Skip silently:**
+- Resolved/outdated threads
+- Bot comments that are purely informational (coverage reports, etc.)
+
+### Step 7: Address Valid Issues
+
+Make minimal, targeted code changes. Only fix what is actually broken or what the user has chosen to address.
+
+### Step 8: Commit and Push
 
 ```bash
 git add -A
@@ -93,7 +136,7 @@ git commit -m "fix: <descriptive message of what was fixed>"
 git push origin $(git branch --show-current)
 ```
 
-### Step 8: Wait for CI
+### Step 9: Wait for CI
 
 Use the built-in watch functionality:
 
@@ -109,7 +152,7 @@ Alternatively, poll manually if you need more control:
 gh pr checks --json name,state,bucket | jq '.[] | select(.bucket != "pass")'
 ```
 
-### Step 9: Repeat
+### Step 10: Repeat
 
 Return to Step 2 if:
 - Any CI checks failed
@@ -121,7 +164,8 @@ Continue until all checks pass and no unaddressed feedback remains.
 
 **Success:**
 - All CI checks are green (`bucket: pass`)
-- No unaddressed human review feedback
+- No unaddressed blocking feedback
+- User has decided on all suggestion-type feedback
 
 **Ask for Help:**
 - Same failure persists after 3 attempts (likely a flaky test or deeper issue)
@@ -137,3 +181,4 @@ Continue until all checks pass and no unaddressed feedback remains.
 - Use `gh pr checks --required` to focus only on required checks
 - Use `gh run view <run-id> --verbose` to see all job steps, not just failures
 - If a check is from an external service, the `link` field in checks JSON provides the URL to investigate
+- The helper scripts in `scripts/` are optional optimizations - if they fail or are unavailable, use standard `gh` commands
