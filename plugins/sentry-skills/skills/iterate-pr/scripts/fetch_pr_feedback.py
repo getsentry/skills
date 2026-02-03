@@ -9,9 +9,10 @@ If --pr is not specified, uses the PR for the current branch.
 
 Output: JSON to stdout with categorized feedback.
 
-Categories:
-- blocking: Changes requested, must address
-- suggestion: Comments, nitpicks, style suggestions
+Categories (using LOGAF scale - see https://develop.sentry.dev/engineering-practices/code-review/#logaf-scale):
+- high: Must address before merge (h:, blocker, changes requested)
+- medium: Should address (m:, standard feedback)
+- low: Optional suggestions (l:, nit, style)
 - bot: Automated comments (Codecov, Sentry bot, etc.)
 - resolved: Already resolved threads
 """
@@ -154,18 +155,51 @@ def get_review_threads(owner: str, repo: str, pr_number: int) -> list[dict[str, 
         return []
 
 
+def detect_logaf(body: str) -> str | None:
+    """Detect LOGAF scale markers in comment body.
+
+    LOGAF scale (https://develop.sentry.dev/engineering-practices/code-review/#logaf-scale):
+    - l: / [l] / low: → low priority (optional)
+    - m: / [m] / medium: → medium priority (should address)
+    - h: / [h] / high: → high priority (must address)
+
+    Returns 'high', 'medium', 'low', or None if no marker found.
+    """
+    # Check for LOGAF markers at start of comment (with optional whitespace)
+    logaf_patterns = [
+        # h: or [h] or high: patterns
+        (r"^\s*(?:h:|h\s*:|high:|\[h\])", "high"),
+        # m: or [m] or medium: patterns
+        (r"^\s*(?:m:|m\s*:|medium:|\[m\])", "medium"),
+        # l: or [l] or low: patterns
+        (r"^\s*(?:l:|l\s*:|low:|\[l\])", "low"),
+    ]
+
+    for pattern, level in logaf_patterns:
+        if re.search(pattern, body, re.IGNORECASE):
+            return level
+
+    return None
+
+
 def categorize_comment(comment: dict[str, Any], body: str) -> str:
-    """Categorize a comment based on content and author."""
+    """Categorize a comment based on content and author.
+
+    Uses LOGAF scale: high (must fix), medium (should fix), low (optional).
+    """
     author = comment.get("author", {}).get("login", "") or comment.get("user", {}).get("login", "")
 
     if is_bot(author):
         return "bot"
 
-    # Look for blocking indicators
-    body_lower = body.lower()
-    blocking_patterns = [
+    # Check for explicit LOGAF markers first
+    logaf_level = detect_logaf(body)
+    if logaf_level:
+        return logaf_level
+
+    # Look for high-priority (blocking) indicators
+    high_patterns = [
         r"(?i)must\s+(fix|change|update|address)",
-        r"(?i)please\s+(fix|change|update|address)",
         r"(?i)this\s+(is\s+)?(wrong|incorrect|broken|buggy)",
         r"(?i)security\s+(issue|vulnerability|concern)",
         r"(?i)will\s+(break|cause|fail)",
@@ -173,12 +207,12 @@ def categorize_comment(comment: dict[str, Any], body: str) -> str:
         r"(?i)blocker",
     ]
 
-    for pattern in blocking_patterns:
+    for pattern in high_patterns:
         if re.search(pattern, body):
-            return "blocking"
+            return "high"
 
-    # Look for suggestion indicators
-    suggestion_patterns = [
+    # Look for low-priority (suggestion) indicators
+    low_patterns = [
         r"(?i)nit[:\s]",
         r"(?i)nitpick",
         r"(?i)suggestion[:\s]",
@@ -195,12 +229,12 @@ def categorize_comment(comment: dict[str, Any], body: str) -> str:
         r"(?i)fwiw",
     ]
 
-    for pattern in suggestion_patterns:
+    for pattern in low_patterns:
         if re.search(pattern, body):
-            return "suggestion"
+            return "low"
 
-    # Default to suggestion for non-bot comments without strong indicators
-    return "suggestion"
+    # Default to medium for non-bot comments without clear indicators
+    return "medium"
 
 
 def extract_feedback_item(
@@ -261,10 +295,11 @@ def main():
     # Get review decision
     review_decision = pr_info.get("reviewDecision", "")
 
-    # Categorized feedback
+    # Categorized feedback using LOGAF scale
     feedback = {
-        "blocking": [],
-        "suggestion": [],
+        "high": [],      # Must address before merge
+        "medium": [],    # Should address
+        "low": [],       # Optional suggestions
         "bot": [],
         "resolved": [],
     }
@@ -278,7 +313,7 @@ def main():
             if body and author != pr_author:
                 item = extract_feedback_item(body, author)
                 item["type"] = "changes_requested"
-                feedback["blocking"].append(item)
+                feedback["high"].append(item)
 
     # Get review threads (inline comments with resolution status)
     threads = get_review_threads(owner, repo, pr_number)
@@ -360,20 +395,23 @@ def main():
             "review_decision": review_decision,
         },
         "summary": {
-            "blocking": len(feedback["blocking"]),
-            "suggestions": len(feedback["suggestion"]),
+            "high": len(feedback["high"]),
+            "medium": len(feedback["medium"]),
+            "low": len(feedback["low"]),
             "bot_comments": len(feedback["bot"]),
             "resolved": len(feedback["resolved"]),
-            "needs_attention": len(feedback["blocking"]) + len(feedback["suggestion"]),
+            "needs_attention": len(feedback["high"]) + len(feedback["medium"]),
         },
         "feedback": feedback,
     }
 
-    # Add actionable summary
-    if feedback["blocking"]:
-        output["action_required"] = "Address blocking feedback before merge"
-    elif feedback["suggestion"]:
-        output["action_required"] = "Review suggestions - ask user which to address"
+    # Add actionable summary based on LOGAF priorities
+    if feedback["high"]:
+        output["action_required"] = "Address high-priority feedback before merge"
+    elif feedback["medium"]:
+        output["action_required"] = "Address medium-priority feedback"
+    elif feedback["low"]:
+        output["action_required"] = "Review low-priority suggestions - ask user which to address"
     else:
         output["action_required"] = None
 

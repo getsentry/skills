@@ -33,15 +33,16 @@ Returns JSON:
 
 ### `scripts/fetch_pr_feedback.py`
 
-Fetches and categorizes PR review feedback.
+Fetches and categorizes PR review feedback using the [LOGAF scale](https://develop.sentry.dev/engineering-practices/code-review/#logaf-scale).
 
 ```bash
 python scripts/fetch_pr_feedback.py [--pr NUMBER]
 ```
 
 Returns JSON with feedback categorized as:
-- `blocking` - Changes requested, must address
-- `suggestion` - Nitpicks, style, optional improvements
+- `high` - Must address before merge (`h:`, blocker, changes requested)
+- `medium` - Should address (`m:`, standard feedback)
+- `low` - Optional (`l:`, nit, style, suggestion)
 - `bot` - Automated comments (Codecov, Sentry, etc.)
 - `resolved` - Already resolved threads
 
@@ -74,20 +75,20 @@ Do NOT assume what failed based on check name alone—always read the logs.
 
 Run `scripts/fetch_pr_feedback.py` to get categorized feedback.
 
-### 5. Handle Feedback by Category
+### 5. Handle Feedback by LOGAF Priority
 
 **Auto-fix (no prompt):**
-- `blocking` feedback - changes explicitly requested
-- Security issues, bugs, incorrect behavior
+- `high` - must address (blockers, security, changes requested)
+- `medium` - should address (standard feedback)
 
 **Prompt user for selection:**
-- `suggestion` feedback - present numbered list and ask which to address:
+- `low` - present numbered list and ask which to address:
 
 ```
-Found 3 suggestions (non-blocking):
-1. [nit] "Consider renaming this variable" - @reviewer in api.py:42
-2. [style] "Could use a list comprehension" - @reviewer in utils.py:18
-3. [suggestion] "Add a docstring" - @reviewer in models.py:55
+Found 3 low-priority suggestions:
+1. [l] "Consider renaming this variable" - @reviewer in api.py:42
+2. [nit] "Could use a list comprehension" - @reviewer in utils.py:18
+3. [style] "Add a docstring" - @reviewer in models.py:55
 
 Which would you like to address? (e.g., "1,3" or "all" or "none")
 ```
@@ -116,7 +117,7 @@ Return to step 2 if CI failed or new feedback appeared.
 
 ## Exit Conditions
 
-**Success:** All checks pass, no unaddressed blocking feedback, user has decided on suggestions.
+**Success:** All checks pass, no unaddressed high/medium feedback, user has decided on low-priority items.
 
 **Ask for help:** Same failure after 3 attempts, feedback needs clarification, infrastructure issues.
 
