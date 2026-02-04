@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# ///
 """
 Fetch PR CI checks and extract relevant failure snippets.
 
