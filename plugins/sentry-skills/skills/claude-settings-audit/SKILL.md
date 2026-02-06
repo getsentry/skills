@@ -153,7 +153,8 @@ If this is a Sentry project (or sentry-skills plugin is installed), include:
   "Skill(sentry-skills:doc-coauthoring)",
   "Skill(sentry-skills:security-review)",
   "Skill(sentry-skills:django-perf-review)",
-  "Skill(sentry-skills:code-simplifier)"
+  "Skill(sentry-skills:code-simplifier)",
+  "Skill(sentry-skills:skill-creator)"
 ]
 ```
 
