@@ -47,6 +47,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [doc-coauthoring](plugins/sentry-skills/skills/doc-coauthoring/SKILL.md) | Structured workflow for co-authoring documentation, proposals, and specs |
 | [security-review](plugins/sentry-skills/skills/security-review/SKILL.md) | Systematic security code review following OWASP guidelines |
 | [code-simplifier](plugins/sentry-skills/skills/code-simplifier/SKILL.md) | Simplifies and refines code for clarity, consistency, and maintainability |
+| [skill-creator](plugins/sentry-skills/skills/skill-creator/SKILL.md) | Create new agent skills for this repository |
 
 ## Available Subagents
 

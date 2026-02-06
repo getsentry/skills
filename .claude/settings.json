@@ -53,7 +53,8 @@
       "Skill(sentry-skills:doc-coauthoring)",
       "Skill(sentry-skills:security-review)",
       "Skill(sentry-skills:django-perf-review)",
-      "Skill(sentry-skills:code-simplifier)"
+      "Skill(sentry-skills:code-simplifier)",
+      "Skill(sentry-skills:skill-creator)"
     ],
     "deny": []
   },
