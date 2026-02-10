@@ -6,8 +6,6 @@ permissions:
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    paths:
-      - "**/skills/**"
 
 jobs:
   warden:
