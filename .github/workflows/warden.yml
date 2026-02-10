@@ -1,5 +1,7 @@
 name: Warden
 
+# contents: write required for resolving review threads via GraphQL
+# See: https://github.com/orgs/community/discussions/44650
 permissions:
   contents: write
 
@@ -8,7 +10,7 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  warden:
+  review:
     runs-on: ubuntu-latest
     env:
       WARDEN_ANTHROPIC_API_KEY: ${{ secrets.WARDEN_ANTHROPIC_API_KEY }}
@@ -22,6 +24,6 @@ jobs:
           app-id: ${{ secrets.WARDEN_APP_ID }}
           private-key: ${{ secrets.WARDEN_PRIVATE_KEY }}
 
-      - run: npx @sentry/warden
-        env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+      - uses: getsentry/warden@v0
+        with:
+          github-token: ${{ steps.app-token.outputs.token }}
