@@ -29,6 +29,8 @@ The current year minus one is the previous year.
 
 Collect all of the required information from the user:
 
+*Github Username*: What is the github username of the user?
+
 *Github Repositories*: Which Github repositories should be searched for PRs?
 
 The user can either specify a comma separated list, or provide a directory that contains repositories. In the second case use this command in the specified directory:
@@ -60,7 +62,7 @@ If a document with this name already exists, notify the user to rename the exist
 Ensure:
 - If the Work Summary already exists, stop execution.
 
-### Step 5
+### Step 4
 
 The time window is Feb. 1 of the previous year until Jan. 31 of the current year
 Find all Github PRs created or merged in the time window for the user repos. 
@@ -80,9 +82,9 @@ Ensure:
 - All the Notion docs were created in the time window and were created by the user.
 - All the Linear tickets were opened or completed in the time window and were assigned to the user when they were completed.
 
-### Step 6
+### Step 5
 
-For each of the Github PRs, Notion documents and Linear tickets found in Step 4, put a link into the private document created in Step 2.
+For each of the Github PRs, Notion documents and Linear tickets found in Step 4, put a link into the private document created in Step 3.
 
 Ensure:
 - There is a link for all the Github PRs in the Work Summary
@@ -90,7 +92,7 @@ Ensure:
 - There is a link for all the Linear tickets in the Work Summary
 - DO NOT truncate the lists of links. DO NOT use shorteners like "...and 75 more". Make sure that the full set of all Github PRs, Notion documents and Linear tickets is visible in the document.
 
-### Step 7
+### Step 6
 
 Use your own intelligence to group all the Github, Notion and Linear ticket links in the Work Summary document into projects. The format of this document is shown below.
 
@@ -120,12 +122,13 @@ For Linear tickets use the title of the ticket and the description of the ticket
 Ensure:
 - All the links in the file are assigned to a project.
 - The file follows the format specified above.
+- DO NOT truncate the lists of links. DO NOT use shorteners like "...and 75 more". Make sure that the full set of all Github PRs, Notion documents and Linear tickets is visible in the document.
 
-### Step 8
+### Step 7
 
 Search for notion documents created by the "other users". Take any that are relevant to the projects in the Work Summary and add links to those Notion documents into the Work Summary in the appropriate project.
 
-### Step 9
+### Step 8
 
 Return a link to the Work Summary Notion doc to the user.
 
