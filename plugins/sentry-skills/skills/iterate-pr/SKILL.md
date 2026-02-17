@@ -45,8 +45,10 @@ Returns JSON with feedback categorized as:
 - `high` - Must address before merge (`h:`, blocker, changes requested)
 - `medium` - Should address (`m:`, standard feedback)
 - `low` - Optional (`l:`, nit, style, suggestion)
-- `bot` - Automated comments (Codecov, Sentry, etc.)
+- `bot` - Informational automated comments (Codecov, Dependabot, etc.)
 - `resolved` - Already resolved threads
+
+Review bot feedback (from Sentry, Warden, Cursor, Bugbot, CodeQL, etc.) appears in `high`/`medium`/`low` with `review_bot: true` — it is NOT placed in the `bot` bucket.
 
 ## Workflow
 
@@ -62,7 +64,7 @@ Stop if no PR exists for the current branch.
 
 Run `${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py` to get structured failure data.
 
-**Wait if pending:** If bot-related checks (sentry, codecov, cursor, bugbot, seer) are still running, wait before proceeding—they may post additional feedback.
+**Wait if pending:** If review bot checks (sentry, warden, cursor, bugbot, seer, codeql) are still running, wait before proceeding—they post actionable feedback that must be evaluated. Informational bots (codecov) are not worth waiting for.
 
 ### 3. Fix CI Failures
 
@@ -83,6 +85,11 @@ Run `${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py` to get categorized feedb
 - `high` - must address (blockers, security, changes requested)
 - `medium` - should address (standard feedback)
 
+This includes review bot feedback (items with `review_bot: true`). Treat it the same as human feedback:
+- Real issue found → fix it
+- False positive → skip, but explain why in a brief comment
+- Never silently ignore review bot feedback — always verify the finding
+
 **Prompt user for selection:**
 - `low` - present numbered list and ask which to address:
 
@@ -97,7 +104,7 @@ Which would you like to address? (e.g., "1,3" or "all" or "none")
 
 **Skip silently:**
 - `resolved` threads
-- `bot` comments (informational only)
+- `bot` comments (informational only — Codecov, Dependabot, etc.)
 
 ### 6. Commit and Push
 
@@ -119,7 +126,7 @@ Return to step 2 if CI failed or new feedback appeared.
 
 ## Exit Conditions
 
-**Success:** All checks pass, no unaddressed high/medium feedback, user has decided on low-priority items.
+**Success:** All checks pass, no unaddressed high/medium feedback (including review bot findings), user has decided on low-priority items.
 
 **Ask for help:** Same failure after 3 attempts, feedback needs clarification, infrastructure issues.
 
