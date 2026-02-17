@@ -1,6 +1,6 @@
 ---
 name: commit
-description: Create commit messages following Sentry conventions. Use when committing code changes, writing commit messages, or formatting git history. Follows conventional commits with Sentry-specific issue references.
+description: ALWAYS use this skill when committing code changes — never commit directly without it. Creates commits following Sentry conventions with proper conventional commit format and issue references. Trigger on any commit, git commit, save changes, or commit message task.
 ---
 
 # Sentry Commit Messages
@@ -9,14 +9,13 @@ Follow these conventions when creating commits for Sentry projects.
 
 ## Prerequisites
 
-Before committing, ensure you're working on a feature branch, not the main branch.
+Before committing, always check the current branch:
 
 ```bash
-# Check current branch
 git branch --show-current
 ```
 
-If you're on `main` or `master`, create a new branch first:
+**If you're on `main` or `master`, you MUST create a feature branch first** — unless the user explicitly asked to commit to main. Do not ask for confirmation; default to creating the branch.
 
 ```bash
 # Create and switch to a new branch

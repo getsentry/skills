@@ -1,6 +1,6 @@
 ---
 name: create-pr
-description: Create pull requests following Sentry conventions. Use when opening PRs, writing PR descriptions, or preparing changes for review. Follows Sentry's code review guidelines.
+description: ALWAYS use this skill when creating pull requests — never create a PR directly without it. Follows Sentry conventions for PR titles, descriptions, and issue references. Trigger on any create PR, open PR, submit PR, make PR, push and create PR, or prepare changes for review task.
 ---
 
 # Create Pull Request
