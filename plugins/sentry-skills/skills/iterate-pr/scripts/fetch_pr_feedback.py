@@ -16,8 +16,15 @@ Categories (using LOGAF scale - see https://develop.sentry.dev/engineering-pract
 - high: Must address before merge (h:, blocker, changes requested)
 - medium: Should address (m:, standard feedback)
 - low: Optional suggestions (l:, nit, style)
-- bot: Automated comments (Codecov, Sentry bot, etc.)
+- bot: Informational automated comments (Codecov, Dependabot, etc.)
 - resolved: Already resolved threads
+
+Bot classification:
+- Review bots (Sentry, Warden, Cursor, Bugbot, etc.) provide actionable code
+  feedback. Their comments are categorized by content into high/medium/low with
+  a ``review_bot: true`` flag — they are NOT placed in the ``bot`` bucket.
+- Info bots (Codecov, Dependabot, Renovate, etc.) post status reports and are
+  placed in the ``bot`` bucket for silent skipping.
 """
 from __future__ import annotations
 
@@ -29,11 +36,24 @@ import sys
 from typing import Any
 
 
-# Known bot usernames and patterns
-BOT_PATTERNS = [
-    r"(?i)bot$",
-    r"(?i)^codecov",
+# Bots that provide actionable code review feedback (security issues, lint
+# violations, bugs). Their comments are categorized by content, not skipped.
+REVIEW_BOT_PATTERNS = [
     r"(?i)^sentry",
+    r"(?i)^warden",
+    r"(?i)^cursor",
+    r"(?i)^bugbot",
+    r"(?i)^seer",
+    r"(?i)^copilot",
+    r"(?i)^codex",
+    r"(?i)^claude",
+    r"(?i)^codeql",
+]
+
+# Bots that post informational status reports (coverage, dependency updates).
+# These are placed in the ``bot`` bucket and skipped silently.
+INFO_BOT_PATTERNS = [
+    r"(?i)^codecov",
     r"(?i)^dependabot",
     r"(?i)^renovate",
     r"(?i)^github-actions",
@@ -41,10 +61,7 @@ BOT_PATTERNS = [
     r"(?i)^semantic-release",
     r"(?i)^sonarcloud",
     r"(?i)^snyk",
-    r"(?i)^cursor",
-    r"(?i)^bugbot",
-    r"(?i)^seer",
-    r"(?i)^copilot",
+    r"(?i)bot$",
     r"(?i)\[bot\]$",
 ]
 
@@ -82,12 +99,19 @@ def get_pr_info(pr_number: int | None = None) -> dict[str, Any] | None:
     return run_gh(args)
 
 
+def is_review_bot(username: str) -> bool:
+    """Check if username matches a review bot that posts actionable feedback."""
+    return any(re.search(p, username) for p in REVIEW_BOT_PATTERNS)
+
+
+def is_info_bot(username: str) -> bool:
+    """Check if username matches an informational bot (skip silently)."""
+    return any(re.search(p, username) for p in INFO_BOT_PATTERNS)
+
+
 def is_bot(username: str) -> bool:
-    """Check if username matches known bot patterns."""
-    for pattern in BOT_PATTERNS:
-        if re.search(pattern, username):
-            return True
-    return False
+    """Check if username matches any known bot pattern."""
+    return is_review_bot(username) or is_info_bot(username)
 
 
 def get_review_comments(owner: str, repo: str, pr_number: int) -> list[dict[str, Any]]:
@@ -193,7 +217,9 @@ def categorize_comment(comment: dict[str, Any], body: str) -> str:
     """
     author = comment.get("author", {}).get("login", "") or comment.get("user", {}).get("login", "")
 
-    if is_bot(author):
+    # Info bots are skipped silently; review bots fall through to content
+    # categorization so their actionable feedback is not lost.
+    if is_info_bot(author) and not is_review_bot(author):
         return "bot"
 
     # Check for explicit LOGAF markers first
@@ -249,6 +275,7 @@ def extract_feedback_item(
     url: str | None = None,
     is_resolved: bool = False,
     is_outdated: bool = False,
+    review_bot: bool = False,
 ) -> dict[str, Any]:
     """Create a standardized feedback item."""
     # Truncate long bodies for summary
@@ -271,6 +298,8 @@ def extract_feedback_item(
         item["resolved"] = True
     if is_outdated:
         item["outdated"] = True
+    if review_bot:
+        item["review_bot"] = True
 
     return item
 
@@ -357,7 +386,11 @@ def main():
 
         if is_resolved:
             feedback["resolved"].append(item)
-        elif is_bot(author):
+        elif is_review_bot(author):
+            category = categorize_comment(first_comment, body)
+            item["review_bot"] = True
+            feedback[category].append(item)
+        elif is_info_bot(author):
             feedback["bot"].append(item)
         else:
             category = categorize_comment(first_comment, body)
@@ -384,11 +417,22 @@ def main():
             url=comment.get("html_url"),
         )
 
-        if is_bot(author):
+        if is_review_bot(author):
+            category = categorize_comment(comment, body)
+            item["review_bot"] = True
+            feedback[category].append(item)
+        elif is_info_bot(author):
             feedback["bot"].append(item)
         else:
             category = categorize_comment(comment, body)
             feedback[category].append(item)
+
+    # Count review bot items across priority buckets
+    review_bot_count = sum(
+        1 for bucket in ("high", "medium", "low")
+        for item in feedback[bucket]
+        if item.get("review_bot")
+    )
 
     # Build output
     output = {
@@ -404,6 +448,7 @@ def main():
             "low": len(feedback["low"]),
             "bot_comments": len(feedback["bot"]),
             "resolved": len(feedback["resolved"]),
+            "review_bot_feedback": review_bot_count,
             "needs_attention": len(feedback["high"]) + len(feedback["medium"]),
         },
         "feedback": feedback,
