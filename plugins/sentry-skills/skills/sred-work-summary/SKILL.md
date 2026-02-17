@@ -65,7 +65,7 @@ Ensure:
 ### Step 4
 
 The time window is Feb. 1 of the previous year until Jan. 31 of the current year
-Find all Github PRs created or merged in the time window for the user repos. 
+Find all Github PRs created by the given github username in the time window for the user repos.
 If the user does not want to include incident documents, ignore any Github PRs with `INC-X`, `inc-X` in the title or description.
 Use either the Github MCP or the `gh` command to do this.
 
