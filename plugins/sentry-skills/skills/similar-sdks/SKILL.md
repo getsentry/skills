@@ -11,7 +11,7 @@ Investigate how other Sentry SDKs in the same category implement a concept, then
 ## Arguments
 
 - `query` — a question or topic to investigate across sibling SDKs (e.g., "what are typical options for metrics")
-- `category` (optional prefix) — one of `backend`, `mobile`, or `frontend`; restricts the search to that category only
+- `category` (optional prefix) — one of `backend`, `mobile`, `frontend`, `uses`, or `used-by`; restricts the search to that category only
 
 ## Examples
 
@@ -20,6 +20,8 @@ Investigate how other Sentry SDKs in the same category implement a concept, then
 /similar-sdks how is session replay implemented
 /similar-sdks backend: how are breadcrumbs captured
 /similar-sdks frontend: how is error boundary handled
+/similar-sdks uses: how is the native layer initialized
+/similar-sdks used-by: how is the Java SDK integrated
 ```
 
 ## Step 1: Detect the Current Repo
@@ -32,9 +34,11 @@ git rev-parse --show-toplevel
 
 Extract the repo name from the last path component of the output (e.g., `/Users/me/repos/sentry-java` → `sentry-java`).
 
-## Step 2: Load SDK Groups
+## Step 2: Load Reference Files
 
-Read `${CLAUDE_SKILL_ROOT}/references/sdk-groups.md` to load the category-to-SDK mapping.
+Read both reference files:
+1. `${CLAUDE_SKILL_ROOT}/references/sdk-groups.md` — predefined category-to-SDK mapping
+2. `${CLAUDE_SKILL_ROOT}/references/sdk-dependencies.md` — dependency graph between SDKs
 
 ## Step 3: Parse the Argument
 
@@ -44,18 +48,22 @@ Check if the argument starts with a category prefix:
 |---------|----------|-------|
 | `backend: how are breadcrumbs captured` | `backend` | `how are breadcrumbs captured` |
 | `mobile: scope management` | `mobile` | `scope management` |
+| `uses: how is the native layer initialized` | `uses` | `how is the native layer initialized` |
+| `used-by: how is the Java SDK integrated` | `used-by` | `how is the Java SDK integrated` |
 | `how is replay implemented` | _(none)_ | `how is replay implemented` |
 
-The category must be one of: `backend`, `mobile`, `frontend`.
+The category must be one of: `backend`, `mobile`, `frontend`, `uses`, `used-by`.
 
 ## Step 4: Determine Target SDKs
 
-**If a category was specified:**
-1. Use only the SDKs listed under that category
+### Static categories (`backend`, `mobile`, `frontend`, or no prefix)
+
+**If a static category was specified:**
+1. Use only the SDKs listed under that category in `sdk-groups.md`
 2. Remove the current repo from the list
 
 **If no category was specified:**
-1. Find ALL categories that contain the current repo
+1. Find ALL categories in `sdk-groups.md` that contain the current repo
 2. Collect all SDKs from those categories into a single list
 3. Deduplicate — each SDK appears only once
 4. Remove the current repo from the list
@@ -63,6 +71,46 @@ The category must be one of: `backend`, `mobile`, `frontend`.
 **Examples (from `sentry-java`, which is in `backend` + `mobile`):**
 - No prefix → targets: `sentry-python`, `sentry-ruby`, `sentry-go`, `sentry-dotnet`, `sentry-php`, `sentry-elixir`, `sentry-cocoa`, `sentry-dart`, `sentry-react-native`
 - `backend:` prefix → targets: `sentry-python`, `sentry-ruby`, `sentry-go`, `sentry-dotnet`, `sentry-php`, `sentry-elixir`
+
+### Dynamic category: `uses`
+
+Collect all SDKs that the current repo transitively **depends on** by traversing the dependency graph from `sdk-dependencies.md`:
+
+1. Initialize a `visited` set (empty) and a `queue` containing only the current repo
+2. While `queue` is not empty:
+   a. Pop a repo from `queue`
+   b. If already in `visited`, skip it (prevents infinite loops from circular dependencies)
+   c. Add it to `visited`
+   d. Look up its dependencies in `sdk-dependencies.md`
+   e. For each dependency not yet in `visited`, add it to `queue`
+3. The target list is `visited` minus the current repo
+
+**Example (from `sentry-dotnet`):**
+- `sentry-dotnet` depends on: `sentry-native`, `sentry-cocoa`, `sentry-java`
+- `sentry-java` depends on: `sentry-native`
+- `sentry-native` depends on: (none)
+- `sentry-cocoa` depends on: (none)
+- `uses` targets: `sentry-native`, `sentry-cocoa`, `sentry-java`
+
+### Dynamic category: `used-by`
+
+Collect all SDKs that transitively **depend on** the current repo by traversing the reverse dependency graph from `sdk-dependencies.md`:
+
+1. Build a reverse mapping: for each SDK in `sdk-dependencies.md`, record which other SDKs list it as a dependency (i.e., "dependents")
+2. Initialize a `visited` set (empty) and a `queue` containing only the current repo
+3. While `queue` is not empty:
+   a. Pop a repo from `queue`
+   b. If already in `visited`, skip it (prevents infinite loops from circular dependencies)
+   c. Add it to `visited`
+   d. Look up its dependents from the reverse mapping
+   e. For each dependent not yet in `visited`, add it to `queue`
+4. The target list is `visited` minus the current repo
+
+**Example (from `sentry-java`):**
+- Direct dependents of `sentry-java`: `sentry-kotlin-multiplatform`, `sentry-react-native`, `sentry-dotnet`, `sentry-godot`, `sentry-unity`, `sentry-unreal`, `sentry-dart`
+- Direct dependents of `sentry-dotnet`: `sentry-powershell`, `sentry-unity`
+- (Continue until no new repos are found)
+- `used-by` targets: `sentry-kotlin-multiplatform`, `sentry-react-native`, `sentry-dotnet`, `sentry-godot`, `sentry-unity`, `sentry-unreal`, `sentry-dart`, `sentry-powershell`
 
 ## Step 5: Investigate Each Target SDK
 
