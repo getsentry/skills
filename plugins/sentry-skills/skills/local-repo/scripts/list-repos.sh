@@ -6,7 +6,7 @@ if [ -f "$config" ]; then
         [ -d "$dir" ] && ls -1 "$dir" 2>/dev/null | while read -r repo; do
             [ -d "$dir/$repo/.git" ] && echo "- $repo"
         done
-    done | sort -u | head -30
+    done | sort -u
 else
     echo "(No repos.local.json config found)"
 fi
