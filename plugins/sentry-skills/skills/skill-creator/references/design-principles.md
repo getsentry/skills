@@ -57,6 +57,20 @@ This keeps the base context small while making deep knowledge available when nee
 
 The `description` field determines when agents activate the skill. It must contain the phrases users actually say.
 
+**Write in third person** — the description is injected into the system prompt, and inconsistent point-of-view causes discovery problems:
+```yaml
+# Good — third person
+description: Processes Excel files and generates reports. Use when working with spreadsheets.
+
+# Bad — first person
+description: I can help you process Excel files.
+
+# Bad — second person
+description: You can use this to process Excel files.
+```
+
+**Include all "when to use" information in the description**, not in the body. The body is only loaded after triggering, so "When to Use This Skill" sections in the body are not helpful.
+
 **Effective descriptions:**
 ```yaml
 # Good — includes natural trigger phrases
@@ -92,3 +106,60 @@ Skills are instructions to an agent, not documentation for humans. Write in impe
 | Skip test files unless explicitly requested | Test files are generally skipped unless explicitly requested |
 
 The agent interprets imperative instructions as direct commands. Descriptive language introduces ambiguity about whether an action is required or optional.
+
+## Consistent Terminology
+
+Pick one term for each concept and use it throughout the skill. Inconsistent terminology confuses agents and leads to inconsistent behavior.
+
+| Do (pick one) | Don't (mix these) |
+|---------------|-------------------|
+| "API endpoint" everywhere | "API endpoint", "URL", "API route", "path" |
+| "field" everywhere | "field", "box", "element", "control" |
+| "extract" everywhere | "extract", "pull", "get", "retrieve" |
+
+## Avoid Duplication
+
+Information should live in either SKILL.md or reference files, not both. Prefer reference files for detailed content and SKILL.md for the core procedural workflow.
+
+Similarly, don't repeat conventions already in `CLAUDE.md` or `AGENTS.md`. Reference them instead: "Follow the commit conventions in CLAUDE.md" rather than copying the entire format spec.
+
+## Avoid Time-Sensitive Information
+
+Don't include information that will become outdated:
+
+```markdown
+# Bad — will become wrong
+If you're doing this before August 2025, use the old API.
+
+# Good — use "old patterns" section
+## Current method
+Use the v2 API endpoint.
+
+## Legacy patterns (deprecated)
+The v1 API is no longer supported.
+```
+
+## Long Reference Files
+
+For reference files longer than 100 lines, include a table of contents at the top so agents can see the full scope when previewing:
+
+```markdown
+# API Reference
+
+## Contents
+- Authentication and setup
+- Core methods (create, read, update, delete)
+- Advanced features (batch operations, webhooks)
+- Error handling patterns
+
+## Authentication and setup
+...
+```
+
+For very large reference files (>10k words), include grep search patterns in SKILL.md so agents can find relevant sections:
+
+```markdown
+Find specific metrics using grep:
+- Revenue data: `grep -i "revenue" ${CLAUDE_SKILL_ROOT}/references/finance.md`
+- Pipeline data: `grep -i "pipeline" ${CLAUDE_SKILL_ROOT}/references/sales.md`
+```
