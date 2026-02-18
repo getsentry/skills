@@ -155,7 +155,8 @@ If this is a Sentry project (or sentry-skills plugin is installed), include:
   "Skill(sentry-skills:django-perf-review)",
   "Skill(sentry-skills:code-simplifier)",
   "Skill(sentry-skills:skill-creator)",
-  "Skill(sentry-skills:skill-scanner)"
+  "Skill(sentry-skills:skill-scanner)",
+  "Skill(sentry-skills:rust-development)"
 ]
 ```
 
