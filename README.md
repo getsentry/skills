@@ -228,6 +228,7 @@ The `code-simplifier` agent is vendored from [Anthropic's official plugins](http
 
 - [Agent Skills Specification](https://agentskills.io/specification)
 - [Sentry Engineering Practices](https://develop.sentry.dev/engineering-practices/)
+- [Skill Synthesis Guide](docs/skill-synthesis.md) — using your AI agent to research and improve skills
 
 ## License
 
