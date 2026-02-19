@@ -157,6 +157,7 @@ If this is a Sentry project (or sentry-skills plugin is installed), include:
   "Skill(sentry-skills:skill-creator)",
   "Skill(sentry-skills:skill-scanner)",
   "Skill(sentry-skills:local-repo)",
+  "Skill(sentry-skills:similar-sdks)"
 ]
 ```
 

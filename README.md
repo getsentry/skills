@@ -50,6 +50,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [skill-creator](plugins/sentry-skills/skills/skill-creator/SKILL.md) | Create new agent skills for this repository |
 | [skill-scanner](plugins/sentry-skills/skills/skill-scanner/SKILL.md) | Scan agent skills for security issues before adoption |
 | [local-repo](plugins/sentry-skills/skills/local-repo/SKILL.md) | Investigate, compare, and modify files in other local git repositories |
+| [similar-sdks](plugins/sentry-skills/skills/similar-sdks/SKILL.md) | Investigate how other Sentry SDKs in the same category implement a concept |
 
 ## Available Subagents
 
