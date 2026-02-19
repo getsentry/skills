@@ -100,7 +100,7 @@ Ensure:
 - Only one bullet point for each Result/Learning/Success
 
 *Step 7*
-Take all of the links for the project found in the Workflow Summary, and for any that were not linked as part of an Uncertainty, include them in the `Project Documentation & Links` section of the Project Summary.
+Take all of the links for the project found in the Work Summary, and for any that were not linked as part of an Uncertainty, include them in the `Project Documentation & Links` section of the Project Summary.
 
 Ensure:
 - Provide a list of all the specific links, not a summary or a general link for Github notifications.
