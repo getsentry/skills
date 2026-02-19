@@ -53,7 +53,7 @@ If the requested repo is not in the list, inform the user.
 For each directory in `repoDirs`, check if the repo exists by running a **separate** Bash call for each:
 
 ```bash
-test -d <repoDir>/<repo-name>/.git
+test -e <repoDir>/<repo-name>/.git
 ```
 
 Use the first match as `<repo-path>` for all subsequent steps. Do not assume the repo is in the first `repoDir` — check each one.
