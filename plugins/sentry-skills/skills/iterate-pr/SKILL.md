@@ -60,26 +60,11 @@ gh pr view --json number,url,headRefName
 
 Stop if no PR exists for the current branch.
 
-### 2. Check CI Status
+### 2. Gather Review Feedback
 
-Run `${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py` to get structured failure data.
+Run `${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py` to get categorized feedback already posted on the PR.
 
-**Wait if pending:** If review bot checks (sentry, warden, cursor, bugbot, seer, codeql) are still running, wait before proceeding—they post actionable feedback that must be evaluated. Informational bots (codecov) are not worth waiting for.
-
-### 3. Fix CI Failures
-
-For each failure in the script output:
-1. Read the `log_snippet` to understand the failure
-2. Read the relevant code before making changes
-3. Fix the issue with minimal, targeted changes
-
-Do NOT assume what failed based on check name alone—always read the logs.
-
-### 4. Gather Review Feedback
-
-Run `${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py` to get categorized feedback.
-
-### 5. Handle Feedback by LOGAF Priority
+### 3. Handle Feedback by LOGAF Priority
 
 **Auto-fix (no prompt):**
 - `high` - must address (blockers, security, changes requested)
@@ -106,6 +91,21 @@ Which would you like to address? (e.g., "1,3" or "all" or "none")
 - `resolved` threads
 - `bot` comments (informational only — Codecov, Dependabot, etc.)
 
+### 4. Check CI Status
+
+Run `${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py` to get structured failure data.
+
+**Wait if pending:** If review bot checks (sentry, warden, cursor, bugbot, seer, codeql) are still running, wait before proceeding—they post actionable feedback that must be evaluated. Informational bots (codecov) are not worth waiting for.
+
+### 5. Fix CI Failures
+
+For each failure in the script output:
+1. Read the `log_snippet` to understand the failure
+2. Read the relevant code before making changes
+3. Fix the issue with minimal, targeted changes
+
+Do NOT assume what failed based on check name alone—always read the logs.
+
 ### 6. Commit and Push
 
 ```bash
@@ -120,13 +120,24 @@ git push
 gh pr checks --watch --interval 30
 ```
 
-### 8. Repeat
+### 8. Re-check Feedback After CI
 
-Return to step 2 if CI failed or new feedback appeared.
+Review bots often post feedback seconds after CI checks complete. Wait briefly, then check again:
+
+```bash
+sleep 10
+uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py
+```
+
+Address any new high/medium feedback the same way as step 3. If new feedback requires code changes, return to step 6 to commit and push.
+
+### 9. Repeat
+
+Return to step 2 if CI failed or new feedback appeared in step 8.
 
 ## Exit Conditions
 
-**Success:** All checks pass, no unaddressed high/medium feedback (including review bot findings), user has decided on low-priority items.
+**Success:** All checks pass, post-CI feedback re-check is clean (no new unaddressed high/medium feedback including review bot findings), user has decided on low-priority items.
 
 **Ask for help:** Same failure after 3 attempts, feedback needs clarification, infrastructure issues.
 

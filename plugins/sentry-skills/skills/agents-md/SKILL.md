@@ -30,6 +30,7 @@ Read each skill's frontmatter to understand when to reference it.
 - **Reference, don't duplicate** - Point to skills: "Use `db-migrate` skill. See `.claude/skills/db-migrate/SKILL.md`"
 - **No filler** - No intros, conclusions, or pleasantries
 - **Trust capabilities** - Omit obvious context
+- **Skill updates** - ALWAYS use `/skill-creator` when creating or updating skills
 
 ## Required Sections
 
