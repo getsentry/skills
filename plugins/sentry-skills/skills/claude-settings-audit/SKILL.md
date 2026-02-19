@@ -79,6 +79,7 @@ Build the allow list by combining:
   "Bash(git tag:*)",
   "Bash(git stash list:*)",
   "Bash(git rev-parse:*)",
+  "Bash(gh pr create:*)",
   "Bash(gh pr view:*)",
   "Bash(gh pr list:*)",
   "Bash(gh pr checks:*)",
