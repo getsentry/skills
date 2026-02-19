@@ -164,5 +164,5 @@ Avoid these common mistakes:
 
 ## References
 
-- [Sentry Voice Guidelines](https://develop.sentry.dev/frontend/sentry-voice/)
+- [Sentry Voice Guidelines](https://github.com/getsentry/sentry/blob/master/static/app/components/core/principles/content-and-voice/content-and-voice.mdx)
 - [Sentry Frontend Handbook](https://develop.sentry.dev/frontend/)
