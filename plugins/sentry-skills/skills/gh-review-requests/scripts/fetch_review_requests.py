@@ -80,7 +80,7 @@ def main():
         requested_team_names = [t["name"] for t in reviewers_data.get("teams", [])]
         matching_teams = [
             t for t in requested_team_names
-            if any(slug.lower() in t.lower() or t.lower() in slug.lower() for slug in team_slugs)
+            if any(slug.lower() == t.lower() for slug in team_slugs)
         ]
 
         by_team_member = author in members
