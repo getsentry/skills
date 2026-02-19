@@ -60,6 +60,10 @@ Use the first match as `<repo-path>` for all subsequent steps. Do not assume the
 
 **IMPORTANT — Simple commands only:** Every Bash command in this skill MUST be a single, simple command. Do NOT chain commands with `&&`, `||`, or pipes (`|`). Do NOT use shell redirects (`2>/dev/null`, `2>&1`). These break user permission patterns. Run each command as its own separate Bash tool call instead.
 
+### If Multiple Repos Match
+
+If the exact name is not found, check the Step 2 listing for repos that contain `<repo-name>` as a substring. If there are multiple matches, use AskUserQuestion to ask the user which repo they meant. Then continue with the selected repo.
+
 ### If Not Found Locally
 
 1. Check GitHub: use WebFetch on `https://github.com/orgs/getsentry/repositories?type=source&q=<repo-name>` and look for a matching repository
