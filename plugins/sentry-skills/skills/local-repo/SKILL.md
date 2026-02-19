@@ -2,6 +2,7 @@
 name: local-repo
 description: Investigate, compare, and modify files in other local git repositories. Use when asked to "check another repo", "look at other repo", "compare repos", "local-repo", "cross-repo", "what does sentry-python do", or work with a repository outside the current working directory.
 argument-hint: "<repo-name> [file-pattern-or-query]"
+allowed-tools: Read, Glob, Bash, Edit, Write, Task, WebFetch, AskUserQuestion
 ---
 
 # Local Repository
