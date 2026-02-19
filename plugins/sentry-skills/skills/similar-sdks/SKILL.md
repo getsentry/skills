@@ -2,6 +2,7 @@
 name: similar-sdks
 description: Investigate how other Sentry SDKs in the same category implement a concept. Use when asked to "check other SDKs", "how do other SDKs do X", "similar SDKs", "cross-sdk comparison", "compare SDK implementations", "what do sibling SDKs do", or investigate a feature across backend, mobile, or frontend SDK groups.
 argument-hint: "[category:] <query>"
+allowed-tools: Read, Bash, Task, Skill
 ---
 
 # Similar SDKs
