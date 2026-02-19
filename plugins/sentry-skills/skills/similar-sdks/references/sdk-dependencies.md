@@ -75,3 +75,6 @@
 - sentry-cocoa
 - sentry-native
 - sentry-javascript
+
+## sentry-electron
+- sentry-javascript
