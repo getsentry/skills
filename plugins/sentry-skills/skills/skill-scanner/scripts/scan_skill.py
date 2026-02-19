@@ -18,10 +18,8 @@ from __future__ import annotations
 
 import base64
 import json
-import os
 import re
 import sys
-import unicodedata
 from pathlib import Path
 from typing import Any
 
@@ -363,7 +361,7 @@ def extract_urls(content: str, filepath: str) -> list[dict[str, Any]]:
 
 def compute_description_body_overlap(frontmatter: dict[str, Any] | None, body: str) -> float:
     """Compute keyword overlap between description and body as a heuristic."""
-    if not frontmatter or "description" not in frontmatter:
+    if not frontmatter or "description" not in frontmatter or frontmatter["description"] is None:
         return 0.0
 
     desc_words = set(re.findall(r"\b[a-z]{4,}\b", frontmatter["description"].lower()))
