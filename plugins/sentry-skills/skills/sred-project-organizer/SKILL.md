@@ -100,7 +100,11 @@ Ensure:
 - Only one bullet point for each Result/Learning/Success
 
 *Step 7*
-For any Notion documents, Github PRs or Linear tickets that were not linked as part of an Uncertainty, include them in the `Project Documentation & Links` section of the Project Summary.
+Take all of the links for the project found in the Workflow Summary, and for any that were not linked as part of an Uncertainty, include them in the `Project Documentation & Links` section of the Project Summary.
+
+Ensure:
+- Provide a list of all the specific links, not a summary or a general link for Github notifications.
+- Check that every link is directly related to the project and/or its uncertainties.
 
 *Step 8*
 Provide the user with the link to the Project Summary document again, and ask the user to review it before moving on to the next SREDable Project. Remind the user to fill out the Participants section of the document.
