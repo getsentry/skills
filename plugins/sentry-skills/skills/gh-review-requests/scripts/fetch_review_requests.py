@@ -27,7 +27,8 @@ def gh(path: str, paginate: bool = False) -> list | dict:
     if paginate:
         cmd.append("--paginate")
     result = subprocess.run(cmd, capture_output=True, text=True)
-    if result.returncode != 0:
+    if result.returncode != 0 or not result.stdout:
+        print(f"Error running gh {' '.join(cmd)}: {result.stderr}", file=sys.stderr)
         return [] if paginate else {}
     return json.loads(result.stdout)
 
@@ -77,7 +78,7 @@ def main():
         author = pr_data["user"]["login"]
 
         reviewers_data = gh(f"repos/{repo}/pulls/{pr_num}/requested_reviewers")
-        requested_team_names = [t["name"] for t in reviewers_data.get("teams", [])]
+        requested_team_names = [t["slug"] for t in reviewers_data.get("teams", [])]
         matching_teams = [
             t for t in requested_team_names
             if any(slug.lower() == t.lower() for slug in team_slugs)
