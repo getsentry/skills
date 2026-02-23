@@ -146,6 +146,6 @@ Return to step 2 if CI failed or new feedback appeared in step 8.
 ## Fallback
 
 If scripts fail, use `gh` CLI directly:
-- `gh pr checks --json name,state,bucket,link`
+- `gh pr checks name,state,bucket,link`
 - `gh run view <run-id> --log-failed`
 - `gh api repos/{owner}/{repo}/pulls/{number}/comments`
