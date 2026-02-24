@@ -143,7 +143,7 @@ Poll CI status and review feedback in a loop instead of blocking:
 
 ### 8. Repeat
 
-Return to step 2 if CI failed or new feedback appeared in step 7.
+If step 7 required code changes (from new feedback after CI passed), return to step 2 for a fresh cycle. CI failures during monitoring are already handled within step 7's polling loop.
 
 ## Exit Conditions
 
