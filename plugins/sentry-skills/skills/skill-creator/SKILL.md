@@ -44,7 +44,7 @@ Gather requirements before writing anything.
 | **With scripts** | `SKILL.md` + `scripts/` | Workflow automation needing Python scripts |
 | **Full** | All of the above | Complex skills with automation and domain knowledge |
 
-Read `${CLAUDE_SKILL_ROOT}/references/design-principles.md` for guidance on keeping skills focused and concise.
+Read `references/design-principles.md` for guidance on keeping skills focused and concise.
 
 ## Step 2: Plan the Skill
 
@@ -64,7 +64,7 @@ Example analysis:
 
 Before writing, study 1-2 existing skills that match the chosen tier. Look for skills in the target repository or plugin to understand local conventions.
 
-Read `${CLAUDE_SKILL_ROOT}/references/skill-patterns.md` for concrete examples of each tier.
+Read `references/skill-patterns.md` for concrete examples of each tier.
 
 Also read `CLAUDE.md` (or `AGENTS.md`) at the repository root for repo-specific conventions that the skill should follow.
 
@@ -93,7 +93,7 @@ description: <what it does>. Use when <trigger phrases>. <key capabilities>.
 - `metadata` — arbitrary key-value mapping for additional metadata
 - `compatibility` — environment requirements (max 500 chars); most skills don't need this
 
-For Claude Code-specific fields (`argument-hint`, `disable-model-invocation`, `context`, etc.), read `${CLAUDE_SKILL_ROOT}/references/claude-code-extensions.md`.
+For Claude Code-specific fields (`argument-hint`, `disable-model-invocation`, `context`, etc.), read `references/claude-code-extensions.md`.
 
 ### Description Guidelines
 
@@ -132,8 +132,8 @@ Write the body in **imperative voice** — these are instructions, not documenta
 5. End with validation criteria or exit conditions
 
 For workflow and output patterns, read:
-- `${CLAUDE_SKILL_ROOT}/references/workflow-patterns.md` — sequential workflows, feedback loops, plan-validate-execute
-- `${CLAUDE_SKILL_ROOT}/references/output-patterns.md` — template, examples, and structured data patterns
+- `references/workflow-patterns.md` — sequential workflows, feedback loops, plan-validate-execute
+- `references/output-patterns.md` — template, examples, and structured data patterns
 
 **Size limits:**
 - Keep SKILL.md under **500 lines** (< 5000 tokens recommended)
@@ -185,7 +185,7 @@ Use for domain knowledge the agent loads conditionally.
 
 Reference from SKILL.md with:
 ```markdown
-Read `${CLAUDE_SKILL_ROOT}/references/topic-a.md` for details on [topic].
+Read `references/topic-a.md` for details on [topic].
 ```
 
 Guidelines:
@@ -207,7 +207,7 @@ Use for workflow automation that benefits from structured Python.
 ```
 
 **Script requirements:**
-- Always use `uv run` to execute: `uv run ${CLAUDE_SKILL_ROOT}/scripts/do_thing.py`
+- Always use `uv run` to execute: `uv run scripts/do_thing.py`
 - Add PEP 723 inline metadata for dependencies:
 
 ```python
@@ -235,7 +235,7 @@ Include a LICENSE file in the skill directory when vendoring content with specif
 Run the validation script to catch issues early:
 
 ```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/quick_validate.py <path/to/skill-directory>
+uv run scripts/quick_validate.py <path/to/skill-directory>
 ```
 
 The script checks frontmatter format, required fields, naming rules, and common mistakes. Fix any errors and re-run until validation passes.
@@ -282,14 +282,14 @@ Run through this checklist before finishing:
 - [ ] Any repo-specific registration steps completed (check CLAUDE.md)
 
 ### Scripts (if applicable)
-- [ ] Uses `uv run ${CLAUDE_SKILL_ROOT}/scripts/...`
+- [ ] Uses `uv run scripts/...`
 - [ ] Has PEP 723 inline metadata
 - [ ] Outputs structured JSON
 - [ ] Handles errors explicitly
 - [ ] Documented in SKILL.md
 
 ### Validation
-- [ ] `uv run ${CLAUDE_SKILL_ROOT}/scripts/quick_validate.py` passes
+- [ ] `uv run scripts/quick_validate.py` passes
 - [ ] Tested with a real usage scenario
 
 Report any issues found and fix them before completing.

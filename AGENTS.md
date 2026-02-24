@@ -53,6 +53,8 @@ Instructions for the agent.
 
 When writing skills that include Python scripts, always instruct the agent to use `uv run <script>` instead of `python <script>` or `python3 <script>`.
 
+Use skill-root-relative paths for skill files (`scripts/...`, `references/...`, `assets/...`). Do not use `${CLAUDE_SKILL_ROOT}` or hardcoded repository paths.
+
 ## References
 
 - [Agent Skills Spec](https://agentskills.io/specification)

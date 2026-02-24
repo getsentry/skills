@@ -55,8 +55,8 @@ When branches get large, push them into separate reference files:
 ```markdown
 | Task Type | Read This Reference |
 |-----------|-------------------|
-| Creating documents | `${CLAUDE_SKILL_ROOT}/references/creation.md` |
-| Editing documents | `${CLAUDE_SKILL_ROOT}/references/editing.md` |
+| Creating documents | `references/creation.md` |
+| Editing documents | `references/editing.md` |
 ```
 
 ## Feedback Loops
@@ -67,7 +67,7 @@ Use a validate-fix-repeat pattern for tasks where output quality matters:
 ## Validation loop
 
 1. Make edits to the document
-2. Validate immediately: `uv run ${CLAUDE_SKILL_ROOT}/scripts/validate.py`
+2. Validate immediately: `uv run scripts/validate.py`
 3. If validation fails:
    - Review the error message
    - Fix the issues
@@ -87,9 +87,9 @@ For complex, high-stakes tasks, have the agent create a plan file before executi
 
 ```markdown
 1. Analyze the input and generate `changes.json` with planned modifications
-2. Validate the plan: `uv run ${CLAUDE_SKILL_ROOT}/scripts/validate_plan.py changes.json`
+2. Validate the plan: `uv run scripts/validate_plan.py changes.json`
 3. If validation fails, revise the plan and re-validate
-4. Execute the plan: `uv run ${CLAUDE_SKILL_ROOT}/scripts/apply_changes.py changes.json`
+4. Execute the plan: `uv run scripts/apply_changes.py changes.json`
 5. Verify the result
 ```
 

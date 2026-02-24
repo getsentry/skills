@@ -21,13 +21,13 @@ Accept either a team slug (`streaming-platform`) or a display name ("Streaming P
 ## Step 2: Run the Script
 
 ```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_review_requests.py --org getsentry --teams <team-slug>
+uv run scripts/fetch_review_requests.py --org getsentry --teams <team-slug>
 ```
 
 To filter by multiple teams, pass a comma-separated list:
 
 ```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_review_requests.py --org getsentry --teams <team slugs>
+uv run scripts/fetch_review_requests.py --org getsentry --teams <team slugs>
 ```
 
 ### Script output
