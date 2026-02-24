@@ -276,6 +276,7 @@ def extract_feedback_item(
     is_resolved: bool = False,
     is_outdated: bool = False,
     review_bot: bool = False,
+    thread_id: str | None = None,
 ) -> dict[str, Any]:
     """Create a standardized feedback item."""
     # Truncate long bodies for summary
@@ -300,6 +301,8 @@ def extract_feedback_item(
         item["outdated"] = True
     if review_bot:
         item["review_bot"] = True
+    if thread_id:
+        item["thread_id"] = thread_id
 
     return item
 
@@ -371,6 +374,7 @@ def main():
         is_resolved = thread.get("isResolved", False)
         is_outdated = thread.get("isOutdated", False)
 
+        thread_id = thread.get("id")
         item = extract_feedback_item(
             body=body,
             author=author,
@@ -378,9 +382,9 @@ def main():
             line=thread.get("line"),
             is_resolved=is_resolved,
             is_outdated=is_outdated,
+            thread_id=thread_id,
         )
 
-        thread_id = thread.get("id")
         if thread_id:
             seen_thread_ids.add(thread_id)
 
