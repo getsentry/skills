@@ -9,7 +9,7 @@ This skill enforces Sentry's blog writing standards across every post — whethe
 
 **The bar:** Every Sentry blog post should be something a senior engineer would share in their team's Slack, or reference in a technical decision.
 
-Before writing or reviewing any blog content, read the full writing guide at `references/writing-guide.md` for detailed examples, templates, and the complete checklist. What follows here are the core principles you must internalize and apply to every piece of content.
+What follows are the core principles to internalize and apply to every piece of content.
 
 ## The Sentry Voice
 
@@ -94,7 +94,7 @@ End with something useful — a link to docs, a way to try it, a call to give fe
 
 ## Post Types
 
-Refer to `references/writing-guide.md` for full templates, but here's the quick map:
+Here's the quick map by post type:
 
 | Type | Goal | Byline |
 |------|------|--------|
@@ -130,7 +130,7 @@ Posts worth sharing contain at least one of:
 
 ## When Reviewing or Editing a Draft
 
-Run through both checklists from `references/writing-guide.md`:
+Run through both checklists:
 
 **Technical Review:**
 - All technical claims accurate
