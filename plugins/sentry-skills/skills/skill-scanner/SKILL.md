@@ -11,7 +11,7 @@ allowed-tools: Read, Grep, Glob, Bash
 
 Scan agent skills for security issues before adoption. Detects prompt injection, malicious code, excessive permissions, secret exposure, and supply chain risks.
 
-**Important**: All scripts must be run from the repository root directory (where `.git` is located), not from the skill directory. Invoke scripts using their absolute paths.
+**Important**: Run all scripts from the repository root directory (where `.git` is located), not from the skill directory. Invoke scripts using their absolute paths, like `/path/to/skill/directory/scripts/script-to-execute`.
 
 ## Bundled Script
 

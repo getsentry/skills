@@ -9,7 +9,7 @@ Continuously iterate on the current branch until all CI checks pass and review f
 
 **Requires**: GitHub CLI (`gh`) authenticated.
 
-**Important**: All scripts must be run from the repository root directory (where `.git` is located), not from the skill directory. Invoke scripts using their absolute paths.
+**Important**: All scripts must be run from the repository root directory (where `.git` is located), not from the skill directory. Invoke scripts using their absolute paths, like `/path/to/skill/directory/scripts/script-to-execute`.
 
 ## Bundled Scripts
 
