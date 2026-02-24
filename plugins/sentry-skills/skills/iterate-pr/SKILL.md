@@ -70,6 +70,11 @@ Run `${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py` to get categorized feedb
 - `high` - must address (blockers, security, changes requested)
 - `medium` - should address (standard feedback)
 
+When fixing feedback:
+- Understand the root cause, not just the surface symptom
+- Check for similar issues in nearby code or related files
+- Fix all instances, not just the one mentioned
+
 This includes review bot feedback (items with `review_bot: true`). Treat it the same as human feedback:
 - Real issue found → fix it
 - False positive → skip, but explain why in a brief comment
@@ -100,13 +105,21 @@ Run `${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py` to get structured failure 
 ### 5. Fix CI Failures
 
 For each failure in the script output:
-1. Read the `log_snippet` to understand the failure
-2. Read the relevant code before making changes
-3. Fix the issue with minimal, targeted changes
+1. Read the `log_snippet` and trace backwards from the error to understand WHY it failed — not just what failed
+2. Read the relevant code and check for related issues (e.g., if a type error in one call site, check other call sites)
+3. Fix the root cause with minimal, targeted changes
+4. Find existing tests for the affected code and run them. If the fix introduces behavior not covered by existing tests, extend them to cover it (add a test case, not a whole new test file)
 
-Do NOT assume what failed based on check name alone—always read the logs.
+Do NOT assume what failed based on check name alone—always read the logs. Do NOT "quick fix and hope" — understand the failure thoroughly before changing code.
 
-### 6. Commit and Push
+### 6. Verify Locally, Then Commit and Push
+
+Before committing, verify your fixes locally:
+- If you fixed a test failure: re-run that specific test locally
+- If you fixed a lint/type error: re-run the linter or type checker on affected files
+- For any code fix: run existing tests covering the changed code
+
+If local verification fails, fix before proceeding — do not push known-broken code.
 
 ```bash
 git add <files>
@@ -114,32 +127,29 @@ git commit -m "fix: <descriptive message>"
 git push
 ```
 
-### 7. Wait for CI
+### 7. Monitor CI and Address Feedback
 
-```bash
-gh pr checks --watch --interval 30
-```
+Poll CI status and review feedback in a loop instead of blocking:
 
-### 8. Re-check Feedback After CI
+1. Run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py` to get current CI status
+2. If all checks passed → proceed to exit conditions
+3. If any checks failed (none pending) → return to step 5
+4. If checks are still pending:
+   a. Run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py` for new review feedback
+   b. Address any new high/medium feedback immediately (same as step 3)
+   c. If changes were needed, commit and push (this restarts CI), then continue polling
+   d. Sleep 30 seconds, then repeat from sub-step 1
+5. After all checks pass, do a final feedback check: `sleep 10`, then run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py`. Address any new high/medium feedback — if changes are needed, return to step 6.
 
-Review bots often post feedback seconds after CI checks complete. Wait briefly, then check again:
+### 8. Repeat
 
-```bash
-sleep 10
-uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py
-```
-
-Address any new high/medium feedback the same way as step 3. If new feedback requires code changes, return to step 6 to commit and push.
-
-### 9. Repeat
-
-Return to step 2 if CI failed or new feedback appeared in step 8.
+Return to step 2 if CI failed or new feedback appeared in step 7.
 
 ## Exit Conditions
 
 **Success:** All checks pass, post-CI feedback re-check is clean (no new unaddressed high/medium feedback including review bot findings), user has decided on low-priority items.
 
-**Ask for help:** Same failure after 3 attempts, feedback needs clarification, infrastructure issues.
+**Ask for help:** Same failure after 2 attempts, feedback needs clarification, infrastructure issues.
 
 **Stop:** No PR exists, branch needs rebase.
 
