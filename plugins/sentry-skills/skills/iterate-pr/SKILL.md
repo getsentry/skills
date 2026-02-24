@@ -9,7 +9,7 @@ Continuously iterate on the current branch until all CI checks pass and review f
 
 **Requires**: GitHub CLI (`gh`) authenticated.
 
-**Important**: All scripts must be run from the repository root directory (where `.git` is located), not from the skill directory. Use the full path to the script via `${CLAUDE_SKILL_ROOT}`.
+**Important**: All scripts must be run from the repository root directory (where `.git` is located), not from the skill directory. Invoke scripts using their absolute paths, like `/path/to/skill/directory/scripts/script-to-execute`.
 
 ## Bundled Scripts
 
@@ -18,7 +18,7 @@ Continuously iterate on the current branch until all CI checks pass and review f
 Fetches CI check status and extracts failure snippets from logs.
 
 ```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py [--pr NUMBER]
+uv run scripts/fetch_pr_checks.py [--pr NUMBER]
 ```
 
 Returns JSON:
@@ -38,7 +38,7 @@ Returns JSON:
 Fetches and categorizes PR review feedback using the [LOGAF scale](https://develop.sentry.dev/engineering-practices/code-review/#logaf-scale).
 
 ```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py [--pr NUMBER]
+uv run scripts/fetch_pr_feedback.py [--pr NUMBER]
 ```
 
 Returns JSON with feedback categorized as:
@@ -62,7 +62,7 @@ Stop if no PR exists for the current branch.
 
 ### 2. Gather Review Feedback
 
-Run `${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py` to get categorized feedback already posted on the PR.
+Run `scripts/fetch_pr_feedback.py` to get categorized feedback already posted on the PR.
 
 ### 3. Handle Feedback by LOGAF Priority
 
@@ -93,7 +93,7 @@ Which would you like to address? (e.g., "1,3" or "all" or "none")
 
 ### 4. Check CI Status
 
-Run `${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py` to get structured failure data.
+Run `scripts/fetch_pr_checks.py` to get structured failure data.
 
 **Wait if pending:** If review bot checks (sentry, warden, cursor, bugbot, seer, codeql) are still running, wait before proceeding—they post actionable feedback that must be evaluated. Informational bots (codecov) are not worth waiting for.
 
@@ -126,7 +126,7 @@ Review bots often post feedback seconds after CI checks complete. Wait briefly, 
 
 ```bash
 sleep 10
-uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py
+uv run scripts/fetch_pr_feedback.py
 ```
 
 Address any new high/medium feedback the same way as step 3. If new feedback requires code changes, return to step 6 to commit and push.
