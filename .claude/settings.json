@@ -55,7 +55,8 @@
       "Skill(sentry-skills:django-perf-review)",
       "Skill(sentry-skills:code-simplifier)",
       "Skill(sentry-skills:skill-creator)",
-      "Skill(sentry-skills:skill-scanner)"
+      "Skill(sentry-skills:skill-scanner)",
+      "Skill(sentry-skills:local-repo)"
     ],
     "deny": []
   },
