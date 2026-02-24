@@ -126,6 +126,17 @@ Concrete examples showing expected input/output.
 - Edge cases to handle
 ```
 
+#### Skill Path References
+
+Use skill-root-relative paths for files referenced inside `SKILL.md`.
+These references are relative to the skill directory (the directory containing `SKILL.md`), not the current working directory. When executing commands from elsewhere (for example, repo root), resolve them using the skill directory:
+
+- `scripts/...`
+- `references/...`
+- `assets/...`
+
+Do not use `${CLAUDE_SKILL_ROOT}` or hardcoded repository paths like `plugins/.../skills/...`.
+
 #### Naming Conventions
 
 - **name**: 1-64 characters, lowercase alphanumeric with hyphens only

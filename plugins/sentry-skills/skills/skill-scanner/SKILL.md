@@ -11,7 +11,7 @@ allowed-tools: Read, Grep, Glob, Bash
 
 Scan agent skills for security issues before adoption. Detects prompt injection, malicious code, excessive permissions, secret exposure, and supply chain risks.
 
-**Important**: Run all scripts from the repository root using the full path via `${CLAUDE_SKILL_ROOT}`.
+**Important**: All scripts must be run from the repository root directory (where `.git` is located), not from the skill directory. Invoke scripts using their absolute paths.
 
 ## Bundled Script
 
@@ -20,7 +20,7 @@ Scan agent skills for security issues before adoption. Detects prompt injection,
 Static analysis scanner that detects deterministic patterns. Outputs structured JSON.
 
 ```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/scan_skill.py <skill-directory>
+uv run scripts/scan_skill.py <skill-directory>
 ```
 
 Returns JSON with findings, URLs, structure info, and severity counts. The script catches patterns mechanically — your job is to evaluate intent and filter false positives.
@@ -48,7 +48,7 @@ ls <skill-directory>/scripts/ 2>/dev/null
 Run the bundled scanner:
 
 ```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/scan_skill.py <skill-directory>
+uv run scripts/scan_skill.py <skill-directory>
 ```
 
 Parse the JSON output. The script produces findings with severity levels, URL analysis, and structure information. Use these as leads for deeper analysis.
@@ -67,7 +67,7 @@ Read the SKILL.md and check:
 
 ### Phase 4: Prompt Injection Analysis
 
-Load `${CLAUDE_SKILL_ROOT}/references/prompt-injection-patterns.md` for context.
+Load `references/prompt-injection-patterns.md` for context.
 
 Review scanner findings in the "Prompt Injection" category. For each finding:
 
@@ -104,7 +104,7 @@ This phase is agent-only — no pattern matching. Read the full SKILL.md instruc
 
 If the skill has a `scripts/` directory:
 
-1. Load `${CLAUDE_SKILL_ROOT}/references/dangerous-code-patterns.md` for context
+1. Load `references/dangerous-code-patterns.md` for context
 2. Read each script file fully (do not skip any)
 3. Check scanner findings in the "Malicious Code" category
 4. For each finding, evaluate:
@@ -130,7 +130,7 @@ Review URLs from the scanner output and any additional URLs found in scripts:
 
 ### Phase 8: Permission Analysis
 
-Load `${CLAUDE_SKILL_ROOT}/references/permission-analysis.md` for the tool risk matrix.
+Load `references/permission-analysis.md` for the tool risk matrix.
 
 Evaluate:
 
