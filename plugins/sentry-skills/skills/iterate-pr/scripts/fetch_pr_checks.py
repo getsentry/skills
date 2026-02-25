@@ -48,12 +48,33 @@ def get_pr_info(pr_number: int | None = None) -> dict[str, Any] | None:
 
 
 def get_checks(pr_number: int | None = None) -> list[dict[str, Any]]:
-    """Get all checks for a PR."""
-    args = ["pr", "checks", "--json", "name,state,bucket,link,workflow"]
+    """Get all checks for a PR by parsing tab-separated gh output."""
+    args = ["gh", "pr", "checks"]
     if pr_number:
-        args.insert(2, str(pr_number))
-    result = run_gh(args)
-    return result if isinstance(result, list) else []
+        args.append(str(pr_number))
+    try:
+        result = subprocess.run(
+            args,
+            capture_output=True,
+            text=True,
+        )
+        if not result.stdout.strip():
+            return []
+        checks = []
+        for line in result.stdout.strip().split("\n"):
+            if not line.strip():
+                continue
+            parts = line.split("\t")
+            if len(parts) >= 2:
+                checks.append({
+                    "name": parts[0].strip(),
+                    "bucket": parts[1].strip(),
+                    "link": parts[3].strip() if len(parts) > 3 else "",
+                    "workflow": "",
+                })
+        return checks
+    except Exception:
+        return []
 
 
 def get_failed_runs(branch: str) -> list[dict[str, Any]]:
