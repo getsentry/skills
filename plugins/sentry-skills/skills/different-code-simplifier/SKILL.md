@@ -1,5 +1,5 @@
 ---
-name: code-simplifier
+name: different-simplifier
 description: Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality. Use when asked to "simplify code", "clean up code", "refactor for clarity", "improve readability", or review recently modified code for elegance. Focuses on project-specific best practices.
 ---
 
@@ -70,31 +70,44 @@ Only refine code that has been recently modified or touched in the current sessi
 ### Before: Nested Ternaries
 
 ```typescript
-const status = isLoading ? 'loading' : hasError ? 'error' : isComplete ? 'complete' : 'idle';
+const status = isLoading
+  ? "loading"
+  : hasError
+    ? "error"
+    : isComplete
+      ? "complete"
+      : "idle";
 ```
 
 ### After: Clear Switch Statement
 
 ```typescript
-function getStatus(isLoading: boolean, hasError: boolean, isComplete: boolean): string {
-  if (isLoading) return 'loading';
-  if (hasError) return 'error';
-  if (isComplete) return 'complete';
-  return 'idle';
+function getStatus(
+  isLoading: boolean,
+  hasError: boolean,
+  isComplete: boolean,
+): string {
+  if (isLoading) return "loading";
+  if (hasError) return "error";
+  if (isComplete) return "complete";
+  return "idle";
 }
 ```
 
 ### Before: Overly Compact
 
 ```typescript
-const result = arr.filter(x => x > 0).map(x => x * 2).reduce((a, b) => a + b, 0);
+const result = arr
+  .filter((x) => x > 0)
+  .map((x) => x * 2)
+  .reduce((a, b) => a + b, 0);
 ```
 
 ### After: Clear Steps
 
 ```typescript
-const positiveNumbers = arr.filter(x => x > 0);
-const doubled = positiveNumbers.map(x => x * 2);
+const positiveNumbers = arr.filter((x) => x > 0);
+const doubled = positiveNumbers.map((x) => x * 2);
 const sum = doubled.reduce((a, b) => a + b, 0);
 ```
 
