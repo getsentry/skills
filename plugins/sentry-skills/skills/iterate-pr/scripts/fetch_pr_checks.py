@@ -57,6 +57,7 @@ def get_checks(pr_number: int | None = None) -> list[dict[str, Any]]:
             args,
             capture_output=True,
             text=True,
+            check=True,
         )
         checks = []
         for line in result.stdout.strip().split("\n"):
