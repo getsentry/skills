@@ -57,8 +57,9 @@ def get_checks(pr_number: int | None = None) -> list[dict[str, Any]]:
             args,
             capture_output=True,
             text=True,
-            check=True,
         )
+        if not result.stdout.strip():
+            return []
         checks = []
         for line in result.stdout.strip().split("\n"):
             if not line.strip():
@@ -72,7 +73,7 @@ def get_checks(pr_number: int | None = None) -> list[dict[str, Any]]:
                     "workflow": "",
                 })
         return checks
-    except (subprocess.CalledProcessError, Exception):
+    except Exception:
         return []
 
 
