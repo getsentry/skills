@@ -111,8 +111,8 @@ After processing each inline review comment, reply on the PR thread to acknowled
 
 **Reply format:**
 - 1-2 sentences: what was changed, why it's not an issue, or acknowledgment of declined items
-- End every reply with `\n\n- Claude Code`
-- Before replying, check if the thread already has a reply ending with `- Claude Code` to avoid duplicates on re-loops
+- End every reply with `\n\n*— Claude Code*`
+- Before replying, check if the thread already has a reply ending with `*- Claude Code*` or `*— Claude Code*` to avoid duplicates on re-loops
 - If the `gh api` call fails, log and continue — do not block the workflow
 
 ### 4. Check CI Status
