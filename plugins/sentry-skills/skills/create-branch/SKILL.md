@@ -78,78 +78,31 @@ Present it to the user and ask if they want to use it, modify it, or change the 
 
 ## Step 5: Create the Branch
 
-Once confirmed, first detect the default branch and the current branch:
+Once confirmed, detect the current and default branch:
 
 ```bash
-# Get current branch
 git branch --show-current
-
-# Detect the primary remote: use "origin" if it exists, otherwise use the first listed remote
 git remote | grep -qx origin && echo origin || git remote | head -1
-
-# Detect default branch using the detected remote (try in order until one succeeds)
-# Replace <remote> with the result above (or "origin" if empty)
 git symbolic-ref refs/remotes/<remote>/HEAD 2>/dev/null | sed 's|refs/remotes/<remote>/||' | tr -d '[:space:]'
 ```
 
-If the `symbolic-ref` command above fails (e.g. single-branch clone or remote HEAD not set), run:
+If `symbolic-ref` fails, fall back to `git branch --list main master`: use the one that exists; if both or neither exist, ask the user.
 
-```bash
-git branch --list main master
-```
-
-- If only `main` exists → default is `main`
-- If only `master` exists → default is `master`
-- If both exist → ask the user which is the default
-- If neither exists → ask the user what the default branch is
-
-If `git branch --show-current` returns empty, the repo is in a detached HEAD state. Run `git rev-parse --short HEAD` to get the current commit. Warn the user they are in a detached HEAD state and ask whether to branch from that commit or switch to the default branch first.
+If `git branch --show-current` is empty (detached HEAD), show the current commit (`git rev-parse --short HEAD`) and ask whether to branch from it or switch to the default branch first.
 
 Otherwise, if the current branch is not the default branch, warn the user and ask whether to branch from the current branch or switch to the default branch first.
 
-If the user chooses to switch to the default branch first, check for uncommitted changes first:
+If the user wants to switch to the default branch, handle any uncommitted changes appropriately (offer to stash them if present), then run `git checkout <default-branch>`. On any failure, restore stashed changes if applicable and stop.
 
-```bash
-git status --short
-```
+Before creating the branch, check that the name doesn't already exist locally or on the remote (`git show-ref`). If it does, ask the user to choose a different name.
 
-If there are uncommitted changes, warn the user and ask whether to stash them (`git stash`) or abort. If the user chooses to abort, stop here — do not create a branch.
-
-If the user chooses to stash, run `git stash` before switching. If the user cancels or aborts at any point from here until the branch is successfully created, run `git stash pop` to restore their changes before stopping.
-
-Then:
-
-```bash
-git checkout <default-branch>
-```
-
-If the checkout fails, run `git stash pop` to restore the changes and stop — do not create a branch.
-
-Before creating the branch, check if a branch with that name already exists locally or on the remote:
-
-```bash
-git show-ref --verify --quiet refs/heads/<branch-name>
-git show-ref --verify --quiet refs/remotes/<remote>/<branch-name>
-```
-
-If either check succeeds, the branch name already exists — regardless of whether changes were stashed:
-
-1. If changes were stashed, restore them first (`git stash pop`) and clear the "stashed" flag so the final restore step does not run again.
-2. Inform the user the branch name already exists and ask them to choose a different name (return to Step 4).
-
-Otherwise, create the branch:
+Create the branch:
 
 ```bash
 git checkout -b <branch-name>
 ```
 
-If the branch creation fails and changes were stashed, run `git stash pop` to restore the changes and stop.
-
-If changes were stashed earlier **and have not already been restored** (i.e., no branch-name collision occurred on this attempt), restore them now:
-
-```bash
-git stash pop
-```
+Restore any stashed changes after the branch is created.
 
 ## References
 
