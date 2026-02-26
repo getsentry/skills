@@ -84,11 +84,15 @@ Once confirmed, first detect the default branch and the current branch:
 # Get current branch
 git branch --show-current
 
-# Detect default branch (try in order until one succeeds)
-git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' | tr -d '[:space:]'
+# Detect the primary remote (use "origin" if the output is empty)
+git remote | head -1
+
+# Detect default branch using the detected remote (try in order until one succeeds)
+# Replace <remote> with the result above (or "origin" if empty)
+git symbolic-ref refs/remotes/<remote>/HEAD 2>/dev/null | sed 's|refs/remotes/<remote>/||' | tr -d '[:space:]'
 ```
 
-If the above fails (e.g. single-branch clone or remote HEAD not set), run:
+If the `symbolic-ref` command above fails (e.g. single-branch clone or remote HEAD not set), run:
 
 ```bash
 git branch --list main master
@@ -121,7 +125,7 @@ Before creating the branch, check if a branch with that name already exists loca
 
 ```bash
 git show-ref --verify --quiet refs/heads/<branch-name>
-git show-ref --verify --quiet refs/remotes/origin/<branch-name>
+git show-ref --verify --quiet refs/remotes/<remote>/<branch-name>
 ```
 
 If either check succeeds, and changes were stashed, restore them first (`git stash pop`), then inform the user the branch name already exists and ask them to choose a different name (return to Step 4).
