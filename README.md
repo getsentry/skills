@@ -56,6 +56,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | Subagent | Description |
 |----------|-------------|
 | [code-simplifier](plugins/sentry-skills/agents/code-simplifier.md) | Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality |
+| [senpai](plugins/sentry-skills/agents/senpai.md) | Senior engineer and technical mentor for new Sentry hires. Explains infrastructure, architecture, and engineering concepts step-by-step with references |
 
 ## Contributing
 
