@@ -17,12 +17,7 @@ git branch --show-current
 
 **If you're on `main` or `master`, you MUST create a feature branch first** — unless the user explicitly asked to commit to main. Do not ask for confirmation; default to creating the branch.
 
-```bash
-# Create and switch to a new branch
-git checkout -b <type>/<short-description>
-```
-
-Branch naming should follow the pattern: `<type>/<short-description>` where type matches the commit type (e.g., `feat/add-user-auth`, `fix/null-pointer-error`, `ref/extract-validation`).
+Use the `create-branch` skill to create the branch.
 
 ## Format
 
