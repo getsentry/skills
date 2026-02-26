@@ -128,7 +128,7 @@ git show-ref --verify --quiet refs/heads/<branch-name>
 git show-ref --verify --quiet refs/remotes/<remote>/<branch-name>
 ```
 
-If either check succeeds, and changes were stashed, restore them first (`git stash pop`), then inform the user the branch name already exists and ask them to choose a different name (return to Step 4).
+If either check succeeds, inform the user the branch name already exists and ask them to choose a different name. If changes were stashed, restore them first (`git stash pop`) before returning to Step 4, and clear the "stashed" flag so the final restore step does not run again.
 
 Otherwise, create the branch:
 
@@ -136,7 +136,7 @@ Otherwise, create the branch:
 git checkout -b <branch-name>
 ```
 
-If changes were stashed earlier, restore them now:
+If changes were stashed earlier **and have not already been restored** (i.e., no branch-name collision occurred on this attempt), restore them now:
 
 ```bash
 git stash pop
