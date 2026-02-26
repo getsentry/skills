@@ -77,21 +77,34 @@ Present it to the user and ask if they want to use it, modify it, or change the 
 
 ## Step 5: Create the Branch
 
-Once confirmed:
+Once confirmed, first detect the default branch and the current branch:
+
+```bash
+# Get current branch
+git branch --show-current
+
+# Detect default branch (try in order until one succeeds)
+git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||'
+```
+
+If the above fails (e.g. single-branch clone or remote HEAD not set), run:
+
+```bash
+git branch --list main master
+```
+
+- If only `main` exists → default is `main`
+- If only `master` exists → default is `master`
+- If both exist → default is `main`
+- If neither exists → default is `main`
+
+If the current branch is not the default branch, warn the user and ask whether to branch from the current branch or switch to the default branch first.
+
+Then create the branch:
 
 ```bash
 git checkout -b <branch-name>
 ```
-
-If already on a non-default branch, warn the user and ask whether to branch from here or from the default branch first.
-
-To detect the default branch:
-
-```bash
-git symbolic-ref refs/remotes/origin/HEAD | sed 's|refs/remotes/origin/||'
-```
-
-If that fails, fall back to checking whether `main` or `master` exists locally.
 
 ## References
 
