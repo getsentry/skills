@@ -84,8 +84,8 @@ Once confirmed, first detect the default branch and the current branch:
 # Get current branch
 git branch --show-current
 
-# Detect the primary remote (use "origin" if the output is empty)
-git remote | head -1
+# Detect the primary remote: use "origin" if it exists, otherwise use the first listed remote
+git remote | grep -qx origin && echo origin || git remote | head -1
 
 # Detect default branch using the detected remote (try in order until one succeeds)
 # Replace <remote> with the result above (or "origin" if empty)
@@ -115,7 +115,9 @@ git status --short
 
 If there are uncommitted changes, warn the user and ask whether to stash them (`git stash`) or abort. If the user chooses to abort, stop here — do not create a branch.
 
-If the user chooses to stash, run `git stash` before switching, then:
+If the user chooses to stash, run `git stash` before switching. If the user cancels or aborts at any point from here until the branch is successfully created, run `git stash pop` to restore their changes before stopping.
+
+Then:
 
 ```bash
 git checkout <default-branch>
