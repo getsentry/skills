@@ -10,11 +10,11 @@ Create a git branch with the correct type prefix and a descriptive name followin
 
 ## Step 1: Get the Username Prefix
 
-Run `git config user.name` and extract the **first name only**, lowercased.
+Run `git config user.name`, take the first word, lowercase it, and remove any characters that are not ASCII letters or digits (e.g. accents, punctuation).
 
-Example: "Priscila Oliveira" becomes `priscila`.
+Example: "Priscila Oliveira" → `priscila`, "José García" → `jose`.
 
-If empty, ask the user for their preferred prefix.
+If the result is empty, ask the user for their preferred prefix.
 
 ## Step 2: Determine the Branch Description
 
@@ -23,12 +23,12 @@ If empty, ask the user for their preferred prefix.
 **If no arguments**, check for local changes:
 
 ```bash
-git diff --stat
-git diff --cached --stat
+git diff
+git diff --cached
 git status --short
 ```
 
-- **Changes exist**: read the diff to understand what the work is about and generate a description.
+- **Changes exist**: read the diff content to understand what the work is about and generate a description.
 - **No changes**: ask the user what they are about to work on.
 
 ## Step 3: Classify the Type
@@ -95,7 +95,7 @@ git branch --list main master
 
 - If only `main` exists → default is `main`
 - If only `master` exists → default is `master`
-- If both exist → default is `main`
+- If both exist → ask the user which is the default
 - If neither exists → ask the user what the default branch is
 
 If `git branch --show-current` returns empty, the repo is in a detached HEAD state. Run `git rev-parse --short HEAD` to get the current commit. Warn the user they are in a detached HEAD state and ask whether to branch from that commit or switch to the default branch first.
