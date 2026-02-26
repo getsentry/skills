@@ -96,7 +96,7 @@ git branch --list main master
 - If only `main` exists → default is `main`
 - If only `master` exists → default is `master`
 - If both exist → default is `main`
-- If neither exists → default is `main`
+- If neither exists → ask the user what the default branch is
 
 If the current branch is not the default branch, warn the user and ask whether to branch from the current branch or switch to the default branch first.
 
