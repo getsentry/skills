@@ -102,6 +102,12 @@ If `git branch --show-current` returns empty, the repo is in a detached HEAD sta
 
 Otherwise, if the current branch is not the default branch, warn the user and ask whether to branch from the current branch or switch to the default branch first.
 
+If the user chooses to switch to the default branch first, run:
+
+```bash
+git checkout <default-branch>
+```
+
 Then create the branch:
 
 ```bash
