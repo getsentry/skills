@@ -127,6 +127,12 @@ If the local branch already exists, inform the user and ask them to choose a dif
 git checkout -b <branch-name>
 ```
 
+If changes were stashed earlier in this step, restore them now:
+
+```bash
+git stash pop
+```
+
 ## References
 
 - [Sentry Branch Naming](https://develop.sentry.dev/sdk/getting-started/standards/code-submission/#branch-naming)
