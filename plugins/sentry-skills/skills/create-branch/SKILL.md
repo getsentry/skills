@@ -128,7 +128,10 @@ git show-ref --verify --quiet refs/heads/<branch-name>
 git show-ref --verify --quiet refs/remotes/<remote>/<branch-name>
 ```
 
-If either check succeeds, inform the user the branch name already exists and ask them to choose a different name. If changes were stashed, restore them first (`git stash pop`) before returning to Step 4, and clear the "stashed" flag so the final restore step does not run again.
+If either check succeeds, the branch name already exists — regardless of whether changes were stashed:
+
+1. If changes were stashed, restore them first (`git stash pop`) and clear the "stashed" flag so the final restore step does not run again.
+2. Inform the user the branch name already exists and ask them to choose a different name (return to Step 4).
 
 Otherwise, create the branch:
 
