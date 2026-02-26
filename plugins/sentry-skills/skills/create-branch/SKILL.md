@@ -98,7 +98,9 @@ git branch --list main master
 - If both exist → default is `main`
 - If neither exists → ask the user what the default branch is
 
-If the current branch is not the default branch, warn the user and ask whether to branch from the current branch or switch to the default branch first.
+If `git branch --show-current` returns empty, the repo is in a detached HEAD state. Run `git rev-parse --short HEAD` to get the current commit. Warn the user they are in a detached HEAD state and ask whether to branch from that commit or switch to the default branch first.
+
+Otherwise, if the current branch is not the default branch, warn the user and ask whether to branch from the current branch or switch to the default branch first.
 
 Then create the branch:
 
