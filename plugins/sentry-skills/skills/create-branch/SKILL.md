@@ -85,7 +85,7 @@ Once confirmed, first detect the default branch and the current branch:
 git branch --show-current
 
 # Detect default branch (try in order until one succeeds)
-git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||'
+git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' | tr -d '[:space:]'
 ```
 
 If the above fails (e.g. single-branch clone or remote HEAD not set), run:
@@ -109,7 +109,9 @@ If the user chooses to switch to the default branch first, check for uncommitted
 git status --short
 ```
 
-If there are uncommitted changes, warn the user and ask whether to stash them (`git stash`) or abort. If the user chooses to stash, run `git stash` before switching. Then run:
+If there are uncommitted changes, warn the user and ask whether to stash them (`git stash`) or abort. If the user chooses to abort, stop here — do not create a branch.
+
+If the user chooses to stash, run `git stash` before switching, then:
 
 ```bash
 git checkout <default-branch>
@@ -122,13 +124,15 @@ git show-ref --verify --quiet refs/heads/<branch-name>
 git show-ref --verify --quiet refs/remotes/origin/<branch-name>
 ```
 
-If either check succeeds, inform the user and ask them to choose a different name. Otherwise, create the branch:
+If either check succeeds, and changes were stashed, restore them first (`git stash pop`), then inform the user the branch name already exists and ask them to choose a different name (return to Step 4).
+
+Otherwise, create the branch:
 
 ```bash
 git checkout -b <branch-name>
 ```
 
-If changes were stashed earlier in this step, restore them now:
+If changes were stashed earlier, restore them now:
 
 ```bash
 git stash pop
