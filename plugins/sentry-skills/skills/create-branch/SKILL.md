@@ -121,6 +121,8 @@ If the user chooses to stash, run `git stash` before switching, then:
 git checkout <default-branch>
 ```
 
+If the checkout fails, run `git stash pop` to restore the changes and stop — do not create a branch.
+
 Before creating the branch, check if a branch with that name already exists locally or on the remote:
 
 ```bash
@@ -138,6 +140,8 @@ Otherwise, create the branch:
 ```bash
 git checkout -b <branch-name>
 ```
+
+If the branch creation fails and changes were stashed, run `git stash pop` to restore the changes and stop.
 
 If changes were stashed earlier **and have not already been restored** (i.e., no branch-name collision occurred on this attempt), restore them now:
 
