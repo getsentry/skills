@@ -56,7 +56,8 @@
       "Skill(sentry-skills:code-simplifier)",
       "Skill(sentry-skills:skill-creator)",
       "Skill(sentry-skills:skill-scanner)",
-      "Skill(sentry-skills:blog-writing-guide)"
+      "Skill(sentry-skills:blog-writing-guide)",
+      "Skill(sentry-skills:create-branch)"
     ],
     "deny": []
   },
