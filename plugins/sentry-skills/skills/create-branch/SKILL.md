@@ -10,7 +10,7 @@ Create a git branch with the correct type prefix and a descriptive name followin
 
 ## Step 1: Get the Username Prefix
 
-Run `git config user.name`, take the first word, lowercase it, and remove any characters that are not ASCII letters or digits (e.g. accents, punctuation).
+Run `git config user.name`, take the first word, lowercase it, transliterate accented characters to their ASCII equivalents (e.g. é→e, í→i, ñ→n), then remove any remaining characters that are not ASCII letters or digits.
 
 Example: "Priscila Oliveira" → `priscila`, "José García" → `jose`.
 
@@ -61,6 +61,7 @@ Rules for `<short-description>`:
 - Kebab-case, lowercase
 - 3 to 6 words, concise but clear
 - Describe the change, not file names
+- Only use ASCII letters, digits, and hyphens — no spaces, dots, colons, tildes, or other git-forbidden characters
 
 Present it to the user and ask if they want to use it, modify it, or change the type.
 
@@ -102,13 +103,25 @@ If `git branch --show-current` returns empty, the repo is in a detached HEAD sta
 
 Otherwise, if the current branch is not the default branch, warn the user and ask whether to branch from the current branch or switch to the default branch first.
 
-If the user chooses to switch to the default branch first, run:
+If the user chooses to switch to the default branch first, check for uncommitted changes first:
+
+```bash
+git status --short
+```
+
+If there are uncommitted changes, warn the user and ask whether to stash them (`git stash`) or abort. If the user chooses to stash, run `git stash` before switching. Then run:
 
 ```bash
 git checkout <default-branch>
 ```
 
-Then create the branch:
+Before creating the branch, check if a branch with that name already exists:
+
+```bash
+git rev-parse --verify --quiet <branch-name>
+```
+
+If the branch already exists, inform the user and ask them to choose a different name. Otherwise, create the branch:
 
 ```bash
 git checkout -b <branch-name>
