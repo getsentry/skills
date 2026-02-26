@@ -115,13 +115,14 @@ If there are uncommitted changes, warn the user and ask whether to stash them (`
 git checkout <default-branch>
 ```
 
-Before creating the branch, check if a local branch with that name already exists:
+Before creating the branch, check if a branch with that name already exists locally or on the remote:
 
 ```bash
 git show-ref --verify --quiet refs/heads/<branch-name>
+git show-ref --verify --quiet refs/remotes/origin/<branch-name>
 ```
 
-If the local branch already exists, inform the user and ask them to choose a different name. Otherwise, create the branch:
+If either check succeeds, inform the user and ask them to choose a different name. Otherwise, create the branch:
 
 ```bash
 git checkout -b <branch-name>
