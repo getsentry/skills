@@ -1,5 +1,8 @@
 # Sentry Skills
 
+> [!NOTE]
+> For skills to help set up Sentry in your project or debug production issues, see https://github.com/getsentry/sentry-for-ai
+
 Agent skills for Sentry employees, following the [Agent Skills](https://agentskills.io) open format.
 
 ## Installation
