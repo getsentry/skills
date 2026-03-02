@@ -101,21 +101,23 @@ jobs:
 
 ### Commit Message Injection
 
-On `push` triggers, commit messages are attacker-controlled:
+On `push` triggers, commit messages are technically injectable — but **only if the push trigger accepts pushes from untrusted sources** (e.g., unprotected branches that anyone can push to). On protected branches (e.g., `main`, `master`), pushing requires write access, so the attacker already has full repo access and this is **not a meaningful finding**.
 
 ```yaml
-# VULNERABLE
-on: push
+# NOT TYPICALLY VULNERABLE: push to protected branch requires write access
+on:
+  push:
+    branches: [main]
 steps:
   - run: echo "Commit: ${{ github.event.commits[0].message }}"
 ```
 
-### workflow_dispatch Input Injection
+### workflow_dispatch Input Injection — NOT A FINDING
 
-Manual dispatch inputs are user-provided strings:
+`workflow_dispatch` requires **write access** to the repository to trigger. Someone with write access can already push arbitrary code directly, so injection via dispatch inputs adds no additional risk. **Do not report this pattern.**
 
 ```yaml
-# VULNERABLE
+# NOT A FINDING: requires write access to trigger
 on:
   workflow_dispatch:
     inputs:
@@ -128,8 +130,6 @@ jobs:
     steps:
       - run: echo "Releasing ${{ github.event.inputs.version }}"
 ```
-
-Even though `workflow_dispatch` requires repo access to trigger, the input is still a free-form string that can contain shell metacharacters.
 
 ---
 
@@ -145,11 +145,10 @@ done
 # Specifically look for dangerous expressions in run blocks
 grep -B5 -A5 '\${{.*github\.event\.' .github/workflows/*.yml | grep -B5 'run:'
 
-# Find head_ref usage
+# Find head_ref usage (dangerous in PR-triggered workflows)
 grep -rn 'github\.head_ref\|pull_request\.head\.ref\|pull_request\.head\.label' .github/workflows/
 
-# Find workflow_dispatch inputs used in run blocks
-grep -A30 'workflow_dispatch' .github/workflows/*.yml | grep '\${{.*inputs\.'
+# NOTE: Do NOT flag workflow_dispatch inputs — requires write access, not an external threat
 ```
 
 ---

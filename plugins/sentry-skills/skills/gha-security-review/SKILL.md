@@ -13,9 +13,11 @@ by StepSecurity (2025): https://www.stepsecurity.io/blog/hackerbot-claw-github-a
 
 Find exploitable vulnerabilities in GitHub Actions workflows. Every finding MUST include a concrete exploitation scenario — if you can't build the attack, don't report it.
 
-## Core Principle
+## Core Principles
 
-**Exploitation over theory.** For each finding, you must provide:
+### Exploitation over theory
+
+For each finding, you must provide:
 
 1. **Entry point** — How does the attacker get in? (fork PR, issue comment, branch name, etc.)
 2. **Payload** — What does the attacker send? (actual code/YAML/input)
@@ -24,6 +26,31 @@ Find exploitable vulnerabilities in GitHub Actions workflows. Every finding MUST
 5. **PoC sketch** — A concrete step-by-step an attacker would follow
 
 If you cannot construct all five elements, downgrade to "Needs Verification" — do not report as a confirmed finding.
+
+### External attacker threat model
+
+Only report vulnerabilities exploitable by someone **without existing write access** to the repository. If a vulnerability requires the attacker to already have write/admin access (e.g., triggering `workflow_dispatch`, pushing to a protected branch), it is **not a finding** — someone with write access can already push arbitrary code directly.
+
+This means **do not flag**:
+- `workflow_dispatch` input injection — requires write access to trigger
+- Expression injection in `push`-only workflows on protected branches — requires write access to push
+- `workflow_call` input injection where all callers are internal — no external entry point
+- Secrets in `workflow_dispatch`/`schedule`-only workflows — only maintainers can trigger
+
+The threat model is: **anonymous user or fork PR author** who can open PRs, create issues, or post comments — but cannot push to branches or trigger manual workflows.
+
+### Validate before reporting
+
+Before including any finding in the report, you MUST prove it is real by reading the actual workflow YAML and tracing the complete attack path. Pattern matching is not enough — you must confirm every link in the chain:
+
+1. **Read the workflow file** — don't rely on grep output alone. Read the full YAML to understand job structure, conditions, and step ordering.
+2. **Trace the trigger** — confirm the workflow actually fires on the event you think it does. Check `if:` conditions on jobs and steps that might gate execution.
+3. **Trace the expression** — for injection findings, confirm the `${{ }}` expression actually appears inside a `run:` block (not `if:`, `with:`, or `env:` at job level). Read the surrounding lines.
+4. **Trace the checkout** — for pwn requests, confirm `actions/checkout` actually references the fork's ref (`head.sha`, `head.ref`), not just the base branch.
+5. **Confirm the value is attacker-controlled** — verify the expression maps to something an external attacker can set (PR title, branch name, comment body), not something that requires write access.
+6. **Check for existing mitigations** — look for `if:` conditions that restrict execution, `author_association` checks, environment variable wrapping, or permissions that limit impact.
+
+If any link in the chain is broken or uncertain, the finding is **not confirmed**. Move it to "Needs Verification" with a note about what couldn't be confirmed.
 
 ---
 
@@ -59,8 +86,13 @@ Before reporting, check if the pattern is actually safe:
 | Actions pinned to full SHA (`uses: actions/checkout@8e5e7e5a...`) | Immutable reference |
 | `pull_request` trigger (not `_target`) | Runs in fork context with read-only token |
 | `${{ github.event.pull_request.head.sha }}` used only in `if:` | Not shell-expanded |
+| `${{ github.event.inputs.* }}` in `workflow_dispatch` workflows | Requires write access to trigger — not an external threat |
+| `${{ github.event.commits[*].message }}` on `push` to protected branches | Requires write access to push — not an external threat |
+| Any expression in a `workflow_dispatch`-only or `schedule`-only workflow | No external attacker can trigger these |
 
 **Key distinction:** `${{ }}` is dangerous in `run:` blocks (shell expansion) but safe in `if:`, `with:`, and `env:` at the job/step level (Actions runtime evaluation).
+
+**Key distinction:** An injectable expression only matters if an **external attacker** can control the value. If triggering the workflow already requires write access, the injection adds no additional risk.
 
 ---
 
@@ -84,13 +116,13 @@ For each workflow, identify triggers and load the appropriate references:
 |---------|------------|-------------------|
 | `pull_request_target` | **Critical** | `references/pwn-request.md` |
 | `issue_comment` with command parsing | **High** | `references/comment-triggered-commands.md` |
-| `workflow_dispatch` with inputs in `run:` | **High** | `references/expression-injection.md` |
-| `issues` / `pull_request` / `push` with `${{ }}` in `run:` | **High** | `references/expression-injection.md` |
-| Any workflow using PATs/deploy keys | **High** | `references/credential-escalation.md` |
+| `issues` / `pull_request` with `${{ }}` in `run:` | **High** | `references/expression-injection.md` |
+| Any workflow using PATs/deploy keys accessible to untrusted code | **High** | `references/credential-escalation.md` |
 | Workflows that checkout PR code + read config files | **Medium** | `references/ai-prompt-injection-via-ci.md` |
-| Workflows using third-party actions | **Medium** | `references/supply-chain.md` |
+| Workflows using third-party actions (especially unpinned) | **Medium** | `references/supply-chain.md` |
 | Workflows with `permissions:` block or secrets | **Medium** | `references/permissions-and-secrets.md` |
 | Self-hosted runners or cache/artifact usage | **Medium** | `references/runner-infrastructure.md` |
+| `workflow_dispatch` / `schedule` / `push` to protected branches | **Skip** | Requires write access — not an external threat. Do not analyze for injection. |
 
 **Load references selectively** — only load what's relevant to the triggers found.
 
@@ -105,10 +137,12 @@ Does the workflow use `pull_request_target` AND check out fork code?
 - Check if any `run:` step executes code from the checked-out PR
 
 #### Check 2: Expression Injection
-Are `${{ }}` expressions used inside `run:` blocks?
+Are `${{ }}` expressions used inside `run:` blocks in workflows triggerable by external attackers?
 - Map every `${{ }}` expression in every `run:` step
 - Cross-reference against the Attacker-Controlled Expressions table below
-- Check `workflow_dispatch` inputs used in `run:` blocks
+- **Skip** `workflow_dispatch` inputs — these require write access and are not an external threat
+- **Skip** expressions in workflows that only trigger on `push` to protected branches or `schedule`
+- Only flag expressions where an **external attacker** (fork PR author, issue creator, commenter) controls the value
 
 #### Check 3: Unauthorized Command Execution
 Does an `issue_comment`-triggered workflow execute commands without authorization?
@@ -154,17 +188,39 @@ IMPACT: [What attacker gains — e.g., "GITHUB_TOKEN with contents:write exfiltr
 
 If you cannot fill in all fields with concrete values, the finding is not confirmed.
 
-### Phase 5: Verify Mitigations
+### Phase 5: Validate and Verify
 
-For each confirmed finding, check if mitigations exist:
+**Every finding must survive this gauntlet before being reported.** Read the actual workflow YAML (don't rely on search snippets) and confirm each point:
 
+#### 5a: Prove the attack path exists
+
+| Check | How to Validate | If It Fails |
+|-------|----------------|-------------|
+| Trigger is externally accessible | Workflow uses `pull_request_target`, `issue_comment`, `issues`, or `pull_request` — NOT only `workflow_dispatch`/`schedule`/`push` to protected branch | Drop the finding |
+| Expression is in a shell context | The `${{ }}` appears inside a `run:` block, not in `if:`, `with:`, or job-level `env:` | Drop the finding |
+| Value is attacker-controlled | Expression maps to PR title, body, branch name, comment body, etc. — not to `number`, `sha`, `repository` | Drop the finding |
+| Checkout references fork code | `actions/checkout` uses `ref: ${{ github.event.pull_request.head.sha }}` or `.head.ref` | Drop the finding (for pwn request) |
+| Code executes after checkout | A `run:` step or local action usage follows the checkout | Drop the finding (for pwn request) |
+
+#### 5b: Check for existing mitigations
+
+- **Does exploiting this require write access?** If the only trigger is `workflow_dispatch`, `schedule`, or `push` to a protected branch, **drop the finding entirely** — it is not an external threat.
 - Is the expression wrapped in an environment variable? (`env: TITLE: ${{ ... }}` then `"$TITLE"`)
 - Is there an `author_association` check before command execution?
 - Does the workflow use `pull_request` instead of `pull_request_target`?
 - Are permissions explicitly restricted to read-only?
 - Is the action pinned to a full SHA?
+- Do `if:` conditions on the job or step gate execution in a way that blocks the attack?
 
 If mitigations exist, re-evaluate whether the attack still works. Drop the finding if mitigated.
+
+#### 5c: Confirm impact is real
+
+- What permissions does `GITHUB_TOKEN` have in this workflow? (Check `permissions:` block, or note if using repo default)
+- Are secrets actually accessible to the compromised step?
+- Could the attacker actually exfiltrate data? (Check for network restrictions, ephemeral runners)
+
+If the impact is negligible (e.g., read-only token, no secrets, ephemeral runner), downgrade severity accordingly.
 
 ### Phase 6: Report
 
@@ -193,10 +249,7 @@ These expressions are **dangerous when used in `run:` blocks** because an attack
 | `github.event.discussion.title` | Discussion title | Shell injection |
 | `github.event.discussion.body` | Discussion body | Shell injection |
 | `github.head_ref` | Branch name (shorthand) | `dev$(malicious_cmd)` |
-| `github.event.workflow_dispatch.inputs.*` | Manual input | User-supplied strings |
 | `github.event.pages.*.page_name` | Wiki page name | Shell injection |
-| `github.event.commits[*].message` | Commit message | Shell injection on `push` |
-| `github.event.commits[*].author.name` | Commit author | Shell injection on `push` |
 
 ### Safe Expressions (NOT attacker-controlled)
 
@@ -211,6 +264,9 @@ These expressions are **dangerous when used in `run:` blocks** because an attack
 | `secrets.*` | Not expanded into shell literally |
 | `github.run_id` / `github.run_number` | Numeric |
 | `github.event.pull_request.merged` | Boolean |
+| `github.event.workflow_dispatch.inputs.*` | Requires write access to trigger — not an external threat |
+| `github.event.commits[*].message` | On `push` to protected branches, requires write access |
+| `github.event.commits[*].author.name` | On `push` to protected branches, requires write access |
 
 ---
 
@@ -256,15 +312,26 @@ jobs:
     # Missing: github.event.comment.author_association check
     steps:
       - run: ./deploy.sh
+```
 
-# Workflow dispatch input in run block
+### Do NOT Flag (Requires Write Access)
+
+```yaml
+# workflow_dispatch inputs — triggerer already has write access
 on:
   workflow_dispatch:
     inputs:
       name:
         description: 'Name to greet'
 - run: echo "Hello ${{ github.event.inputs.name }}"
-  # Attacker provides: "; cat /etc/passwd #
+  # NOT a finding: requires write access to trigger
+
+# push to protected branches — pusher already has write access
+on:
+  push:
+    branches: [main]
+- run: echo "${{ github.event.commits[0].message }}"
+  # NOT a finding: requires write access to push
 ```
 
 ### Check Context First
@@ -294,9 +361,10 @@ if: ${{ github.event.pull_request.title != '' }}
 | Severity | Criteria | Examples |
 |----------|----------|---------|
 | **Critical** | RCE + write token theft; full repo compromise possible | Pwn request with PAT theft; expression injection with `contents: write` |
-| **High** | RCE with limited impact; credential exposure without write access | Expression injection with read-only token; unpinned action from popular org |
+| **High** | RCE with limited impact; credential exposure without write access | Expression injection with read-only token; unpinned action with secrets in externally-triggerable workflow |
 | **Medium** | Requires specific conditions; limited blast radius | Comment command without auth check (but no secrets exposed); unpinned action from less-known org |
 | **Low** | Defense-in-depth; no direct exploitation path | Overly broad permissions but no reachable attack; missing SHA pin on official action |
+| **Not a finding** | Requires write access to exploit | `workflow_dispatch` input injection; `push`-only expression injection; secrets in maintainer-only workflows |
 
 ---
 
