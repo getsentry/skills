@@ -1,11 +1,11 @@
 ---
 name: agents-md
-description: This skill should be used when the user asks to "create AGENTS.md", "update AGENTS.md", "maintain agent docs", "set up CLAUDE.md", or needs to keep agent instructions concise. Guides discovery of local skills and enforces minimal documentation style.
+description: This skill should be used when the user asks to "create AGENTS.md", "update AGENTS.md", "maintain agent docs", "set up CLAUDE.md", or needs to keep agent instructions concise. Enforces research-backed best practices for minimal, high-signal agent documentation.
 ---
 
 # Maintaining AGENTS.md
 
-AGENTS.md is the canonical agent-facing documentation. Keep it minimal—agents are capable and don't need hand-holding.
+AGENTS.md is the canonical agent-facing documentation. Keep it minimal—agents are capable and don't need hand-holding. Target under 60 lines; never exceed 100. Instruction-following quality degrades as document length increases.
 
 ## File Setup
 
@@ -14,23 +14,23 @@ AGENTS.md is the canonical agent-facing documentation. Keep it minimal—agents 
 
 ## Before Writing
 
-Discover local skills to reference:
+Analyze the project to understand what belongs in the file:
 
-```bash
-find .claude/skills -name "SKILL.md" 2>/dev/null
-ls plugins/*/skills/*/SKILL.md 2>/dev/null
-```
-
-Read each skill's frontmatter to understand when to reference it.
+1. **Package manager** — Check for lock files (`pnpm-lock.yaml`, `yarn.lock`, `package-lock.json`, `uv.lock`, `poetry.lock`)
+2. **Linter/formatter configs** — Look for `.eslintrc`, `biome.json`, `ruff.toml`, `.prettierrc`, etc. (don't duplicate these in AGENTS.md)
+3. **CI/build commands** — Check `Makefile`, `package.json` scripts, CI configs for canonical commands
+4. **Monorepo indicators** — Check for `pnpm-workspace.yaml`, `nx.json`, Cargo workspace, or subdirectory `package.json` files
+5. **Existing conventions** — Check for existing CONTRIBUTING.md, docs/, or README patterns
 
 ## Writing Rules
 
-- **Headers + bullets** - No paragraphs
-- **Code blocks** - For commands and templates
-- **Reference, don't duplicate** - Point to skills: "Use `db-migrate` skill. See `.claude/skills/db-migrate/SKILL.md`"
-- **No filler** - No intros, conclusions, or pleasantries
-- **Trust capabilities** - Omit obvious context
-- **Skill updates** - ALWAYS use `/skill-creator` when creating or updating skills
+- **Headers + bullets** — No paragraphs
+- **Code blocks** — For commands and templates
+- **Reference, don't embed** — Point to existing docs: "See `CONTRIBUTING.md` for setup" or "Follow patterns in `src/api/routes/`"
+- **No filler** — No intros, conclusions, or pleasantries
+- **Trust capabilities** — Omit obvious context
+- **Prefer file-scoped commands** — Per-file test/lint/typecheck commands over project-wide builds
+- **Don't duplicate linters** — Code style lives in linter configs, not AGENTS.md
 
 ## Required Sections
 
@@ -39,6 +39,17 @@ Which tool and key commands only:
 ```markdown
 ## Package Manager
 Use **pnpm**: `pnpm install`, `pnpm dev`, `pnpm test`
+```
+
+### File-Scoped Commands
+Per-file commands are faster and cheaper than full project builds. Always include when available:
+```markdown
+## File-Scoped Commands
+| Task | Command |
+|------|---------|
+| Typecheck | `pnpm tsc --noEmit path/to/file.ts` |
+| Lint | `pnpm eslint path/to/file.ts` |
+| Test | `pnpm jest path/to/file.test.ts` |
 ```
 
 ### Commit Attribution
@@ -55,29 +66,23 @@ Example: `Co-Authored-By: Claude Sonnet 4 <noreply@example.com>`
 ### Key Conventions
 Project-specific patterns agents must follow. Keep brief.
 
-### Local Skills
-Reference each discovered skill:
-```markdown
-## Database
-Use `db-migrate` skill for schema changes. See `.claude/skills/db-migrate/SKILL.md`
-
-## Testing
-Use `write-tests` skill. See `.claude/skills/write-tests/SKILL.md`
-```
-
 ## Optional Sections
 
 Add only if truly needed:
 - API route patterns (show template, not explanation)
 - CLI commands (table format)
 - File naming conventions
+- Project structure hints (point to critical files, flag legacy code to avoid)
+- Monorepo overrides (subdirectory `AGENTS.md` files override root)
 
 ## Anti-Patterns
 
 Omit these:
 - "Welcome to..." or "This document explains..."
 - "You should..." or "Remember to..."
-- Content duplicated from skills (reference instead)
+- Linter/formatter rules already in config files (`.eslintrc`, `biome.json`, `ruff.toml`)
+- Listing installed skills or plugins (agents discover these automatically)
+- Full project-wide build commands when file-scoped alternatives exist
 - Obvious instructions ("run tests", "write clean code")
 - Explanations of why (just say what)
 - Long prose paragraphs
@@ -96,14 +101,15 @@ AI commits MUST include:
 Co-Authored-By: (the agent model's name and attribution byline)
 ```
 
+## File-Scoped Commands
+| Task | Command |
+|------|---------|
+| Typecheck | `pnpm tsc --noEmit path/to/file.ts` |
+| Lint | `pnpm eslint path/to/file.ts` |
+| Test | `pnpm jest path/to/file.test.ts` |
+
 ## API Routes
 [Template code block]
-
-## Database
-Use `db-migrate` skill. See `.claude/skills/db-migrate/SKILL.md`
-
-## Testing
-Use `write-tests` skill. See `.claude/skills/write-tests/SKILL.md`
 
 ## CLI
 | Command | Description |
