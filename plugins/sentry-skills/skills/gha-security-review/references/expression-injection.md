@@ -229,6 +229,41 @@ env:
 
 ---
 
+## Attacker-Controlled Expressions Quick Reference
+
+These expressions are **dangerous when used in `run:` blocks** because an attacker controls the value:
+
+| Expression | Attack Vector |
+|------------|--------------|
+| `github.event.pull_request.title` | PR title |
+| `github.event.pull_request.body` | PR description |
+| `github.event.pull_request.head.ref` | Branch name |
+| `github.event.pull_request.head.label` | Fork label |
+| `github.event.issue.title` | Issue title |
+| `github.event.issue.body` | Issue body |
+| `github.event.comment.body` | Comment text |
+| `github.event.review.body` | Review text |
+| `github.event.discussion.title` | Discussion title |
+| `github.event.discussion.body` | Discussion body |
+| `github.head_ref` | Branch name (shorthand) |
+| `github.event.pages.*.page_name` | Wiki page name |
+
+### Safe Expressions (NOT attacker-controlled)
+
+| Expression | Why Safe |
+|------------|----------|
+| `github.event.pull_request.number` | Numeric only |
+| `github.repository` / `github.repository_owner` | Repo owner controls |
+| `github.actor` | GitHub username, alphanumeric + hyphens |
+| `github.sha` | Hex string |
+| `github.ref_name` (on `push` to protected branch) | Protected branch rules apply |
+| `secrets.*` | Not expanded into shell literally |
+| `github.run_id` / `github.run_number` | Numeric |
+| `github.event.inputs.*` (workflow_dispatch) | Requires write access — not an external threat |
+| `github.event.commits[*].message` (push to protected) | Requires write access |
+
+---
+
 ## Exploitation Scenario Template
 
 ```
