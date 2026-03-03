@@ -53,6 +53,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [skill-creator](plugins/sentry-skills/skills/skill-creator/SKILL.md) | Create new agent skills for this repository |
 | [skill-scanner](plugins/sentry-skills/skills/skill-scanner/SKILL.md) | Scan agent skills for security issues before adoption |
 | [blog-writing-guide](plugins/sentry-skills/skills/blog-writing-guide/SKILL.md) | Write, review, and improve blog posts following Sentry's writing standards |
+| [gha-security-review](plugins/sentry-skills/skills/gha-security-review/SKILL.md) | GitHub Actions workflow security review for exploitation vulnerabilities |
 
 ## Available Subagents
 
