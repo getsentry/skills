@@ -1,59 +1,34 @@
-# Sentry Agent Skills
+# Agent Instructions
 
-A collection of agent skills for use by Sentry employees, primarily designed for [Claude Code](https://claude.ai/claude-code).
-
-This repository is structured as a Claude Code plugin (see `plugins/sentry-skills/`), but the skills themselves follow the open [Agent Skills specification](https://agentskills.io) format to maintain compatibility with other tools that adopt the standard.
-
-## Structure
-
+## Skill Structure
 ```
 plugins/sentry-skills/skills/<skill-name>/SKILL.md
 ```
 
-Each skill is a directory containing a `SKILL.md` file with YAML frontmatter (`name`, `description`) and markdown instructions.
+## Creating/Updating Skills
+ALWAYS use `/skill-creator` — it handles requirements, writing, registration, and validation.
 
-## Creating a Skill
-
+### Registration Checklist
 1. Create `plugins/sentry-skills/skills/<skill-name>/SKILL.md`
-2. Add YAML frontmatter (see below)
-3. Write clear instructions in markdown
-4. Update `README.md` to include the new skill in the Available Skills table
-5. Update the skills allowlist in `plugins/sentry-skills/skills/claude-settings-audit/SKILL.md`
-6. Add the skill to `.claude/settings.json` in the `permissions.allow` array as `Skill(sentry-skills:<skill-name>)`
+2. Add to `README.md` Available Skills table
+3. Add to `.claude/settings.json`: `Skill(sentry-skills:<skill-name>)`
+4. Add to allowlist in `plugins/sentry-skills/skills/claude-settings-audit/SKILL.md`
 
-### Frontmatter
+## Key Conventions
+- Frontmatter `---` must be the **first line** of SKILL.md — no comments before it
+- `name` field must match the directory name exactly
+- `description` includes trigger keywords — this is how agents discover the skill
+- Attribution comments go **after** the closing `---`
+- Python scripts: always use `uv run <script>`, never `python` or `python3`
+- Keep SKILL.md under 500 lines; move reference material to `references/`
 
-**Important:** The YAML frontmatter must be at the very beginning of the file. Do not place comments or any other content before it—parsers expect `---` as the first line.
-
-**Required:**
-- `name` - kebab-case, 1-64 chars
-- `description` - up to 1024 chars, include trigger keywords
-
-**Optional:**
-- `allowed-tools` - comma-separated list of permitted tools
-- `license` - license name or path (for attribution, place a LICENSE file in the skill directory)
-- `compatibility` - environment requirements (max 500 chars)
-
-```yaml
----
-name: example-skill
-description: What this skill does and when to use it. Include trigger keywords.
-allowed-tools: Read, Grep, Glob, Bash
-license: LICENSE
----
-
-<!-- Attribution comments go AFTER the frontmatter -->
-
-# Example Skill
-
-Instructions for the agent.
+## Commit Attribution
+AI commits MUST include:
+```
+Co-Authored-By: (the agent model's name and attribution byline)
 ```
 
-## Skill Design Guidelines
-
-When writing skills that include Python scripts, always instruct the agent to use `uv run <script>` instead of `python <script>` or `python3 <script>`.
-
 ## References
-
+- Skill template and optional fields: `README.md`
+- Testing and PR workflow: `CONTRIBUTING.md`
 - [Agent Skills Spec](https://agentskills.io/specification)
-- [Sentry Engineering Practices](https://develop.sentry.dev/engineering-practices/)

@@ -45,7 +45,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [find-bugs](plugins/sentry-skills/skills/find-bugs/SKILL.md) | Find bugs and security vulnerabilities in branch changes |
 | [iterate-pr](plugins/sentry-skills/skills/iterate-pr/SKILL.md) | Iterate on a PR until CI passes and feedback is addressed |
 | [claude-settings-audit](plugins/sentry-skills/skills/claude-settings-audit/SKILL.md) | Analyze repo and generate recommended Claude Code settings.json permissions |
-| [agents-md](plugins/sentry-skills/skills/agents-md/SKILL.md) | Maintain AGENTS.md with concise agent instructions |
+| [agents-md](plugins/sentry-skills/skills/agents-md/SKILL.md) | Maintain AGENTS.md with research-backed best practices for minimal agent docs |
 | [brand-guidelines](plugins/sentry-skills/skills/brand-guidelines/SKILL.md) | Write copy following Sentry brand guidelines |
 | [doc-coauthoring](plugins/sentry-skills/skills/doc-coauthoring/SKILL.md) | Structured workflow for co-authoring documentation, proposals, and specs |
 | [security-review](plugins/sentry-skills/skills/security-review/SKILL.md) | Systematic security code review following OWASP guidelines |
