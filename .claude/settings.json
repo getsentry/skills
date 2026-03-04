@@ -57,7 +57,8 @@
       "Skill(sentry-skills:skill-creator)",
       "Skill(sentry-skills:skill-scanner)",
       "Skill(sentry-skills:blog-writing-guide)",
-      "Skill(sentry-skills:create-branch)"
+      "Skill(sentry-skills:create-branch)",
+      "Skill(sentry-skills:gha-security-review)"
     ],
     "deny": []
   },

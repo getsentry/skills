@@ -158,6 +158,7 @@ If this is a Sentry project (or sentry-skills plugin is installed), include:
   "Skill(sentry-skills:skill-scanner)",
   "Skill(sentry-skills:blog-writing-guide)",
   "Skill(sentry-skills:create-branch)"
+  "Skill(sentry-skills:gha-security-review)"
 ]
 ```
 
