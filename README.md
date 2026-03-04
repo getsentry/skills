@@ -41,7 +41,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 |-------|-------------|
 | [code-review](plugins/sentry-skills/skills/code-review/SKILL.md) | Sentry code review guidelines and checklist |
 | [commit](plugins/sentry-skills/skills/commit/SKILL.md) | Sentry commit message conventions |
-| [pr-writer](plugins/sentry-skills/skills/pr-writer/SKILL.md) | Canonical pull request writing workflow following Sentry conventions |
+| [pr-writer](plugins/sentry-skills/skills/pr-writer/SKILL.md) | Canonical workflow to create and update pull requests following Sentry conventions |
 | [create-pr](plugins/sentry-skills/skills/create-pr/SKILL.md) | Alias for `pr-writer` (kept for compatibility) |
 | [find-bugs](plugins/sentry-skills/skills/find-bugs/SKILL.md) | Find bugs and security vulnerabilities in branch changes |
 | [iterate-pr](plugins/sentry-skills/skills/iterate-pr/SKILL.md) | Iterate on a PR until CI passes and feedback is addressed |
