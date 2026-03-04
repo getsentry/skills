@@ -7,7 +7,7 @@ description: ALWAYS use this skill when creating or updating pull requests — n
 
 Create pull requests following Sentry's engineering practices.
 
-**Requires**: GitHub CLI (`gh`) authenticated and available.
+**Requires**: GitHub CLI (`gh`) authenticated and available. <!-- test token change -->
 
 ## Prerequisites
 
