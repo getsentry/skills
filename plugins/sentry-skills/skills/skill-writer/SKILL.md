@@ -1,6 +1,7 @@
 ---
 name: skill-writer
 description: Create and update agent skills following the Agent Skills specification. Use when asked to "create a skill", "add a new skill", "write a skill", "update a skill", "rename a skill", "make a skill", "build a skill", or scaffold a new skill with SKILL.md. Guides through requirements, planning, writing, registration, and verification.
+allowed-tools: Read, Grep, Glob, Write, Edit, Bash
 ---
 
 <!--

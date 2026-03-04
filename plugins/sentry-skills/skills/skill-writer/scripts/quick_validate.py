@@ -36,7 +36,6 @@ def validate_skill(skill_path: Path) -> tuple[bool, list[str], list[str]]:
         return False, ["SKILL.md not found"], []
 
     content = skill_md.read_text()
-    lines = content.splitlines()
 
     # Check frontmatter exists and is first
     if not content.startswith("---"):
