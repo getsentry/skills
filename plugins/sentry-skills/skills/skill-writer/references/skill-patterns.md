@@ -6,7 +6,7 @@ Concrete examples of skill structures at each complexity tier.
 
 Use when the entire skill fits in under ~200 lines with no external resources needed.
 
-**Examples:** `brand-guidelines`, `commit`, `create-pr`
+**Examples:** `brand-guidelines`, `commit`, `pr-writer`
 
 **Structure:**
 ```

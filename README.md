@@ -41,7 +41,8 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 |-------|-------------|
 | [code-review](plugins/sentry-skills/skills/code-review/SKILL.md) | Sentry code review guidelines and checklist |
 | [commit](plugins/sentry-skills/skills/commit/SKILL.md) | Sentry commit message conventions |
-| [create-pr](plugins/sentry-skills/skills/create-pr/SKILL.md) | Create pull requests following Sentry conventions |
+| [pr-writer](plugins/sentry-skills/skills/pr-writer/SKILL.md) | Canonical workflow to create and update pull requests following Sentry conventions |
+| [create-pr](plugins/sentry-skills/skills/create-pr/SKILL.md) | Alias for `pr-writer` (kept for compatibility) |
 | [find-bugs](plugins/sentry-skills/skills/find-bugs/SKILL.md) | Find bugs and security vulnerabilities in branch changes |
 | [iterate-pr](plugins/sentry-skills/skills/iterate-pr/SKILL.md) | Iterate on a PR until CI passes and feedback is addressed |
 | [claude-settings-audit](plugins/sentry-skills/skills/claude-settings-audit/SKILL.md) | Analyze repo and generate recommended Claude Code settings.json permissions |
@@ -50,7 +51,8 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [doc-coauthoring](plugins/sentry-skills/skills/doc-coauthoring/SKILL.md) | Structured workflow for co-authoring documentation, proposals, and specs |
 | [security-review](plugins/sentry-skills/skills/security-review/SKILL.md) | Systematic security code review following OWASP guidelines |
 | [code-simplifier](plugins/sentry-skills/skills/code-simplifier/SKILL.md) | Simplifies and refines code for clarity, consistency, and maintainability |
-| [skill-creator](plugins/sentry-skills/skills/skill-creator/SKILL.md) | Create new agent skills for this repository |
+| [skill-writer](plugins/sentry-skills/skills/skill-writer/SKILL.md) | Canonical workflow to create and update agent skills for this repository |
+| [skill-creator](plugins/sentry-skills/skills/skill-creator/SKILL.md) | Alias for `skill-writer` (kept for compatibility) |
 | [skill-scanner](plugins/sentry-skills/skills/skill-scanner/SKILL.md) | Scan agent skills for security issues before adoption |
 | [blog-writing-guide](plugins/sentry-skills/skills/blog-writing-guide/SKILL.md) | Write, review, and improve blog posts following Sentry's writing standards |
 | [create-branch](plugins/sentry-skills/skills/create-branch/SKILL.md) | Create git branches following Sentry naming conventions |
@@ -161,7 +163,7 @@ Skills should live in the appropriate location based on their scope:
 
 | Scope | Location | Example |
 |-------|----------|---------|
-| **Global** - Used across Sentry | `sentry-skills` plugin | `commit`, `code-review`, `create-pr` |
+| **Global** - Used across Sentry | `sentry-skills` plugin | `commit`, `code-review`, `pr-writer` |
 | **Domain-specific** - Used by a team or domain | Dedicated plugin in this repo (e.g., `infra-skills`) | `gcp-logs`, `terraform-review` |
 | **Repo-specific** - Only relevant to one repo | The repository itself (`.claude/skills/`) | Project-specific workflows |
 
