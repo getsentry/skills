@@ -10,7 +10,7 @@ ALWAYS use `/skill-writer` — it handles requirements, writing, registration, a
 
 ### Registration Checklist
 1. Create `plugins/sentry-skills/skills/<skill-name>/SKILL.md`
-2. Add to `README.md` Available Skills table
+2. Add to `README.md` Available Skills table (alphabetical by skill name)
 3. Add to `.claude/settings.json`: `Skill(sentry-skills:<skill-name>)`
 4. Add to allowlist in `plugins/sentry-skills/skills/claude-settings-audit/SKILL.md`
 
