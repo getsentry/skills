@@ -148,6 +148,23 @@ Reference issues in the PR body:
 | `Refs GH-1234` | Links without closing |
 | `Refs LINEAR-ABC-123` | Links Linear issue |
 
+## PR Dependencies
+
+Add dependencies between PRs when merge order matters — for example, stacked PRs, schema migrations that must land first, or large features broken into reviewable chunks.
+
+GitHub's Issue Dependencies API (Enterprise Cloud) creates native "blocked by" relationships visible in the UI. Since every PR is an issue, use these endpoints directly:
+
+```bash
+# Get the numeric issue ID of the blocking PR
+BLOCKING_ID=$(gh api repos/{owner}/{repo}/issues/BLOCKING_PR_NUMBER --jq '.id')
+
+# Mark the new PR as blocked by the blocking PR
+gh api --method POST \
+  -H "Accept: application/vnd.github+json" \
+  repos/{owner}/{repo}/issues/NEW_PR_NUMBER/dependencies/blocked_by \
+  -f issue_id="$BLOCKING_ID"
+```
+
 ## Guidelines
 
 - **One PR per feature/fix** - Don't bundle unrelated changes
