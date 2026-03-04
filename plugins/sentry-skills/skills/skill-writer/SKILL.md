@@ -263,7 +263,7 @@ skills-ref validate <path/to/skill-directory>
 Registration steps vary by repository. Check the repository's `CLAUDE.md` or `README.md` for specific instructions.
 
 1. **Verify directory-name match** — confirm the directory name matches the `name` field in SKILL.md frontmatter exactly
-2. **Update documentation** — add the skill to any skills index or table in README.md
+2. **Update documentation** — add the skill to any skills index or table in README.md, keeping skill lists alphabetical by name
 3. **Update permissions** — if the repo has `.claude/settings.json`, add `Skill(<plugin>:<name>)` to the `permissions.allow` array
 4. **Check CLAUDE.md** — read the repository's `CLAUDE.md` for any additional registration steps specific to that project
 

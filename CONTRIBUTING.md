@@ -53,7 +53,7 @@ All changes go through the PR flow, but formal review is optional.
    ---
    ```
 
-3. Update `README.md` to add the skill to the Available Skills table
+3. Update `README.md` to add the skill to the Available Skills table in alphabetical order by skill name
 
 4. Add the skill to `.claude/settings.json`:
 
