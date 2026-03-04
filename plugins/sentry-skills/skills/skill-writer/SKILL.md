@@ -104,6 +104,8 @@ description: <what it does>. Use when <trigger phrases>. <key capabilities>.
 - `metadata` — arbitrary key-value mapping for additional metadata
 - `compatibility` — environment requirements (max 500 chars); most skills don't need this
 
+Default behavior: do not add `allowed-tools` unless the user explicitly asks for strict tool scoping or the repository has a policy requiring it. Tool-allowlist syntax can vary across clients.
+
 For Claude Code-specific fields (`argument-hint`, `disable-model-invocation`, `context`, etc.), read `${CLAUDE_SKILL_ROOT}/references/claude-code-extensions.md`.
 
 ### Description Guidelines
