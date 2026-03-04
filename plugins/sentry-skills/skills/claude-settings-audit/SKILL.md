@@ -143,6 +143,7 @@ If this is a Sentry project (or sentry-skills plugin is installed), include:
 ```json
 [
   "Skill(sentry-skills:commit)",
+  "Skill(sentry-skills:pr-writer)",
   "Skill(sentry-skills:create-pr)",
   "Skill(sentry-skills:code-review)",
   "Skill(sentry-skills:find-bugs)",
@@ -154,6 +155,7 @@ If this is a Sentry project (or sentry-skills plugin is installed), include:
   "Skill(sentry-skills:security-review)",
   "Skill(sentry-skills:django-perf-review)",
   "Skill(sentry-skills:code-simplifier)",
+  "Skill(sentry-skills:skill-writer)",
   "Skill(sentry-skills:skill-creator)",
   "Skill(sentry-skills:skill-scanner)",
   "Skill(sentry-skills:blog-writing-guide)",

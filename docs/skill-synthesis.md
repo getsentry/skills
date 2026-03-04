@@ -2,7 +2,7 @@
 
 Skill synthesis is using your AI coding agent to research upstream implementations, specs, and best practices online before creating a skill. Instead of writing from scratch, you have the agent survey what already exists and synthesize the best ideas into your skill.
 
-This pairs with the [skill-creator](../plugins/sentry-skills/skills/skill-creator/SKILL.md) skill — synthesis handles the research phase, skill-creator handles the implementation.
+This pairs with the [skill-writer](../plugins/sentry-skills/skills/skill-writer/SKILL.md) skill — synthesis handles the research phase, skill-writer handles the implementation.
 
 ## Key Sources
 
@@ -42,15 +42,15 @@ The agent should show you:
 
 This is your checkpoint. Redirect before writing, not after.
 
-### 3. Create — hand off to skill-creator
+### 3. Create — hand off to skill-writer
 
-Once you agree on the approach, use the skill-creator to build the skill informed by the research:
+Once you agree on the approach, use the skill-writer to build the skill informed by the research:
 
 ```
-Now use /skill-creator to create the skill, incorporating what you found.
+Now use /skill-writer to create the skill, incorporating what you found.
 ```
 
-The synthesis research stays in context, so the skill-creator produces a better result than it would from a cold start.
+The synthesis research stays in context, so the skill-writer produces a better result than it would from a cold start.
 
 ## When To Do This
 

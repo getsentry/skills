@@ -6,7 +6,7 @@ plugins/sentry-skills/skills/<skill-name>/SKILL.md
 ```
 
 ## Creating/Updating Skills
-ALWAYS use `/skill-creator` — it handles requirements, writing, registration, and validation.
+ALWAYS use `/skill-writer` — it handles requirements, writing, registration, and validation. (`/skill-creator` remains an alias.)
 
 ### Registration Checklist
 1. Create `plugins/sentry-skills/skills/<skill-name>/SKILL.md`
