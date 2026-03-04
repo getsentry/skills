@@ -20,8 +20,24 @@ Before writing, collect the information that makes documentation useful beyond m
 | **What do developers commonly get wrong?** | `> [!WARNING]` callouts, icon-only accessibility notes, required prop reminders |
 | **Does this component require a specific parent, peer, or provider to work correctly?** | Noted in the introduction or a `> [!NOTE]` callout |
 | **Are there related components that overlap in purpose?** | `## See Also` with one-line guidance on when to prefer each |
+| **Which props and variants are worth documenting with a demo?** | See prop triage below |
 
 You don't need answers to all questions for every component. Skip ones that don't apply. The goal is to not write docs that only describe *how* to use the API — write docs that tell developers *when and why*.
+
+### Prop triage
+
+Not every prop needs a demo section. Ask the user: **"Which props should I document, and are there any variants or values with specific intended uses?"**
+
+If the user isn't available, read the component's TypeScript props and classify each:
+
+| Tier | Document how | Examples |
+|------|-------------|---------|
+| **Core** — defines the component's primary behavior or appearance | Full `##` section with live demo and semantic description of each value | `priority`, `variant`, `size` |
+| **Modifier** — adjusts a single aspect; values are self-explanatory | Brief mention with a demo, or a single combined demo with other modifiers | `disabled`, `busy`, `icon`, `showIcon` |
+| **Structural** — controls layout or composition | Demo showing the before/after or compound usage | `system`, `expand`, `trailingItems` |
+| **Internal / pass-through** — not user-facing | Skip entirely | `className`, `style`, `ref`, `data-test-id` |
+
+For **enum props** specifically, always ask: "Does each value have a distinct intended meaning, or are they purely visual?" If distinct (e.g., `danger` means destructive, not just red), document the semantics — not just the visual difference.
 
 ## Step 1: Locate the Component
 
