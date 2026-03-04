@@ -49,6 +49,7 @@
       "Skill(sentry-skills:code-review)",
       "Skill(sentry-skills:code-simplifier)",
       "Skill(sentry-skills:commit)",
+      "Skill(sentry-skills:component-docs)",
       "Skill(sentry-skills:create-branch)",
       "Skill(sentry-skills:create-pr)",
       "Skill(sentry-skills:django-access-review)",
@@ -64,8 +65,7 @@
       "Skill(sentry-skills:skill-scanner)",
       "Skill(sentry-skills:skill-writer)",
       "Skill(sentry-skills:sred-project-organizer)",
-      "Skill(sentry-skills:sred-work-summary)",
-      "Skill(sentry-skills:component-docs)"
+      "Skill(sentry-skills:sred-work-summary)"
     ],
     "deny": []
   },
