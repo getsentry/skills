@@ -10,11 +10,9 @@ Create a git branch with the correct type prefix and a descriptive name followin
 
 ## Step 1: Get the Username Prefix
 
-Run `git config user.name`, take the first word, lowercase it, transliterate accented characters to their ASCII equivalents (e.g. é→e, í→i, ñ→n), then remove any remaining characters that are not ASCII letters or digits.
+Run `gh api user --jq .login` to get the GitHub username.
 
-Example: "Priscila Oliveira" → `priscila`, "José García" → `jose`.
-
-If the result is empty, ask the user for their preferred prefix.
+If the command fails (e.g. not authenticated), ask the user for their preferred prefix.
 
 ## Step 2: Determine the Branch Description
 
