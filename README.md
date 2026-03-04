@@ -46,6 +46,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [code-review](plugins/sentry-skills/skills/code-review/SKILL.md) | Perform code reviews following Sentry engineering practices. |
 | [code-simplifier](plugins/sentry-skills/skills/code-simplifier/SKILL.md) | Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality. |
 | [commit](plugins/sentry-skills/skills/commit/SKILL.md) | ALWAYS use this skill when committing code changes — never commit directly without it. |
+| [component-docs](plugins/sentry-skills/skills/component-docs/SKILL.md) | Create or update component documentation in Sentry's MDX stories format. |
 | [create-branch](plugins/sentry-skills/skills/create-branch/SKILL.md) | Create git branches following Sentry naming conventions. |
 | [create-pr](plugins/sentry-skills/skills/create-pr/SKILL.md) | ALWAYS use this skill when creating pull requests — never create a PR directly without it. |
 | [django-access-review](plugins/sentry-skills/skills/django-access-review/SKILL.md) | Django access control and IDOR security review. |
