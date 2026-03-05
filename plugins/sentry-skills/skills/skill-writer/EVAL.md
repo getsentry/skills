@@ -53,3 +53,34 @@ When you need stronger confidence, run this sequence:
 2. Capture deterministic traces (`codex exec --json`).
 3. Apply rubric/schema checks where practical (`--output-schema`).
 4. Compare baseline vs candidate and report deltas.
+
+## Isolated Eval Runbook
+
+Run the eval in a temporary isolated workspace (copy of repo in `/tmp`):
+
+```bash
+EVAL_DIR=/tmp/sentry-skills-eval-run
+rm -rf "$EVAL_DIR"
+mkdir -p "$EVAL_DIR"
+rsync -a "<repo-root>/"/ "$EVAL_DIR"/
+
+codex exec \
+  --ephemeral \
+  --full-auto \
+  --sandbox workspace-write \
+  --skip-git-repo-check \
+  --add-dir "<pi-mono-root>" \
+  -C "$EVAL_DIR" \
+  "$(cat <eval-prompt-file>)"
+```
+
+Where `<eval-prompt-file>` contains the exact eval prompt from this file.
+
+Validate the generated skill output:
+
+```bash
+uv run "<repo-root>/plugins/sentry-skills/skills/skill-writer/scripts/quick_validate.py" \
+  /tmp/sentry-skills-eval-run/plugins/sentry-skills/skills/pi-agent-integration-eval \
+  --skill-class integration-documentation \
+  --strict-depth
+```
