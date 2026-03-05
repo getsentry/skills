@@ -28,8 +28,9 @@ Read `${CLAUDE_SKILL_ROOT}/references/source-collection.md`.
 
 1. Gather sources across required categories before drafting conclusions.
 2. Prefer canonical docs and authoritative implementations.
-3. Maximize relevant input depth for the target type (for example, full relevant official docs for documentation skills; broad TP/FP/fix coverage for detection skills).
-4. Record unresolved unknowns in `Coverage Gaps` with concrete next retrieval actions.
+3. Apply trust-tier, safety, and provenance rules while collecting sources.
+4. Maximize relevant input depth for the target type (for example, full relevant official docs for documentation skills; broad TP/FP/fix coverage for detection skills).
+5. Record unresolved unknowns in `Coverage Gaps` with concrete next retrieval actions.
 
 ## Step 3: Synthesize and decide
 
@@ -60,7 +61,7 @@ Read `${CLAUDE_SKILL_ROOT}/references/example-intake.md`.
 1. Store examples in `<target-skill-dir>/examples/YYYY-MM-DD-<slug>.md`.
 2. Enforce strict anonymization before storage.
 3. Re-evaluate decisions using the full example corpus, not only newly added files.
-4. Run replay checks across representative positive, negative, and fix examples.
+4. Run replay checks across both working and holdout corpus slices.
 5. Propose concrete SKILL/support-file updates and append a changelog entry.
 
 ## Output format

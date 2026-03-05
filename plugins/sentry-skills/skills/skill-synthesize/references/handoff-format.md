@@ -37,6 +37,11 @@ Use markdown, not JSON. Emit the block exactly in this structure and section ord
 ### Assumptions
 - Explicit assumptions used to complete synthesis.
 
+### Risk Notes
+- Prompt-injection or untrusted-source concerns
+- Licensing/terms caveats for stored source content
+- Trust-tier conflicts not fully resolved
+
 ### Open Gaps
 - Unresolved unknowns and next retrieval actions.
 ```

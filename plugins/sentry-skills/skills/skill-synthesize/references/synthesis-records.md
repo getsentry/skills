@@ -8,8 +8,8 @@ Maintain `<target-skill-dir>/SYNTHESIS.md` as the persistent synthesis ledger. K
 # Synthesis Record
 
 ## Source Inventory
-| Source | Type | Accessed | Confidence | Contribution | Status |
-|--------|------|----------|------------|--------------|--------|
+| Source | Type | Trust Tier | Accessed | Confidence | Contribution | Status | License/Terms | Storage Mode |
+|--------|------|------------|----------|------------|--------------|--------|---------------|--------------|
 
 ## Synthesis Decisions
 - Decision: ...
@@ -34,8 +34,9 @@ Maintain `<target-skill-dir>/SYNTHESIS.md` as the persistent synthesis ledger. K
 
 ## Replay Results
 - Corpus replay date: YYYY-MM-DD
-- Checked sets: positive | negative | fix
+- Checked sets: working-corpus | holdout-corpus
 - Outcome: improved | unchanged | regressed
+- PII check completed: yes | no
 - Notes: ...
 
 ## Changelog
@@ -51,3 +52,4 @@ Maintain `<target-skill-dir>/SYNTHESIS.md` as the persistent synthesis ledger. K
 4. Add one dated changelog entry per synthesis pass.
 5. Keep language concise and implementation-relevant.
 6. Keep `Coverage Matrix` and `Replay Results` current on every iteration.
+7. Keep `Storage Mode` as `summary` by default unless verbatim storage is necessary and permitted.

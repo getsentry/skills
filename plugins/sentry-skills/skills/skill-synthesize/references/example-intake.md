@@ -18,6 +18,7 @@ id: ex-2026-03-05-001
 label: positive
 example_kind: true-positive
 anonymized: true
+evidence_origin: human-verified
 date: 2026-03-05
 source_type: user-feedback
 summary: Short summary of what this example demonstrates.
@@ -29,6 +30,7 @@ Constraints:
 - `label` must be `positive` or `negative`.
 - `example_kind` should be one of: `true-positive`, `false-positive`, `fix`, `regression`, `edge-case`.
 - `anonymized` must be `true` before saving.
+- `evidence_origin` should be one of: `human-verified`, `mixed`, `synthetic`.
 
 ## Required body sections
 
@@ -52,7 +54,9 @@ If a sensitive identifier must remain for technical clarity, justify it in `## E
 When new examples are added:
 
 1. Re-evaluate current synthesis decisions against the full corpus, not only new entries.
-2. Run replay checks against representative positive, negative, and fix examples.
+2. Run replay checks across two slices:
+   - working corpus (examples used during iteration)
+   - holdout corpus (examples reserved for final checks)
 3. Propose concrete updates to `SKILL.md` and supporting files.
 4. Record what improved and what regressed in `SYNTHESIS.md`.
 5. Append a dated changelog entry in `SYNTHESIS.md`.
@@ -67,3 +71,5 @@ For detection/review skills, maintain balanced corpus slices:
 3. Fix examples linking issue patterns to successful remediation.
 
 If one slice is weak, mark it in `Coverage Gaps` and prioritize new collection there.
+
+Maintain a small holdout set over time so updates are not judged only on examples used during tuning.
