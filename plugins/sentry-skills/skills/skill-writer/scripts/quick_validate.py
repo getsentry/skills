@@ -157,7 +157,17 @@ def parse_open_gap_lines(sources_markdown: str) -> list[str]:
 
 
 def count_list_items(markdown: str) -> int:
-    return len(re.findall(r"(?m)^\s*(?:-|\d+\.)\s+", markdown))
+    count = 0
+    in_fenced_code = False
+    for line in markdown.splitlines():
+        if re.match(r"^\s*(```|~~~)", line):
+            in_fenced_code = not in_fenced_code
+            continue
+        if in_fenced_code:
+            continue
+        if re.match(r"^\s*(?:-|\d+\.)\s+", line):
+            count += 1
+    return count
 
 
 def find_machine_specific_paths(text: str) -> list[str]:

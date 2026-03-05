@@ -61,7 +61,8 @@ Read `references/authoring-path.md`.
 
 1. Write or update `SKILL.md` in imperative voice with trigger-rich description.
 2. Create focused reference files and scripts only when justified.
-3. Follow `references/skill-patterns.md` and `references/output-patterns.md` for structure/output determinism.
+3. Follow `references/skill-patterns.md`, `references/workflow-patterns.md`, and
+   `references/output-patterns.md` for structure and output determinism.
 4. For authoring/generator skills, include transformed examples in references:
    - happy-path
    - secure/robust variant
