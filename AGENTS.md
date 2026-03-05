@@ -8,9 +8,14 @@ plugins/sentry-skills/skills/<skill-name>/SKILL.md
 ## Creating/Updating Skills
 ALWAYS use `/skill-writer` — it handles requirements, writing, registration, and validation. (`/skill-creator` remains an alias.)
 
+### Alias Policy
+- Keep alias skills (for example `create-pr`, `skill-creator`) only for backward compatibility.
+- Do **not** list alias/symlink skills in "Available Skills" documentation tables.
+- List only canonical skills in public skill inventories (for example `pr-writer`, `skill-writer`).
+
 ### Registration Checklist
 1. Create `plugins/sentry-skills/skills/<skill-name>/SKILL.md`
-2. Add to `README.md` Available Skills table (alphabetical by skill name)
+2. Add to `README.md` Available Skills table (alphabetical by canonical skill name; exclude aliases/symlinks)
 3. Add to `.claude/settings.json`: `Skill(sentry-skills:<skill-name>)`
 4. Add to allowlist in `plugins/sentry-skills/skills/claude-settings-audit/SKILL.md`
 

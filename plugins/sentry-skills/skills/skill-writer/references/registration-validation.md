@@ -5,7 +5,7 @@ Apply repository registration and quality checks before completion.
 ## Registration checklist
 
 1. Create/update `plugins/sentry-skills/skills/<name>/SKILL.md`.
-2. Add/update skill in `README.md` Available Skills table (alphabetical).
+2. Add/update canonical skill in `README.md` Available Skills table (alphabetical; exclude alias/symlink entries).
 3. Add/update `Skill(sentry-skills:<name>)` in `.claude/settings.json`.
 4. Add/update skill allowlist in `plugins/sentry-skills/skills/claude-settings-audit/SKILL.md`.
 

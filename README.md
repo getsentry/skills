@@ -47,7 +47,6 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [code-simplifier](plugins/sentry-skills/skills/code-simplifier/SKILL.md) | Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality. |
 | [commit](plugins/sentry-skills/skills/commit/SKILL.md) | ALWAYS use this skill when committing code changes — never commit directly without it. |
 | [create-branch](plugins/sentry-skills/skills/create-branch/SKILL.md) | Create git branches following Sentry naming conventions. |
-| [create-pr](plugins/sentry-skills/skills/create-pr/SKILL.md) | ALWAYS use this skill when creating pull requests — never create a PR directly without it. |
 | [django-access-review](plugins/sentry-skills/skills/django-access-review/SKILL.md) | Django access control and IDOR security review. |
 | [django-perf-review](plugins/sentry-skills/skills/django-perf-review/SKILL.md) | Django performance code review. |
 | [doc-coauthoring](plugins/sentry-skills/skills/doc-coauthoring/SKILL.md) | Guide users through a structured workflow for co-authoring documentation. |
@@ -57,7 +56,6 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [iterate-pr](plugins/sentry-skills/skills/iterate-pr/SKILL.md) | Iterate on a PR until CI passes. |
 | [pr-writer](plugins/sentry-skills/skills/pr-writer/SKILL.md) | Canonical workflow to create and update pull requests following Sentry conventions. |
 | [security-review](plugins/sentry-skills/skills/security-review/SKILL.md) | Security code review for vulnerabilities. |
-| [skill-creator](plugins/sentry-skills/skills/skill-creator/SKILL.md) | Alias for `skill-writer` for compatibility with legacy invocations. |
 | [skill-scanner](plugins/sentry-skills/skills/skill-scanner/SKILL.md) | Scan agent skills for security issues. |
 | [skill-writer](plugins/sentry-skills/skills/skill-writer/SKILL.md) | Canonical workflow to synthesize, create, and iteratively improve agent skills for this repository. |
 | [sred-project-organizer](plugins/sentry-skills/skills/sred-project-organizer/SKILL.md) | Take a list of projects and their related documentation, and organize them into the SRED format for submission. |
