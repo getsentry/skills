@@ -85,17 +85,28 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 def infer_skill_class(description: str, content: str) -> str:
     text = f"{description}\n{content}".lower()
 
-    if any(tok in text for tok in ("create a skill", "write a skill", "skill-writer", "maintain skill docs")):
+    if has_any_term(text, ("create a skill", "write a skill", "skill-writer", "maintain skill docs")):
         return "skill-authoring"
-    if any(tok in text for tok in ("security", "vulnerability", "owasp", "injection", "xss")):
+    if has_any_term(text, ("security", "vulnerability", "owasp", "injection", "xss")):
         return "security-review"
-    if any(tok in text for tok in ("integrate", "sdk", "library", "api surface", "public api", "api contract")) and any(
-        tok in text for tok in ("use when", "downstream", "consumer", "abstraction")
+    if has_any_term(text, ("integrate", "sdk", "library", "api surface", "public api", "api contract")) and has_any_term(
+        text, ("use when", "downstream", "consumer", "abstraction")
     ):
         return "integration-documentation"
-    if any(tok in text for tok in ("workflow", "ci", "branch", "checklist", "runbook", "triage")):
+    if has_any_term(text, ("workflow", "ci", "branch", "checklist", "runbook", "triage")):
         return "workflow-process"
     return "generic"
+
+
+def has_any_term(text: str, terms: tuple[str, ...]) -> bool:
+    for term in terms:
+        if " " in term:
+            if term in text:
+                return True
+            continue
+        if re.search(rf"\b{re.escape(term)}\b", text):
+            return True
+    return False
 
 
 def get_section_lines(markdown: str, heading_name: str) -> list[str]:
