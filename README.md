@@ -59,6 +59,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [security-review](plugins/sentry-skills/skills/security-review/SKILL.md) | Security code review for vulnerabilities. |
 | [skill-creator](plugins/sentry-skills/skills/skill-creator/SKILL.md) | Create new agent skills following the Agent Skills specification. |
 | [skill-scanner](plugins/sentry-skills/skills/skill-scanner/SKILL.md) | Scan agent skills for security issues. |
+| [skill-synthesize](plugins/sentry-skills/skills/skill-synthesize/SKILL.md) | Research and synthesize source material to create or improve skills, then prepare a structured handoff for skill-writer. |
 | [skill-writer](plugins/sentry-skills/skills/skill-writer/SKILL.md) | Canonical workflow to create and update agent skills for this repository. |
 | [sred-project-organizer](plugins/sentry-skills/skills/sred-project-organizer/SKILL.md) | Take a list of projects and their related documentation, and organize them into the SRED format for submission. |
 | [sred-work-summary](plugins/sentry-skills/skills/sred-work-summary/SKILL.md) | Go back through the previous year of work and create a Notion doc that groups relevant links into projects that can then be documented as SRED projects. |
@@ -241,7 +242,6 @@ The `code-simplifier` agent is vendored from [Anthropic's official plugins](http
 
 - [Agent Skills Specification](https://agentskills.io/specification)
 - [Sentry Engineering Practices](https://develop.sentry.dev/engineering-practices/)
-- [Skill Synthesis Guide](docs/skill-synthesis.md) — using your AI agent to research and improve skills
 
 ## License
 
