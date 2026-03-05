@@ -26,6 +26,7 @@ uv run plugins/sentry-skills/skills/skill-writer/scripts/quick_validate.py <path
 - `references/api-surface.md` exists
 - `references/common-use-cases.md` exists with sufficient depth
 - `references/troubleshooting-workarounds.md` exists with sufficient depth
+- `SKILL.md` and `references/*.md` avoid host-specific absolute filesystem paths
 
 4. Confirm evaluation outputs are present:
 - qualitative eval summary (mandatory)

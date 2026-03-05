@@ -9,6 +9,7 @@ Use this path to create or update the skill files.
 3. `description` must contain realistic trigger phrases.
 4. Keep body imperative and concise.
 5. Use SKILL.md as index/orchestration for complex workflows.
+6. Keep paths portable: do not hardcode host-specific absolute filesystem paths (for example `<home>/...` or `<drive>:\Users\...`) in `SKILL.md` or `references/`.
 
 ## Supporting files
 

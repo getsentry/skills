@@ -63,6 +63,14 @@ ACTION_TOKENS = (
     "map",
 )
 
+MACHINE_SPECIFIC_PATH_PATTERNS = (
+    re.compile(r"/Users/[^/\s`\"'<>)](?:[^\s`\"'<>)]*)"),
+    re.compile(r"/home/[^/\s`\"'<>)](?:[^\s`\"'<>)]*)"),
+    re.compile(r"/var/folders/[^/\s`\"'<>)](?:[^\s`\"'<>)]*)"),
+    re.compile(r"/private/var/folders/[^/\s`\"'<>)](?:[^\s`\"'<>)]*)"),
+    re.compile(r"[A-Za-z]:\\\\Users\\\\[^\s`\"'<>)](?:[^\s`\"'<>)]*)"),
+)
+
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -137,6 +145,44 @@ def parse_open_gap_lines(sources_markdown: str) -> list[str]:
 
 def count_list_items(markdown: str) -> int:
     return len(re.findall(r"(?m)^\s*(?:-|\d+\.)\s+", markdown))
+
+
+def find_machine_specific_paths(text: str) -> list[str]:
+    matches: list[str] = []
+    for pattern in MACHINE_SPECIFIC_PATH_PATTERNS:
+        for match in pattern.finditer(text):
+            matched = match.group(0)
+            if matched not in matches:
+                matches.append(matched)
+    return matches
+
+
+def validate_portable_paths(
+    skill_path: Path,
+    skill_content: str,
+    strict_depth: bool,
+    errors: list[str],
+    warnings: list[str],
+) -> None:
+    severity = errors if strict_depth else warnings
+    portability_hits: list[str] = []
+
+    skill_hits = find_machine_specific_paths(skill_content)
+    if skill_hits:
+        portability_hits.append(f"SKILL.md: {', '.join(skill_hits[:3])}")
+
+    refs_dir = skill_path / "references"
+    if refs_dir.exists():
+        for ref_path in sorted(refs_dir.glob("*.md")):
+            ref_hits = find_machine_specific_paths(ref_path.read_text())
+            if ref_hits:
+                portability_hits.append(f"{ref_path.name}: {', '.join(ref_hits[:3])}")
+
+    if portability_hits:
+        severity.append(
+            "Machine-specific absolute filesystem paths detected. Use portable placeholders like "
+            "`<repo-root>/...` or `<skill-dir>/...`. Offenders: " + "; ".join(portability_hits)
+        )
 
 
 def validate_integration_depth(
@@ -354,6 +400,7 @@ def validate_skill(
 
     if resolved_skill_class == "integration-documentation":
         validate_integration_depth(skill_path, strict_depth, errors, warnings)
+    validate_portable_paths(skill_path, content, strict_depth, errors, warnings)
 
     return len(errors) == 0, errors, warnings, resolved_skill_class
 

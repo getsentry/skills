@@ -139,6 +139,20 @@ Use the v2 API endpoint.
 The v1 API is no longer supported.
 ```
 
+## Avoid Machine-Specific Paths
+
+Do not bake host-specific filesystem paths into skills. These make generated skills non-portable.
+
+```markdown
+# Bad
+Read `<absolute-path>/README.md`.
+Run `python <absolute-path>/tool.py`.
+
+# Good
+Read `<repo-root>/README.md`.
+Run `uv run <skill-dir>/scripts/tool.py`.
+```
+
 ## Long Reference Files
 
 For reference files longer than 100 lines, include a table of contents at the top so agents can see the full scope when previewing:
