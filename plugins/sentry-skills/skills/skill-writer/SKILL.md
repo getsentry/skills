@@ -43,7 +43,18 @@ Read `references/synthesis-path.md`.
 5. Enforce baseline source pack for skill-authoring workflows.
 6. Enforce depth gates before moving to authoring.
 
-## Step 3: Author or update skill artifacts
+## Step 3: Run iteration first when improving from outcomes/examples
+
+Read `references/iteration-path.md` first when selected path includes `iteration` (for example operation `iterate`).
+
+1. Capture and anonymize examples with provenance.
+2. Re-evaluate skill behavior against working and holdout slices.
+3. Propose improvements from positive/negative/fix evidence.
+4. Carry concrete behavior deltas into authoring.
+
+Skip this step when selected path does not include `iteration`.
+
+## Step 4: Author or update skill artifacts
 
 Read `references/authoring-path.md`.
 
@@ -55,22 +66,13 @@ Read `references/authoring-path.md`.
    - secure/robust variant
    - anti-pattern + corrected version
 
-## Step 4: Optimize description quality
+## Step 5: Optimize description quality
 
 Read `references/description-optimization.md`.
 
 1. Validate should-trigger and should-not-trigger query sets.
 2. Reduce false positives and false negatives with targeted description edits.
 3. Keep trigger language generic across Codex and Claude.
-
-## Step 5: Iterate with examples
-
-Read `references/iteration-path.md`.
-
-1. Capture and anonymize examples with provenance.
-2. Re-evaluate skill behavior against working and holdout slices.
-3. Propose and apply improvements from positive/negative/fix evidence.
-4. Update `SOURCES.md` records and changelog entries.
 
 ## Step 6: Evaluate outcomes
 

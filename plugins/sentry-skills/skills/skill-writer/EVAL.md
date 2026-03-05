@@ -11,7 +11,7 @@ Use `sentry-skills:skill-writer` to synthesize a new skill named `pi-agent-integ
 Primary objective: produce a non-surface-level integration skill that covers API surface, known issues/workarounds, and common real-world use cases.
 
 Scope:
-- Source root: `/Users/dcramer/src/pi-mono/packages/agent`
+- Source root: `<pi-mono-root>/packages/agent`
 - This is for USING Pi in another library, not editing Pi internals.
 
 Mandatory source retrieval:

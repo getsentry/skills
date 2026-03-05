@@ -68,7 +68,7 @@ MACHINE_SPECIFIC_PATH_PATTERNS = (
     re.compile(r"/home/[^/\s`\"'<>)](?:[^\s`\"'<>)]*)"),
     re.compile(r"/var/folders/[^/\s`\"'<>)](?:[^\s`\"'<>)]*)"),
     re.compile(r"/private/var/folders/[^/\s`\"'<>)](?:[^\s`\"'<>)]*)"),
-    re.compile(r"[A-Za-z]:\\\\Users\\\\[^\s`\"'<>)](?:[^\s`\"'<>)]*)"),
+    re.compile(r"[A-Za-z]:\\Users\\[^\s`\"'<>)](?:[^\s`\"'<>)]*)"),
 )
 
 
@@ -89,7 +89,7 @@ def infer_skill_class(description: str, content: str) -> str:
         return "skill-authoring"
     if any(tok in text for tok in ("security", "vulnerability", "owasp", "injection", "xss")):
         return "security-review"
-    if any(tok in text for tok in ("integrate", "sdk", "library", "api")) and any(
+    if any(tok in text for tok in ("integrate", "sdk", "library", "api surface", "public api", "api contract")) and any(
         tok in text for tok in ("use when", "downstream", "consumer", "abstraction")
     ):
         return "integration-documentation"
@@ -173,10 +173,12 @@ def validate_portable_paths(
 
     refs_dir = skill_path / "references"
     if refs_dir.exists():
-        for ref_path in sorted(refs_dir.glob("*.md")):
+        for ref_path in sorted(refs_dir.rglob("*.md")):
             ref_hits = find_machine_specific_paths(ref_path.read_text())
             if ref_hits:
-                portability_hits.append(f"{ref_path.name}: {', '.join(ref_hits[:3])}")
+                portability_hits.append(
+                    f"{ref_path.relative_to(skill_path)}: {', '.join(ref_hits[:3])}"
+                )
 
     if portability_hits:
         severity.append(

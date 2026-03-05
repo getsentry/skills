@@ -14,26 +14,26 @@ Run the eval in a temporary isolated workspace (copy of repo in `/tmp`):
 EVAL_DIR=/tmp/sentry-skills-eval-run
 rm -rf "$EVAL_DIR"
 mkdir -p "$EVAL_DIR"
-rsync -a /Users/dcramer/src/sentry-skills/ "$EVAL_DIR"/
+rsync -a "<repo-root>/"/ "$EVAL_DIR"/
 
 codex exec \
   --ephemeral \
   --full-auto \
   --sandbox workspace-write \
   --skip-git-repo-check \
-  --add-dir /Users/dcramer/src/pi-mono \
+  --add-dir "<pi-mono-root>" \
   -C "$EVAL_DIR" \
-  "$(cat /tmp/pi_agent_eval_prompt.txt)"
+  "$(cat <eval-prompt-file>)"
 ```
 
-Where `/tmp/pi_agent_eval_prompt.txt` contains the exact eval prompt from `EVAL.md`.
+Where `<eval-prompt-file>` contains the exact eval prompt from `EVAL.md`.
 
 ## Verification
 
 Validate the generated skill output:
 
 ```bash
-uv run /Users/dcramer/src/sentry-skills/plugins/sentry-skills/skills/skill-writer/scripts/quick_validate.py \
+uv run "<repo-root>/plugins/sentry-skills/skills/skill-writer/scripts/quick_validate.py" \
   /tmp/sentry-skills-eval-run/plugins/sentry-skills/skills/pi-agent-integration-eval \
   --skill-class integration-documentation \
   --strict-depth
