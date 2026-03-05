@@ -47,8 +47,8 @@ Structure skills so agents load only what they need, when they need it.
 
 | File Extension | Read This Reference |
 |---------------|-------------------|
-| `.py`         | `${CLAUDE_SKILL_ROOT}/references/python.md` |
-| `.js`, `.ts`  | `${CLAUDE_SKILL_ROOT}/references/javascript.md` |
+| `.py`         | `references/python.md` |
+| `.js`, `.ts`  | `references/javascript.md` |
 ```
 
 This keeps the base context small while making deep knowledge available when needed.
@@ -139,6 +139,20 @@ Use the v2 API endpoint.
 The v1 API is no longer supported.
 ```
 
+## Avoid Machine-Specific Paths
+
+Do not bake host-specific filesystem paths into skills. These make generated skills non-portable.
+
+```markdown
+# Bad
+Read `<absolute-path>/README.md`.
+Run `python <absolute-path>/tool.py`.
+
+# Good
+Read `<repo-root>/README.md`.
+Run `uv run <skill-dir>/scripts/tool.py`.
+```
+
 ## Long Reference Files
 
 For reference files longer than 100 lines, include a table of contents at the top so agents can see the full scope when previewing:
@@ -160,6 +174,6 @@ For very large reference files (>10k words), include grep search patterns in SKI
 
 ```markdown
 Find specific metrics using grep:
-- Revenue data: `grep -i "revenue" ${CLAUDE_SKILL_ROOT}/references/finance.md`
-- Pipeline data: `grep -i "pipeline" ${CLAUDE_SKILL_ROOT}/references/sales.md`
+- Revenue data: `grep -i "revenue" references/finance.md`
+- Pipeline data: `grep -i "pipeline" references/sales.md`
 ```
