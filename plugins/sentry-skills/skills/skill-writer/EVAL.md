@@ -1,6 +1,7 @@
 # Skill Writer Eval Prompts
 
-Use these prompts to evaluate depth and coverage quality of `sentry-skills:skill-writer`.
+Use these prompts when deeper evaluation matters (high-risk, regression tracking, or explicit request).
+These are optional guidance artifacts, not required outputs for every skill.
 
 ## Integration/Documentation Depth Eval
 
@@ -43,3 +44,12 @@ Output sections:
 Pass only if all required artifacts exist and have the requested depth.
 Fail if API mapping is partial, workaround guidance is shallow, or use cases are generic and not actionable.
 Fail if completion is claimed with unresolved high-impact gaps and no next retrieval actions.
+
+## Optional Deep-Eval Pattern
+
+When you need stronger confidence, run this sequence:
+
+1. Use a fixed prompt set (positives + negatives).
+2. Capture deterministic traces (`codex exec --json`).
+3. Apply rubric/schema checks where practical (`--output-schema`).
+4. Compare baseline vs candidate and report deltas.

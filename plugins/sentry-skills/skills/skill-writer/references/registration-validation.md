@@ -28,10 +28,10 @@ uv run plugins/sentry-skills/skills/skill-writer/scripts/quick_validate.py <path
 - `references/troubleshooting-workarounds.md` exists with sufficient depth
 - `SKILL.md` and `references/*.md` avoid host-specific absolute filesystem paths
 
-4. Confirm evaluation outputs are present:
-- qualitative eval summary (mandatory)
-- qualitative depth rubric status for API/workaround/use-case/gap handling (mandatory for integration/documentation and skill-authoring)
-- quantitative summary only if user requested benchmark mode
+4. Confirm evaluation outputs as applicable:
+- lightweight qualitative summary (recommended default)
+- qualitative depth rubric status for API/workaround/use-case/gap handling (recommended for integration/documentation and skill-authoring)
+- deeper eval or quantitative summary only if user requested benchmark mode or risk warrants it
 
 5. Reject shallow handoffs that omit required artifacts.
 

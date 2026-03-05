@@ -76,10 +76,10 @@ Read `references/iteration-path.md`.
 
 Read `references/evaluation-path.md`.
 
-1. Run mandatory qualitative evaluation on representative prompts.
-2. For integration/documentation and skill-authoring skills, run the depth rubric in `references/evaluation-path.md`.
-3. If requested, run quantitative baseline-vs-with-skill benchmark.
-4. Record pass/fail outcomes and unresolved risks.
+1. Run a lightweight qualitative check by default (recommended).
+2. For integration/documentation and skill-authoring skills, include the concise depth rubric from `references/evaluation-path.md`.
+3. Run deeper eval playbook and quantitative baseline-vs-with-skill only when requested or risk warrants it.
+4. Record outcomes and unresolved risks.
 
 ## Step 7: Register and validate
 
