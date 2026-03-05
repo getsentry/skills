@@ -57,10 +57,9 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [iterate-pr](plugins/sentry-skills/skills/iterate-pr/SKILL.md) | Iterate on a PR until CI passes. |
 | [pr-writer](plugins/sentry-skills/skills/pr-writer/SKILL.md) | Canonical workflow to create and update pull requests following Sentry conventions. |
 | [security-review](plugins/sentry-skills/skills/security-review/SKILL.md) | Security code review for vulnerabilities. |
-| [skill-creator](plugins/sentry-skills/skills/skill-creator/SKILL.md) | Create new agent skills following the Agent Skills specification. |
+| [skill-creator](plugins/sentry-skills/skills/skill-creator/SKILL.md) | Alias for `skill-writer` for compatibility with legacy invocations. |
 | [skill-scanner](plugins/sentry-skills/skills/skill-scanner/SKILL.md) | Scan agent skills for security issues. |
-| [skill-synthesize](plugins/sentry-skills/skills/skill-synthesize/SKILL.md) | Research and synthesize source material to create or improve skills, then prepare a structured handoff for skill-writer. |
-| [skill-writer](plugins/sentry-skills/skills/skill-writer/SKILL.md) | Canonical workflow to create and update agent skills for this repository. |
+| [skill-writer](plugins/sentry-skills/skills/skill-writer/SKILL.md) | Canonical workflow to synthesize, create, and iteratively improve agent skills for this repository. |
 | [sred-project-organizer](plugins/sentry-skills/skills/sred-project-organizer/SKILL.md) | Take a list of projects and their related documentation, and organize them into the SRED format for submission. |
 | [sred-work-summary](plugins/sentry-skills/skills/sred-work-summary/SKILL.md) | Go back through the previous year of work and create a Notion doc that groups relevant links into projects that can then be documented as SRED projects. |
 

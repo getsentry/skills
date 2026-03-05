@@ -1,308 +1,92 @@
 ---
 name: skill-writer
-description: Create and update agent skills following the Agent Skills specification. Use when asked to "create a skill", "add a new skill", "write a skill", "update a skill", "rename a skill", "make a skill", "build a skill", or scaffold a new skill with SKILL.md. Guides through requirements, planning, writing, registration, and verification.
+description: Create, synthesize, and iteratively improve agent skills following the Agent Skills specification. Use when asked to "create a skill", "write a skill", "synthesize sources into a skill", "improve a skill from positive/negative examples", "update a skill", or "maintain skill docs and registration". Handles source capture, depth gates, authoring, registration, and validation.
 ---
-
-<!--
-Adapted from skill-creator implementations by Anthropic and OpenAI:
-https://github.com/anthropics/skills/tree/main/skills/skill-creator
-https://github.com/openai/skills/tree/main/skills/.system/skill-creator
-
-References:
-- Agent Skills specification: https://agentskills.io/specification
-- Skill authoring best practices: https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
-- Validation library: https://github.com/agentskills/agentskills/tree/main/skills-ref
--->
 
 # Skill Writer
 
-Guide the user through creating a new agent skill following the [Agent Skills specification](https://agentskills.io/specification). Follow each step in order.
+Use this as the single canonical workflow for skill creation and improvement.
+Primary success condition: maximize high-value input coverage before authoring so the resulting skill has minimal blind spots.
 
-## Step 1: Understand the Skill
+Load only the path(s) required for the task:
 
-Gather requirements before writing anything.
+| Task | Read |
+|------|------|
+| Choose workflow path and required outputs | `references/mode-selection.md` |
+| Load representative synthesis examples by skill type | `references/examples/*.md` |
+| Synthesize external/local sources with depth gates | `references/synthesis-path.md` |
+| Author or update SKILL.md and supporting files | `references/authoring-path.md` |
+| Optimize skill description and trigger precision | `references/description-optimization.md` |
+| Iterate using positive/negative/fix examples | `references/iteration-path.md` |
+| Evaluate behavior and compare baseline vs with-skill (opt-in quantitative) | `references/evaluation-path.md` |
+| Register and validate skill changes | `references/registration-validation.md` |
 
-**Ask the user:**
-1. What should this skill do? (one sentence)
-2. When should an agent use it? (trigger phrases users would say)
-3. What tools does the skill need? (Read, Grep, Glob, Bash, Task, WebFetch, etc.)
-4. Where should the skill live? (which plugin or directory)
+## Step 1: Resolve target and path
 
-**Determine the skill name:**
-- Lowercase letters, digits, and hyphens only (`a-z`, `0-9`, `-`)
-- 1-64 characters; must not start or end with `-`; no consecutive hyphens (`--`)
-- Descriptive and unique among existing skills
-- Prefer capability-first names over lifecycle verbs
-- Check the target skills directory to avoid name collisions
+1. Resolve target skill path and intended operation (`create`, `update`, `synthesize`, `iterate`).
+2. Read `references/mode-selection.md` and select the required path(s).
+3. State assumptions when scope is missing.
 
-**Naming practices:**
-- Prefer stable capability names: `code-review`, `pr-writer`, `skill-writer`
-- Prefer compact patterns: `<domain>-<capability>` or `<artifact>-<role>`
-- Avoid generic names: `helper`, `utils`, `assistant`, `misc-tool`
-- Avoid lifecycle prefixes unless task-specific behavior is essential: `create-`, `make-`, `do-`
-- Keep names specific enough for skill discovery and distinct from nearby skills
+## Step 2: Run synthesis when needed
 
-**Examples:**
-- Good: `pr-writer`, `django-perf-review`, `gha-security-review`
-- Avoid when a clearer capability exists: `create-pr`, `make-skill`, `skill-helper`
+Read `references/synthesis-path.md`.
 
-**Choose a complexity tier:**
+1. Collect and score relevant sources with provenance.
+2. Apply trust and safety rules when ingesting external content.
+3. Produce source-backed decisions and coverage/gap status.
+4. Load the closest profile from `references/examples/*.md`.
+5. Enforce baseline source pack for skill-authoring workflows.
+6. Enforce depth gates before moving to authoring.
 
-| Tier | Structure | Use When |
-|------|-----------|----------|
-| **Simple** | `SKILL.md` only | Self-contained instructions under ~200 lines |
-| **With references** | `SKILL.md` + `references/` | Domain knowledge that agents load conditionally |
-| **With scripts** | `SKILL.md` + `scripts/` | Workflow automation needing Python scripts |
-| **Full** | All of the above | Complex skills with automation and domain knowledge |
+## Step 3: Author or update skill artifacts
 
-Read `${CLAUDE_SKILL_ROOT}/references/design-principles.md` for guidance on keeping skills focused and concise.
+Read `references/authoring-path.md`.
 
-## Step 2: Plan the Skill
+1. Write or update `SKILL.md` in imperative voice with trigger-rich description.
+2. Create focused reference files and scripts only when justified.
+3. For authoring/generator skills, include transformed examples in references:
+   - happy-path
+   - secure/robust variant
+   - anti-pattern + corrected version
 
-Analyze how each use case would be executed from scratch. Identify what reusable resources would help when executing these tasks repeatedly.
+## Step 4: Optimize description quality
 
-For each concrete example, ask:
-1. What code would be rewritten every time? → candidate for `scripts/`
-2. What documentation is needed to inform decisions? → candidate for `references/`
-3. What templates or assets are used in output? → candidate for `assets/`
+Read `references/description-optimization.md`.
 
-Example analysis:
-- "Rotate a PDF" → rotating requires rewriting the same code → `scripts/rotate_pdf.py`
-- "Query BigQuery metrics" → need table schemas each time → `references/schema.md`
-- "Build a frontend app" → same boilerplate HTML/React → `assets/hello-world/`
+1. Validate should-trigger and should-not-trigger query sets.
+2. Reduce false positives and false negatives with targeted description edits.
+3. Keep trigger language generic across Codex and Claude.
 
-## Step 3: Study Existing Skills
+## Step 5: Iterate with examples
 
-Before writing, study 1-2 existing skills that match the chosen tier. Look for skills in the target repository or plugin to understand local conventions.
+Read `references/iteration-path.md`.
 
-Read `${CLAUDE_SKILL_ROOT}/references/skill-patterns.md` for concrete examples of each tier.
+1. Capture and anonymize examples with provenance.
+2. Re-evaluate skill behavior against working and holdout slices.
+3. Propose and apply improvements from positive/negative/fix evidence.
+4. Update `SOURCES.md` records and changelog entries.
 
-Also read `CLAUDE.md` (or `AGENTS.md`) at the repository root for repo-specific conventions that the skill should follow.
+## Step 6: Evaluate outcomes
 
-## Step 4: Write the SKILL.md
+Read `references/evaluation-path.md`.
 
-Create `<skill-directory>/<name>/SKILL.md`.
+1. Run mandatory qualitative evaluation on representative prompts.
+2. If requested, run quantitative baseline-vs-with-skill benchmark.
+3. Record pass/fail outcomes and unresolved risks.
 
-### Frontmatter
+## Step 7: Register and validate
 
-The YAML frontmatter **must** be the first thing in the file. No comments or blank lines before `---`.
+Read `references/registration-validation.md`.
 
-```yaml
----
-name: <skill-name>
-description: <what it does>. Use when <trigger phrases>. <key capabilities>.
----
-```
+1. Apply repository registration steps.
+2. Run quick validation.
+3. Reject shallow outputs that fail depth gates or required artifact checks.
 
-**Required fields:**
-- `name` — must match the directory name exactly
-- `description` — up to 1024 chars, no angle brackets (`<` or `>`); include trigger keywords that help agents match user intent
+## Output format
 
-**Optional fields:**
-- `allowed-tools` — comma-separated list (e.g., `Read, Grep, Glob, Bash`); omit to allow all tools
-- `license` — license name or path (add when vendoring external content)
-- `metadata` — arbitrary key-value mapping for additional metadata
-- `compatibility` — environment requirements (max 500 chars); most skills don't need this
+Return:
 
-Default behavior: do not add `allowed-tools` unless the user explicitly asks for strict tool scoping or the repository has a policy requiring it. Tool-allowlist syntax can vary across clients.
-
-For Claude Code-specific fields (`argument-hint`, `disable-model-invocation`, `context`, etc.), read `${CLAUDE_SKILL_ROOT}/references/claude-code-extensions.md`.
-
-### Description Guidelines
-
-The description is the **primary trigger mechanism** — it determines when agents activate the skill. All "when to use" information belongs here, not in the body.
-
-**Write in third person:**
-- Good: "Processes Excel files and generates reports. Use when..."
-- Bad: "I can help you process Excel files" or "You can use this to..."
-
-**Include natural trigger phrases:**
-```yaml
-# Good — specific triggers users would actually say
-description: Security code review for vulnerabilities. Use when asked to "security review", "find vulnerabilities", "check for security issues", "audit security".
-
-# Bad — too vague, no trigger phrases
-description: A helpful skill for code quality.
-```
-
-**Pattern:** `<What it does>. Use when <trigger phrases>. <Key capabilities>.`
-
-### Body Guidelines
-
-Write the body in **imperative voice** — these are instructions, not documentation.
-
-| Do | Don't |
-|----|-------|
-| "Read the file and extract..." | "This skill reads the file and extracts..." |
-| "Report only HIGH confidence findings" | "The agent should report only HIGH confidence findings" |
-| "Ask the user which option to use" | "You may want to ask the user..." |
-
-**Structure:**
-1. Start with a one-line summary of what the skill does
-2. Organize steps with `## Step N: Title` headings
-3. Use tables for decision logic and mappings
-4. Include concrete examples of expected output
-5. End with validation criteria or exit conditions
-
-For workflow and output patterns, read:
-- `${CLAUDE_SKILL_ROOT}/references/workflow-patterns.md` — sequential workflows, feedback loops, plan-validate-execute
-- `${CLAUDE_SKILL_ROOT}/references/output-patterns.md` — template, examples, and structured data patterns
-
-**Size limits:**
-- Keep SKILL.md under **500 lines** (< 5000 tokens recommended)
-- If approaching the limit, move reference material to `references/` files
-- Load reference files conditionally based on context (not all at once)
-
-**Use consistent terminology** — pick one term for each concept and stick with it throughout. Don't alternate between "API endpoint", "URL", "route", and "path".
-
-### Attribution
-
-If the skill is based on or adapted from external sources, add an HTML comment **after** the frontmatter closing `---`:
-
-```markdown
----
-name: example
-description: ...
----
-
-<!--
-Based on [Original Name] by [Author/Org]:
-https://github.com/example/original-source
--->
-```
-
-## Step 5: Create Supporting Files
-
-### What to Include
-
-Only include files that directly support the skill's function.
-
-### What NOT to Include
-
-Do not create extraneous documentation or auxiliary files:
-- README.md, INSTALLATION_GUIDE.md, QUICK_REFERENCE.md, CHANGELOG.md
-
-A skill should contain only what an agent needs to do the job. Not setup procedures, not user-facing docs, not development history.
-
-### References (`references/`)
-
-Use for domain knowledge the agent loads conditionally.
-
-```
-<name>/
-├── SKILL.md
-└── references/
-    ├── topic-a.md
-    └── topic-b.md
-```
-
-Reference from SKILL.md with:
-```markdown
-Read `${CLAUDE_SKILL_ROOT}/references/topic-a.md` for details on [topic].
-```
-
-Guidelines:
-- Keep each reference file focused on one topic
-- Keep references **one level deep** from SKILL.md (no nested reference chains)
-- For files over 100 lines, add a table of contents at the top
-- For files over 10k words, include grep search patterns in SKILL.md
-- Information should live in either SKILL.md or references, not both
-
-### Scripts (`scripts/`)
-
-Use for workflow automation that benefits from structured Python.
-
-```
-<name>/
-├── SKILL.md
-└── scripts/
-    └── do_thing.py
-```
-
-**Script requirements:**
-- Always use `uv run` to execute: `uv run ${CLAUDE_SKILL_ROOT}/scripts/do_thing.py`
-- Add PEP 723 inline metadata for dependencies:
-
-```python
-# /// script
-# requires-python = ">=3.12"
-# dependencies = ["requests"]
-# ///
-```
-
-- Output structured JSON for agent consumption
-- Run from the **repository root**, not the skill directory
-- Document the script's interface in SKILL.md (arguments, output format)
-- Handle errors explicitly — don't punt to the agent
-
-### Assets (`assets/`)
-
-Use for static files used in the skill's output (templates, images, boilerplate code, fonts). These are not loaded into context — they're copied or used directly.
-
-### LICENSE
-
-Include a LICENSE file in the skill directory when vendoring content with specific licensing requirements.
-
-## Step 6: Validate the Skill
-
-Run the validation script to catch issues early:
-
-```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/quick_validate.py <path/to/skill-directory>
-```
-
-The script checks frontmatter format, required fields, naming rules, and common mistakes. Fix any errors and re-run until validation passes.
-
-Alternatively, use the upstream validation tool:
-```bash
-skills-ref validate <path/to/skill-directory>
-```
-
-## Step 7: Register the Skill
-
-Registration steps vary by repository. Check the repository's `CLAUDE.md` or `README.md` for specific instructions.
-
-1. **Verify directory-name match** — confirm the directory name matches the `name` field in SKILL.md frontmatter exactly
-2. **Update documentation** — add the skill to any skills index or table in README.md, keeping skill lists alphabetical by name
-3. **Update permissions** — if the repo has `.claude/settings.json`, add `Skill(<plugin>:<name>)` to the `permissions.allow` array
-4. **Check CLAUDE.md** — read the repository's `CLAUDE.md` for any additional registration steps specific to that project
-
-## Step 8: Verify
-
-Run through this checklist before finishing:
-
-### Frontmatter
-- [ ] `name` matches directory name
-- [ ] `name` uses only lowercase letters, digits, hyphens (no leading/trailing/consecutive hyphens)
-- [ ] `description` is under 1024 characters, no angle brackets
-- [ ] `description` is in third person and includes trigger keywords
-- [ ] All "when to use" info is in description, not in body
-- [ ] No content before the opening `---`
-
-### Content
-- [ ] SKILL.md is under 500 lines
-- [ ] Written in imperative voice
-- [ ] Steps are numbered and clear
-- [ ] Examples of expected output included
-- [ ] Consistent terminology throughout
-- [ ] Reference files loaded conditionally (not unconditionally)
-- [ ] No extraneous files (README.md, CHANGELOG.md, etc.)
-
-### Registration
-- [ ] Directory name matches frontmatter `name`
-- [ ] Skill added to repo documentation (README or equivalent)
-- [ ] Permissions updated (if applicable)
-- [ ] Any repo-specific registration steps completed (check CLAUDE.md)
-
-### Scripts (if applicable)
-- [ ] Uses `uv run ${CLAUDE_SKILL_ROOT}/scripts/...`
-- [ ] Has PEP 723 inline metadata
-- [ ] Outputs structured JSON
-- [ ] Handles errors explicitly
-- [ ] Documented in SKILL.md
-
-### Validation
-- [ ] `uv run ${CLAUDE_SKILL_ROOT}/scripts/quick_validate.py` passes
-- [ ] Tested with a real usage scenario
-
-Report any issues found and fix them before completing.
+1. `Summary`
+2. `Changes Made`
+3. `Validation Results`
+4. `Open Gaps`

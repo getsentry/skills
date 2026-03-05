@@ -162,7 +162,6 @@ If this is a Sentry project (or sentry-skills plugin is installed), include:
   "Skill(sentry-skills:security-review)",
   "Skill(sentry-skills:skill-creator)",
   "Skill(sentry-skills:skill-scanner)",
-  "Skill(sentry-skills:skill-synthesize)",
   "Skill(sentry-skills:skill-writer)",
   "Skill(sentry-skills:sred-project-organizer)",
   "Skill(sentry-skills:sred-work-summary)"

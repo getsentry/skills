@@ -153,11 +153,26 @@ def validate_skill(skill_path: Path) -> tuple[bool, list[str], list[str]]:
         if "scripts/" in content and not scripts_dir.exists():
             errors.append("SKILL.md references 'scripts/' but directory does not exist")
 
-    # Check for hardcoded paths (should use ${CLAUDE_SKILL_ROOT})
+    # If SOURCES.md is referenced, ensure it exists and includes provenance schema headers.
+    if "SOURCES.md" in content:
+        sources_md = skill_path / "SOURCES.md"
+        if not sources_md.exists():
+            errors.append("SKILL.md references 'SOURCES.md' but file does not exist")
+        else:
+            sources_content = sources_md.read_text()
+            required_headers = ("Trust tier", "Confidence", "Usage constraints")
+            missing_headers = [h for h in required_headers if h not in sources_content]
+            if missing_headers:
+                warnings.append(
+                    "SOURCES.md is missing expected provenance columns: "
+                    + ", ".join(missing_headers)
+                )
+
+    # Check for hardcoded repo paths (prefer skill-local references/scripts paths)
     if re.search(r"(?:plugins|skills)/[a-z-]+/(?:scripts|references|assets)/", content):
         warnings.append(
             "SKILL.md may contain hardcoded paths. "
-            "Use ${CLAUDE_SKILL_ROOT}/scripts/... instead."
+            "Use skill-local references/... paths and run scripts via <skill-dir>/scripts/..."
         )
 
     return len(errors) == 0, errors, warnings

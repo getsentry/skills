@@ -46,8 +46,9 @@ iterate-pr/
   # dependencies = ["requests"]
   # ///
   ```
-- Invoked with `uv run ${CLAUDE_SKILL_ROOT}/scripts/script_name.py`
-- Scripts run from the **repository root**, not the skill directory
+- Scripts live in the skill directory (`scripts/`)
+- Invoke with `uv run <skill-dir>/scripts/script_name.py`
+- Do not assume current working directory is the skill directory
 - Scripts output structured JSON for agent consumption
 - Scripts handle errors explicitly — don't punt to the agent
 - SKILL.md includes a fallback section for when scripts fail
@@ -123,7 +124,7 @@ Fix GitHub issue $ARGUMENTS following our coding standards.
 - `disable-model-invocation: true` prevents Claude from triggering it automatically (appropriate for side-effect-heavy workflows)
 - If `$ARGUMENTS` is absent from the content, arguments are appended as `ARGUMENTS: <value>`
 
-**Note:** These features are Claude Code extensions. See `${CLAUDE_SKILL_ROOT}/references/claude-code-extensions.md`.
+**Note:** These features are Claude Code extensions. See `references/claude-code-extensions.md`.
 
 ## Anti-Patterns
 
@@ -177,14 +178,14 @@ Fix GitHub issue $ARGUMENTS following our coding standards.
 
 ### Scripts Without Documentation
 
-**Problem:** SKILL.md says `uv run ${CLAUDE_SKILL_ROOT}/scripts/tool.py` but doesn't document what arguments it takes or what it outputs.
+**Problem:** SKILL.md says `uv run <skill-dir>/scripts/tool.py` but doesn't document what arguments it takes or what it outputs.
 
 **Fix:** Document every script's interface in SKILL.md:
 ```markdown
 ### `scripts/tool.py`
 Fetches X and returns structured data.
 ```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/tool.py --flag VALUE
+uv run <skill-dir>/scripts/tool.py --flag VALUE
 ```
 Returns JSON:
 ```json
@@ -196,7 +197,7 @@ Returns JSON:
 
 **Problem:** SKILL.md references a hardcoded path like `plugins/my-plugin/skills/my-skill/scripts/tool.py`.
 
-**Fix:** Always use `${CLAUDE_SKILL_ROOT}/scripts/tool.py`. The variable resolves to the skill's directory regardless of where the agent runs from.
+**Fix:** Keep files in the skill directory and execute scripts via `uv run <skill-dir>/scripts/tool.py` so commands still work when cwd is elsewhere.
 
 ### First/Second Person Descriptions
 

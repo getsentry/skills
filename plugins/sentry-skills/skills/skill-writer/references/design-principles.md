@@ -47,8 +47,8 @@ Structure skills so agents load only what they need, when they need it.
 
 | File Extension | Read This Reference |
 |---------------|-------------------|
-| `.py`         | `${CLAUDE_SKILL_ROOT}/references/python.md` |
-| `.js`, `.ts`  | `${CLAUDE_SKILL_ROOT}/references/javascript.md` |
+| `.py`         | `references/python.md` |
+| `.js`, `.ts`  | `references/javascript.md` |
 ```
 
 This keeps the base context small while making deep knowledge available when needed.
@@ -160,6 +160,6 @@ For very large reference files (>10k words), include grep search patterns in SKI
 
 ```markdown
 Find specific metrics using grep:
-- Revenue data: `grep -i "revenue" ${CLAUDE_SKILL_ROOT}/references/finance.md`
-- Pipeline data: `grep -i "pipeline" ${CLAUDE_SKILL_ROOT}/references/sales.md`
+- Revenue data: `grep -i "revenue" references/finance.md`
+- Pipeline data: `grep -i "pipeline" references/sales.md`
 ```
