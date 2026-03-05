@@ -87,12 +87,14 @@ def infer_skill_class(description: str, content: str) -> str:
 
     if has_any_term(text, ("create a skill", "write a skill", "skill-writer", "maintain skill docs")):
         return "skill-authoring"
-    if has_any_term(text, ("security", "vulnerability", "owasp", "injection", "xss")):
-        return "security-review"
     if has_any_term(text, ("integrate", "sdk", "library", "api surface", "public api", "api contract")) and has_any_term(
         text, ("use when", "downstream", "consumer", "abstraction")
     ):
         return "integration-documentation"
+    if has_any_term(text, ("vulnerability", "owasp", "injection", "xss", "idor")) or (
+        has_any_term(text, ("security",)) and has_any_term(text, ("review", "audit", "scan"))
+    ):
+        return "security-review"
     if has_any_term(text, ("workflow", "ci", "branch", "checklist", "runbook", "triage")):
         return "workflow-process"
     return "generic"
