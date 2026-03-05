@@ -103,6 +103,8 @@ sentry-skills/
 
 Skills follow the [Agent Skills specification](https://agentskills.io/specification). Each skill requires a `SKILL.md` file with YAML frontmatter.
 
+For repeatable `skill-writer` evaluation prompts, see [plugins/sentry-skills/skills/skill-writer/EVAL.md](plugins/sentry-skills/skills/skill-writer/EVAL.md).
+
 #### Skill Template
 
 Create a new directory under `plugins/sentry-skills/skills/`:

@@ -20,6 +20,21 @@ Create only files needed to execute the workflow:
 
 When synthesis is used, include or update `SOURCES.md` for provenance, decision records, coverage, and changelog.
 
+## Class-specific artifact requirements
+
+### `integration-documentation`
+
+Require these reference artifacts:
+
+1. `references/api-surface.md`
+2. `references/common-use-cases.md`
+3. `references/troubleshooting-workarounds.md`
+
+Default minimum depth unless user overrides:
+
+1. `common-use-cases.md`: at least 6 concrete downstream use cases.
+2. `troubleshooting-workarounds.md`: at least 8 issue/fix entries.
+
 ## Example artifact requirements
 
 For authoring/generator skills, references must include transformed examples that are directly usable:

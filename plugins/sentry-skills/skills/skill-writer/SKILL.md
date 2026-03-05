@@ -12,6 +12,10 @@ Load only the path(s) required for the task:
 
 | Task | Read |
 |------|------|
+| Set skill class and required dimensions | `references/mode-selection.md` |
+| Apply writing constraints for depth vs concision | `references/design-principles.md` |
+| Select structure pattern for this skill | `references/skill-patterns.md` |
+| Select output format pattern for deterministic quality | `references/output-patterns.md` |
 | Choose workflow path and required outputs | `references/mode-selection.md` |
 | Load representative synthesis examples by skill type | `references/examples/*.md` |
 | Synthesize external/local sources with depth gates | `references/synthesis-path.md` |
@@ -25,7 +29,8 @@ Load only the path(s) required for the task:
 
 1. Resolve target skill path and intended operation (`create`, `update`, `synthesize`, `iterate`).
 2. Read `references/mode-selection.md` and select the required path(s).
-3. State assumptions when scope is missing.
+3. Classify the skill (`workflow-process`, `integration-documentation`, `security-review`, `skill-authoring`, `generic`).
+4. Ask one direct question if class or depth requirements are ambiguous; otherwise state explicit assumptions.
 
 ## Step 2: Run synthesis when needed
 
@@ -34,7 +39,7 @@ Read `references/synthesis-path.md`.
 1. Collect and score relevant sources with provenance.
 2. Apply trust and safety rules when ingesting external content.
 3. Produce source-backed decisions and coverage/gap status.
-4. Load the closest profile from `references/examples/*.md`.
+4. Load one or more profiles from `references/examples/*.md` when the skill is hybrid.
 5. Enforce baseline source pack for skill-authoring workflows.
 6. Enforce depth gates before moving to authoring.
 
@@ -44,7 +49,8 @@ Read `references/authoring-path.md`.
 
 1. Write or update `SKILL.md` in imperative voice with trigger-rich description.
 2. Create focused reference files and scripts only when justified.
-3. For authoring/generator skills, include transformed examples in references:
+3. Follow `references/skill-patterns.md` and `references/output-patterns.md` for structure/output determinism.
+4. For authoring/generator skills, include transformed examples in references:
    - happy-path
    - secure/robust variant
    - anti-pattern + corrected version
@@ -71,15 +77,16 @@ Read `references/iteration-path.md`.
 Read `references/evaluation-path.md`.
 
 1. Run mandatory qualitative evaluation on representative prompts.
-2. If requested, run quantitative baseline-vs-with-skill benchmark.
-3. Record pass/fail outcomes and unresolved risks.
+2. For integration/documentation and skill-authoring skills, run the depth rubric in `references/evaluation-path.md`.
+3. If requested, run quantitative baseline-vs-with-skill benchmark.
+4. Record pass/fail outcomes and unresolved risks.
 
 ## Step 7: Register and validate
 
 Read `references/registration-validation.md`.
 
 1. Apply repository registration steps.
-2. Run quick validation.
+2. Run quick validation with strict depth gates.
 3. Reject shallow outputs that fail depth gates or required artifact checks.
 
 ## Output format

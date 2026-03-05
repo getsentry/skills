@@ -11,6 +11,13 @@ Always run this:
 3. Mark outcomes as improved, unchanged, or regressed.
 4. Record unresolved weaknesses and next steps.
 
+For `integration-documentation` and `skill-authoring` skills, include a depth rubric:
+
+1. API surface coverage: pass/fail.
+2. Known issues/workarounds coverage: pass/fail.
+3. Common use-case coverage: pass/fail.
+4. Gap handling quality (explicit next retrieval actions for partials): pass/fail.
+
 ## Optional quantitative benchmark (opt-in)
 
 Run only when explicitly requested or when objective scoring is practical.
@@ -21,6 +28,11 @@ Run only when explicitly requested or when objective scoring is practical.
 4. Report deltas and confidence in the result.
 
 Do not block completion on quantitative benchmarking unless the user asks for it.
+
+## Canonical eval prompts
+
+Keep reusable, copy/paste eval prompts in `../EVAL.md`.
+Use those prompts when you need a repeatable depth check against `skill-writer`.
 
 ## Agent-agnostic requirement
 

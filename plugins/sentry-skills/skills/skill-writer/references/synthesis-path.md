@@ -3,6 +3,19 @@
 Use this path when creating or materially changing a skill.
 Goal: maximize relevant input coverage and reduce unknowns before writing or revising instructions.
 
+## Step 0: Set class and required dimensions
+
+Pick one class from `references/mode-selection.md`.
+If needed, select multiple example profiles for hybrid skills (for example integration + workflow).
+
+For `integration-documentation` skills, coverage matrix must include:
+
+1. API surface and behavior contracts.
+2. Configuration/runtime options.
+3. Common downstream use cases.
+4. Known issues/failure modes with workarounds.
+5. Version/migration variance.
+
 ## Step 1: Collect sources
 
 Collect from:
@@ -31,13 +44,13 @@ Each `SOURCES.md` source row must include trust tier, confidence, and usage cons
 
 ## Step 1.5: Select synthesis example profile
 
-Select and load the closest profile from `references/examples/*.md`:
+Select and load one or more profiles from `references/examples/*.md`:
 
 - `documentation-skill.md`
 - `security-review-skill.md`
 - `workflow-process-skill.md`
 
-Use the selected profile as a concrete depth and output checklist.
+Use selected profiles as a concrete depth and output checklist.
 
 ## Step 1.6: Run coverage expansion passes
 
@@ -50,6 +63,13 @@ Before authoring, run targeted retrieval passes for:
 5. Version or platform variance (if applicable).
 
 Do not stop after a single documentation page or a small sample set.
+
+For `integration-documentation`, explicitly retrieve:
+
+1. Public API exports and method signatures.
+2. Runtime/config option docs and defaults.
+3. Troubleshooting/known failure behavior from tests/issues/changelog.
+4. In-repo usage patterns from representative consumer code.
 
 ## Step 2: Score and capture provenance
 
@@ -72,7 +92,7 @@ Map each major decision to source evidence and status (`adopted`, `rejected`, `d
 Depth gates are mandatory:
 
 1. No missing high-impact coverage dimensions.
-2. Clear unresolved-gap actions for anything still partial.
+2. For class-required dimensions, status is `complete`, or `partial` with explicit next retrieval actions.
 3. For authoring/generator skills, transformed example artifacts exist in references:
    - happy-path
    - secure/robust variant
@@ -80,6 +100,10 @@ Depth gates are mandatory:
 4. Selected profile requirements are satisfied.
 5. Coverage expansion passes are completed and reflected in the coverage matrix.
 6. Stopping rationale is explicit (why additional retrieval is currently low-yield).
+7. For `integration-documentation`, references include:
+   - `references/api-surface.md`
+   - `references/common-use-cases.md`
+   - `references/troubleshooting-workarounds.md`
 
 If any gate fails, synthesis is incomplete.
 

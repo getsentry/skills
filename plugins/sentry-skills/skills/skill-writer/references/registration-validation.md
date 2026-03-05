@@ -14,7 +14,7 @@ Apply repository registration and quality checks before completion.
 1. Run:
 
 ```bash
-uv run plugins/sentry-skills/skills/skill-writer/scripts/quick_validate.py <path/to/skill-directory>
+uv run plugins/sentry-skills/skills/skill-writer/scripts/quick_validate.py <path/to/skill-directory> --strict-depth
 ```
 
 2. Confirm for authoring/generator skills:
@@ -22,11 +22,17 @@ uv run plugins/sentry-skills/skills/skill-writer/scripts/quick_validate.py <path
 - synthesis depth gates are satisfied
 - selected example profile requirements are satisfied and reported
 
-3. Confirm evaluation outputs are present:
+3. Confirm for integration/documentation skills:
+- `references/api-surface.md` exists
+- `references/common-use-cases.md` exists with sufficient depth
+- `references/troubleshooting-workarounds.md` exists with sufficient depth
+
+4. Confirm evaluation outputs are present:
 - qualitative eval summary (mandatory)
+- qualitative depth rubric status for API/workaround/use-case/gap handling (mandatory for integration/documentation and skill-authoring)
 - quantitative summary only if user requested benchmark mode
 
-4. Reject shallow handoffs that omit required artifacts.
+5. Reject shallow handoffs that omit required artifacts.
 
 ## Required output
 
