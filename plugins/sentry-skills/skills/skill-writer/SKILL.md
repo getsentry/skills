@@ -15,6 +15,7 @@ Load only the path(s) required for the task:
 | Set skill class and required dimensions | `references/mode-selection.md` |
 | Apply writing constraints for depth vs concision | `references/design-principles.md` |
 | Select structure pattern for this skill | `references/skill-patterns.md` |
+| Select workflow orchestration pattern for process-heavy skills | `references/workflow-patterns.md` |
 | Select output format pattern for deterministic quality | `references/output-patterns.md` |
 | Choose workflow path and required outputs | `references/mode-selection.md` |
 | Load representative synthesis examples by skill type | `references/examples/*.md` |

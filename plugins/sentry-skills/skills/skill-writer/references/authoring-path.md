@@ -19,6 +19,9 @@ Create only files needed to execute the workflow:
 - `scripts/` when repeated automation is needed
 - `assets/` for reusable static output artifacts
 
+For workflow/process-heavy skills, also load and apply `references/workflow-patterns.md`
+to structure sequencing, conditional branches, and validation loops.
+
 When synthesis is used, include or update `SOURCES.md` for provenance, decision records, coverage, and changelog.
 
 ## Class-specific artifact requirements
