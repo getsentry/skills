@@ -30,7 +30,7 @@ ALWAYS use `/skill-writer` — it handles requirements, writing, registration, a
 ## Commit Attribution
 AI commits MUST include:
 ```
-Co-Authored-By: (the agent model's name and attribution byline)
+Co-Authored-By: (the agent's name and attribution byline)
 ```
 
 ## References
