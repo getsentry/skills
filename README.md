@@ -54,6 +54,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [gh-review-requests](plugins/sentry-skills/skills/gh-review-requests/SKILL.md) | Fetch unread GitHub notifications for open PRs where review is requested from a specified team or opened by a team member. |
 | [gha-security-review](plugins/sentry-skills/skills/gha-security-review/SKILL.md) | GitHub Actions security review for workflow exploitation vulnerabilities. |
 | [iterate-pr](plugins/sentry-skills/skills/iterate-pr/SKILL.md) | Iterate on a PR until CI passes. |
+| [presentation-creator](plugins/sentry-skills/skills/presentation-creator/SKILL.md) | Create data-driven presentation slides using React, Vite, and Recharts with Sentry branding. Builds to a single distributable HTML file. |
 | [pr-writer](plugins/sentry-skills/skills/pr-writer/SKILL.md) | Canonical workflow to create and update pull requests following Sentry conventions. |
 | [security-review](plugins/sentry-skills/skills/security-review/SKILL.md) | Security code review for vulnerabilities. |
 | [skill-scanner](plugins/sentry-skills/skills/skill-scanner/SKILL.md) | Scan agent skills for security issues. |
