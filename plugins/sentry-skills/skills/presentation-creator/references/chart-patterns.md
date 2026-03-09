@@ -1,5 +1,32 @@
 # Recharts Patterns for Sentry Presentations
 
+## Color Usage Rules
+
+**Categorical palette** — for data series, groups, categories where color is just a distinguisher:
+```javascript
+const CAT = [
+  '#4e79a7',  // steel blue
+  '#f28e2b',  // orange
+  '#e15759',  // coral
+  '#76b7b2',  // teal
+  '#59a14f',  // green
+  '#edc948',  // gold
+  '#b07aa1',  // mauve
+  '#ff9da7',  // pink
+  '#9c755f',  // brown
+  '#bab0ac',  // gray
+];
+```
+
+**Semantic colors** — ONLY when the color itself carries meaning:
+```javascript
+const SEM_GREEN = '#2ba185';   // positive / success / good
+const SEM_RED = '#f55459';     // negative / failure / bad
+const SEM_AMBER = '#d4953a';   // warning / caution
+```
+
+**Rule of thumb**: If you could swap two colors without losing information, use `CAT`. If swapping would confuse the meaning (e.g., making "errors" green), use semantic.
+
 ## Shared Configuration
 
 ### Axis and Grid Defaults
@@ -36,30 +63,31 @@ const grid = {
 
 ### 1. Stacked Area Chart (ComposedChart)
 
-Best for showing volume breakdowns over time (accepted vs sampled vs dropped).
+Best for showing volume breakdowns over time.
+
+When the series have inherent good/bad semantics (accepted vs dropped), use semantic colors:
 
 ```jsx
-<ResponsiveContainer width="100%" height={320}>
-  <ComposedChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-    <CartesianGrid {...grid} />
-    <XAxis dataKey="label" {...ax} />
-    <YAxis {...ax} />
-    <Tooltip />
-    <Area type="monotone" dataKey="accepted" stackId="1"
-      fill={GREEN} stroke={GREEN} fillOpacity={0.7} />
-    <Area type="monotone" dataKey="sampled" stackId="1"
-      fill={PURPLE} stroke={PURPLE} fillOpacity={0.5} />
-    <Area type="monotone" dataKey="dropped" stackId="1"
-      fill={RED} stroke={RED} fillOpacity={0.5} />
-    <ReferenceLine y={300} stroke={AMBER} strokeDasharray="6 3"
-      label={{ value: 'Threshold', fill: AMBER, fontSize: 11 }} />
-  </ComposedChart>
-</ResponsiveContainer>
+<Area type="monotone" dataKey="accepted" stackId="1"
+  fill={SEM_GREEN} stroke={SEM_GREEN} fillOpacity={0.7} />
+<Area type="monotone" dataKey="dropped" stackId="1"
+  fill={SEM_RED} stroke={SEM_RED} fillOpacity={0.5} />
+```
+
+When the series are neutral categories (e.g., different SDK types, regions), use categorical:
+
+```jsx
+<Area type="monotone" dataKey="javascript" stackId="1"
+  fill={CAT[0]} stroke={CAT[0]} fillOpacity={0.6} />
+<Area type="monotone" dataKey="python" stackId="1"
+  fill={CAT[1]} stroke={CAT[1]} fillOpacity={0.6} />
+<Area type="monotone" dataKey="ruby" stackId="1"
+  fill={CAT[2]} stroke={CAT[2]} fillOpacity={0.6} />
 ```
 
 ### 2. Bar Chart (Grouped/Stacked)
 
-Best for discrete comparisons (before/after, per-category).
+For discrete comparisons. Use `CAT` colors unless the bars represent good/bad outcomes.
 
 ```jsx
 <ResponsiveContainer width="100%" height={280}>
@@ -67,11 +95,13 @@ Best for discrete comparisons (before/after, per-category).
     <CartesianGrid {...grid} />
     <XAxis dataKey="name" {...ax} />
     <YAxis {...ax} />
-    <Bar dataKey="before" fill={PURPLE_LIGHT} radius={[3, 3, 0, 0]} />
-    <Bar dataKey="after" fill={PURPLE} radius={[3, 3, 0, 0]} />
+    <Bar dataKey="seriesA" fill={CAT[0]} radius={[3, 3, 0, 0]} />
+    <Bar dataKey="seriesB" fill={CAT[1]} radius={[3, 3, 0, 0]} />
   </BarChart>
 </ResponsiveContainer>
 ```
+
+For a single-series bar chart where all bars represent the same metric, use a single `CAT` color uniformly — do NOT alternate colors per bar unless the bars represent distinct categories.
 
 ### 3. Line/Area Curve Chart
 
@@ -83,33 +113,31 @@ Best for showing mathematical relationships (rate curves, thresholds).
     <CartesianGrid {...grid} />
     <XAxis dataKey="x" {...ax} label={{ value: 'Incoming (t/s)', ... }} />
     <YAxis {...ax} domain={[0, 100]} label={{ value: 'Rate %', ... }} />
-    <Area type="monotone" dataKey="rate" fill={PURPLE} fillOpacity={0.15} stroke={PURPLE} strokeWidth={2} />
+    <Area type="monotone" dataKey="rate" fill={CAT[0]} fillOpacity={0.15} stroke={CAT[0]} strokeWidth={2} />
   </ComposedChart>
 </ResponsiveContainer>
 ```
 
 ### 4. Temporal Scenario Chart (stepAfter)
 
-Best for showing discrete rule updates with lag (e.g., 10-minute sampling intervals).
-
-Use `type="stepAfter"` for curves that change in discrete steps:
+Best for showing discrete rule updates with lag. Use semantic colors when steps represent accept/reject:
 
 ```jsx
 <Area type="stepAfter" dataKey="accepted" stackId="1"
-  fill={GREEN} stroke={GREEN} fillOpacity={0.6} />
+  fill={SEM_GREEN} stroke={SEM_GREEN} fillOpacity={0.6} />
 <Area type="stepAfter" dataKey="hardBlocked" stackId="1"
-  fill={RED} stroke="none" fillOpacity={0.5} />
+  fill={SEM_RED} stroke="none" fillOpacity={0.5} />
 ```
 
 ### 5. Reference Lines and Areas
 
 ```jsx
-{/* Threshold line */}
-<ReferenceLine y={300} stroke={AMBER} strokeDasharray="6 3" />
+{/* Threshold line — semantic amber for "warning" boundary */}
+<ReferenceLine y={300} stroke={SEM_AMBER} strokeDasharray="6 3" />
 
-{/* Shaded zone */}
-<ReferenceArea x1="03:00" x2="03:10" fill={GREEN} fillOpacity={0.08}
-  label={{ value: '~10 min', fill: GREEN, fontSize: 11 }} />
+{/* Shaded zone — semantic green for "safe" region */}
+<ReferenceArea x1="03:00" x2="03:10" fill={SEM_GREEN} fillOpacity={0.08}
+  label={{ value: '~10 min', fill: SEM_GREEN, fontSize: 11 }} />
 ```
 
 ## Data Generation Patterns
@@ -152,14 +180,14 @@ const data = useMemo(() => {
 
 ### Zone Diagram
 
-Horizontal bar showing zones (Normal, Sampling, Hard Limit):
+Horizontal bar showing zones. Use semantic colors ONLY when zones carry meaning (e.g., Normal=green, Danger=red). For neutral categories, use `CAT`:
 
 ```jsx
 function ZoneDiagram({ zones }) {
   return (
     <div className="zone-diagram">
       {zones.map((z, i) => (
-        <div key={i} className={`zone zone-${z.color}`} style={{ flex: z.flex }}>
+        <div key={i} style={{ flex: z.flex, background: z.color, padding: '12px 16px', color: '#fff' }}>
           <div className="zone-name">{z.name}</div>
           <div className="zone-desc">{z.desc}</div>
         </div>
@@ -169,19 +197,13 @@ function ZoneDiagram({ zones }) {
 }
 ```
 
-CSS:
 ```css
 .zone-diagram { display: flex; gap: 2px; border-radius: 8px; overflow: hidden; }
-.zone { padding: 12px 16px; color: #fff; }
-.zone-green { background: #2ba185; }
-.zone-purple { background: #6c5fc7; }
-.zone-red { background: #f55459; }
-.zone-amber { background: #d4953a; }
 ```
 
 ### Trace Diagram
 
-Visual span representation for distributed traces:
+Visual span representation for distributed traces. Use `CAT` for different services:
 
 ```jsx
 function TraceDiagram({ rows }) {
@@ -193,7 +215,7 @@ function TraceDiagram({ rows }) {
           <div className="trace-bar">
             {r.spans.map((s, j) => (
               <div key={j} style={{
-                flex: s.w, background: s.bg || PURPLE,
+                flex: s.w, background: s.bg || CAT[j % CAT.length],
                 opacity: s.opacity ?? 1,
                 borderRadius: 3
               }} />
@@ -209,7 +231,7 @@ function TraceDiagram({ rows }) {
 ### Sparkline (Mini SVG Chart)
 
 ```jsx
-function Sparkline({ seed = 0, bars = 14, color = PURPLE }) {
+function Sparkline({ seed = 0, bars = 14, color = CAT[0] }) {
   const h = Array.from({ length: bars }, (_, i) =>
     20 + ((seed * 17 + i * 31) % 60)
   );

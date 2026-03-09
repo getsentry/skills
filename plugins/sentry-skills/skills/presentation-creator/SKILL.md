@@ -1,5 +1,5 @@
 ---
-name: sentry-presentation
+name: presentation-creator
 description: Create data-driven presentation slides using React, Vite, and Recharts with Sentry branding. Use when asked to "create a presentation", "build slides", "make a deck", "create a data presentation", "build a Sentry presentation". Scaffolds a complete slide-based app with charts, animations, and single-file HTML output.
 ---
 
@@ -110,7 +110,7 @@ Each slide function returns a `<div className="slide-content">` with:
 
 ### Navigation
 
-Implement keyboard navigation (ArrowRight/Space = next, ArrowLeft = prev) and a bottom nav bar with prev/next buttons, dot indicators, and a top progress bar.
+Implement keyboard navigation (ArrowRight/Space = next, ArrowLeft = prev) and a bottom nav overlay with prev/next buttons, dot indicators, and slide number. The nav has **no border or background** — it floats transparently. A small low-contrast Sentry glyph watermark sits fixed in the top-left corner of every slide.
 
 ```jsx
 function App() {
@@ -129,6 +129,7 @@ function App() {
 
   return (
     <>
+      {cur > 0 && <div className="glyph-watermark"><SentryGlyph size={50} /><span className="watermark-title">TITLE</span></div>}
       <div className="progress" style={{ width: `${((cur + 1) / SLIDES.length) * 100}%` }} />
       {SLIDES.map((S, i) => (
         <div key={i} className={`slide ${i === cur ? 'active' : ''}`}>
@@ -152,7 +153,7 @@ Put all chart components in `Charts.jsx`. Key patterns:
 - Use `ResponsiveContainer` with explicit height
 - Wrap in `.chart-wrap` div with max-width 920px
 - Use `useMemo` for data generation
-- Use Sentry color constants for all fills/strokes
+- **Color rule**: Use the Tableau-inspired categorical palette (`CAT[]`) for distinguishing data series and groups. Only use semantic colors (`SEM_GREEN`, `SEM_RED`, `SEM_AMBER`) when the color itself carries meaning (good/bad, success/failure, warning).
 - Common charts: `ComposedChart` with stacked `Area`/`Line`, `BarChart`, custom SVG diagrams
 
 ## Step 5: Style with Sentry Design System
@@ -160,16 +161,17 @@ Put all chart components in `Charts.jsx`. Key patterns:
 Apply the complete CSS from the design system reference. Key elements:
 
 - **Font**: Rubik from Google Fonts
-- **Colors**: CSS variables (`--purple`, `--dark`, `--muted`, etc.)
+- **Colors**: CSS variables for UI chrome (`--purple`, `--dark`, `--muted`). Semantic CSS variables (`--semantic-green`, `--semantic-red`, `--semantic-amber`) only where color conveys meaning. Categorical palette (`CAT[]`) for all other data visualization.
 - **Slides**: Absolute positioned, opacity transitions
 - **Animations**: `fadeUp` keyframe with staggered delays
 - **Layout**: `.cols` flex rows, `.cards` grid, `.chart-wrap` containers
-- **Tags**: `.tag-purple`, `.tag-red`, `.tag-green` for slide labels
+- **Tags**: `.tag-purple`, `.tag-red`, `.tag-green`, `.tag-amber` for slide labels
+- **Logo**: Read the official SVG from `${CLAUDE_SKILL_ROOT}/references/sentry-logo.svg` (full wordmark) or `sentry-glyph.svg` (glyph only). Do NOT hardcode an approximation — always use the exact SVG paths from these files.
 
 ## Step 6: Common Slide Patterns
 
 ### Title Slide
-Logo + h1 + subtitle + author/date info.
+Logo (from `${CLAUDE_SKILL_ROOT}/references/sentry-logo.svg` or `sentry-glyph.svg`) + h1 + subtitle + author/date info.
 
 ### Problem/Context Slide
 Tag + heading + 2-column card grid with icon headers.

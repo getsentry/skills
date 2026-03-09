@@ -2,36 +2,76 @@
 
 ## Color Palette
 
+### Color Philosophy
+
+Use two distinct color sets:
+
+1. **Semantic colors** — Only when the color itself carries meaning (good/bad, success/failure, warning). Do not use these for arbitrary data grouping.
+2. **Categorical colors** — For distinguishing data series, groups, or categories where color has no inherent meaning. Inspired by Tableau's palette for maximum distinguishability.
+
 ### CSS Variables
 
 ```css
 :root {
+  /* ── UI chrome ── */
   --dark: #1c1028;
   --purple: #6c5fc7;
   --purple-light: #b5aade;
   --purple-bg: #ede8f5;
-  --sentry-red: #f55459;
-  --red-bg: #fde8e9;
-  --green: #2ba185;
   --bg: #faf9fb;
   --card: #f3f1f5;
   --muted: #80708f;
   --border: #dbd6e1;
+
+  /* ── Semantic (use ONLY when meaning applies) ── */
+  --semantic-green: #2ba185;   /* positive, success, good */
+  --semantic-red: #f55459;     /* negative, failure, bad */
+  --semantic-amber: #d4953a;   /* warning, caution, moderate */
+  --semantic-green-bg: #e0f5ef;
+  --semantic-red-bg: #fde8e9;
+  --semantic-amber-bg: #fdf3e4;
 }
 ```
 
 ### JS Color Constants (for Charts.jsx)
 
 ```javascript
-const PURPLE = '#6c5fc7';
-const PURPLE_LIGHT = '#b5aade';
-const RED = '#f55459';
-const GREEN = '#2ba185';
+// ── UI / chrome ──
 const DARK = '#1c1028';
 const MUTED = '#80708f';
 const BORDER = '#dbd6e1';
-const AMBER = '#d4953a';
+
+// ── Categorical palette (Tableau-inspired) ──
+// Use for data series, groups, and categories where color is just a label.
+const CAT = [
+  '#4e79a7',  // steel blue
+  '#f28e2b',  // orange
+  '#e15759',  // coral
+  '#76b7b2',  // teal
+  '#59a14f',  // green
+  '#edc948',  // gold
+  '#b07aa1',  // mauve
+  '#ff9da7',  // pink
+  '#9c755f',  // brown
+  '#bab0ac',  // gray
+];
+
+// ── Semantic (use ONLY when the color conveys meaning) ──
+const SEM_GREEN = '#2ba185';   // positive / success / good
+const SEM_RED = '#f55459';     // negative / failure / bad
+const SEM_AMBER = '#d4953a';   // warning / caution
 ```
+
+### When to use which
+
+| Scenario | Palette | Example |
+|----------|---------|---------|
+| Bar chart comparing 7 SKU types | `CAT[0]`–`CAT[6]` | Each SKU gets a distinct hue, none implies "good" or "bad" |
+| Stacked area: accepted vs dropped | Semantic | green = accepted (good), red = dropped (bad) |
+| Heatmap cells: adopted vs not | Semantic | green dot = adopted, empty = not |
+| Before/after comparison | `CAT[0]` / `CAT[1]` | Two neutral colors, neither implies better |
+| Priority columns: Protect / Grow / Expand | Semantic | green = protect, amber = grow, red = expand gaps |
+| Multiple org lines on same chart | `CAT` | Each org gets next color in sequence |
 
 ## Typography
 
@@ -89,8 +129,9 @@ Used on every slide to label the category (Background, Problem, Proposal, etc.).
   margin-bottom: 8px;
 }
 .tag-purple { background: var(--purple-bg); color: var(--purple); }
-.tag-red { background: var(--red-bg); color: var(--sentry-red); }
-.tag-green { background: #e0f5ef; color: var(--green); }
+.tag-red { background: var(--semantic-red-bg); color: var(--semantic-red); }
+.tag-green { background: var(--semantic-green-bg); color: var(--semantic-green); }
+.tag-amber { background: var(--semantic-amber-bg); color: var(--semantic-amber); }
 ```
 
 ## Layout Utilities
@@ -129,19 +170,56 @@ Used on every slide to label the category (Background, Problem, Proposal, etc.).
 
 Add the `.anim` class to `.slide-content` only when the slide is active. Use `.d1`, `.d2`, `.d3` on child elements for staggered entrance.
 
-## Navigation Bar
+## Persistent Glyph Watermark
+
+Every slide shows a small, low-contrast Sentry glyph in the top-left corner. Use the exact path from `${CLAUDE_SKILL_ROOT}/references/sentry-glyph.svg`.
+
+```css
+.glyph-watermark {
+  position: fixed; top: 20px; left: 24px; z-index: 8;
+  opacity: 0.12; pointer-events: none;
+  display: flex; align-items: center; gap: 10px;
+}
+.watermark-title {
+  font-size: 1.1rem; font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+```
+
+Hidden on the title slide (slide 0), shown on all others:
+
+```jsx
+{cur > 0 && (
+  <div className="glyph-watermark">
+    <SentryGlyph size={50} />
+    <span className="watermark-title">Presentation Title</span>
+  </div>
+)}
+```
+
+## Navigation
+
+Navigation sits at the bottom of the viewport with **no border, no background separation** — it floats transparently over the slide. Always show the slide number as `{current} / {total}`.
 
 ```css
 nav {
   position: fixed; bottom: 0; left: 0; right: 0;
   display: flex; align-items: center; justify-content: center;
-  gap: 16px; padding: 14px; background: #fff;
-  border-top: 1px solid var(--border); z-index: 5;
+  gap: 16px; padding: 14px;
+  z-index: 5;
 }
 nav button {
-  background: none; border: 1px solid var(--border);
-  border-radius: 6px; padding: 4px 14px; cursor: pointer;
-  font-family: inherit; font-size: 0.8rem; color: var(--dark);
+  background: none; border: none;
+  cursor: pointer; font-family: inherit;
+  font-size: 0.8rem; color: var(--muted);
+  padding: 4px 8px;
+}
+nav button:hover { color: var(--dark); }
+nav button:disabled { opacity: 0.2; cursor: default; }
+.slide-number {
+  font-size: 0.75rem; color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
 ```
 
@@ -150,11 +228,30 @@ nav button {
 ```css
 .dots { display: flex; gap: 6px; }
 .dot {
-  width: 8px; height: 8px; border-radius: 50%;
+  width: 6px; height: 6px; border-radius: 50%;
   background: var(--border); cursor: pointer;
   transition: background 0.2s;
 }
 .dot.on { background: var(--purple); }
+```
+
+### Nav Component
+
+```jsx
+function Nav({ cur, total, go, setCur }) {
+  return (
+    <nav>
+      <button onClick={() => go(-1)} disabled={cur === 0}>←</button>
+      <div className="dots">
+        {Array.from({ length: total }, (_, i) => (
+          <div key={i} className={`dot${i === cur ? ' on' : ''}`} onClick={() => setCur(i)} />
+        ))}
+      </div>
+      <button onClick={() => go(1)} disabled={cur === total - 1}>→</button>
+      <span className="slide-number">{cur + 1} / {total}</span>
+    </nav>
+  );
+}
 ```
 
 ## Icons
@@ -180,14 +277,31 @@ Use Material Symbols Outlined for icons:
 .compare td { padding: 10px 14px; border-bottom: 1px solid #f0edf3; }
 ```
 
-## Sentry Logo Component
+## Sentry Logo
+
+**Do NOT hardcode the Sentry logo as inline SVG.** Read the official SVGs from the skill references directory:
+
+- **Full wordmark**: `${CLAUDE_SKILL_ROOT}/references/sentry-logo.svg` — the "Sentry" logotype with glyph. Use on title slides.
+- **Glyph only**: `${CLAUDE_SKILL_ROOT}/references/sentry-glyph.svg` — the standalone glyph mark. Use for compact branding.
+
+Read the SVG file contents and embed them as a React component using `dangerouslySetInnerHTML` or by extracting the `<path>` data:
 
 ```jsx
-function SentryLogo({ size = 32 }) {
+// Read the SVG file, extract the content, and embed it:
+function SentryLogo({ width = 120 }) {
+  // The SVG content should be read from references/sentry-logo.svg
+  // and embedded directly — never use a hardcoded approximation.
   return (
-    <svg width={size} height={size} viewBox="0 0 72 66" fill="none">
-      <path d="M29 2.3a4.4 4.4 0 0 0-7.6 0L.7 40.2a4.3 4.3 0 0 0 3.8 6.5h9.6a4.3 4.3 0 0 0 3.8-2.2l13-22.6a18 18 0 0 1 8 14.8h-4a14 14 0 0 0-6.7-11.5l-9.4 16.4h-11L25.2 8.3l18 31.3h-5.8a22 22 0 0 0-10.8-18.2l-3.4 5.9a16 16 0 0 1 8.7 12.3H22a10 10 0 0 0-5.4-7.6l-2 3.6a6 6 0 0 1 2 4h-5a2 2 0 0 1-1.6-3l18-31.3 21 36.4h-7.7a26 26 0 0 0-12.8-22.6l-3.4 5.9a20 20 0 0 1 10.6 16.7h-4.6a16 16 0 0 0-8.6-13l-3.4 5.9a10 10 0 0 1 6.5 7.1H16a6 6 0 0 0-3.3-3.6l-1.6 2.8a2 2 0 0 1 .5.8h-2a4.3 4.3 0 0 1-3.8-6.5L25.2 4.6a.4.4 0 0 1 .7 0l22 38.1h5.5L30.7 3.5z"
-        fill="currentColor" />
+    <svg viewBox="0 0 200 44" width={width} fill="none" aria-hidden="true">
+      {/* paste exact path data from sentry-logo.svg */}
+    </svg>
+  );
+}
+
+function SentryGlyph({ size = 32 }) {
+  return (
+    <svg viewBox="0 0 72 66" width={size} height={size} aria-hidden="true">
+      {/* paste exact path data from sentry-glyph.svg */}
     </svg>
   );
 }
