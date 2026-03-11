@@ -217,3 +217,13 @@ A working React + Vite project that:
 - Omits `Charts.jsx` and the Recharts dependency entirely if no slides have real data
 - Builds to a single distributable HTML file
 - Has smooth fade-in animations on slide transitions
+
+## References
+
+| File | Description |
+|------|-------------|
+| `references/design-system.md` | Color palette, typography, CSS variables, layout, animations |
+| `references/chart-patterns.md` | Recharts component patterns, color usage rules, data generation |
+| `references/offline-fonts.md` | How to inline fonts for fully offline single-file builds |
+| `references/sentry-logo.svg` | Official Sentry wordmark SVG |
+| `references/sentry-glyph.svg` | Official Sentry glyph SVG |
