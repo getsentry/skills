@@ -15,6 +15,15 @@ Ask the user:
 3. What data/charts are needed? (time series, comparisons, diagrams, zone charts)
 4. What is the narrative arc? (problem → solution, before → after, technical deep-dive)
 
+### Data Assessment (CRITICAL)
+
+Before designing any slides, assess whether the source content contains **real quantitative data** (numbers, percentages, measurements, time series, costs, metrics). Only create Recharts visualizations for slides where real data exists. Do NOT fabricate, estimate, or invent data to fill charts.
+
+- **Has real data** → use a Recharts chart (bar, area, line, etc.)
+- **Has no data** → use text-based layouts: cards, tables, bullet columns, diagrams, or quote blocks. Do NOT create a chart with made-up numbers.
+
+If the source content is purely qualitative (narrative, opinions, strategy, process descriptions), the presentation should use zero charts. Recharts and `Charts.jsx` should only be included in the project if at least one slide has real data to visualize.
+
 ## Step 2: Scaffold the Project
 
 Create the project structure:
@@ -102,11 +111,12 @@ const SLIDES = [
 ```
 
 Each slide function returns a `<div className="slide-content">` with:
-1. A `.tag` label (e.g., `<span className="tag tag-purple">Background</span>`)
-2. An `<h2>` heading
-3. Optional subtitle paragraph
-4. Main content (charts, cards, diagrams, tables)
-5. Animation classes: `.anim`, `.d1`, `.d2`, `.d3` for staggered fade-in
+1. An `<h2>` heading
+2. Optional subtitle paragraph
+3. Main content (charts, cards, diagrams, tables)
+4. Animation classes: `.anim`, `.d1`, `.d2`, `.d3` for staggered fade-in
+
+Do NOT add category tag pills/badges above headings (e.g., "BACKGROUND", "EXPERIMENTS"). They look generic and add no value. Let the heading speak for itself.
 
 ### Navigation
 
@@ -144,9 +154,13 @@ function App() {
 }
 ```
 
-## Step 4: Create Charts
+## Step 4: Create Charts (Only When Data Exists)
 
-Read `${CLAUDE_SKILL_ROOT}/references/chart-patterns.md` for Recharts component patterns including axis configuration, color constants, chart types, and data generation techniques.
+**IMPORTANT: Only create charts for slides backed by real, concrete data from the source content.** If a slide's content is qualitative (strategies, learnings, process descriptions, opinions), use text-based layouts instead (cards, tables, bullet lists, columns). Never invent numbers, fabricate percentages, or generate synthetic data to populate a chart. If you are unsure whether data is real or inferred, do NOT create a chart.
+
+If NO slides require charts, skip this step entirely — do not create `Charts.jsx` or import Recharts.
+
+When real data IS available, read `${CLAUDE_SKILL_ROOT}/references/chart-patterns.md` for Recharts component patterns including axis configuration, color constants, chart types, and data generation techniques.
 
 Put all chart components in `Charts.jsx`. Key patterns:
 
@@ -155,6 +169,7 @@ Put all chart components in `Charts.jsx`. Key patterns:
 - Use `useMemo` for data generation
 - **Color rule**: Use the Tableau-inspired categorical palette (`CAT[]`) for distinguishing data series and groups. Only use semantic colors (`SEM_GREEN`, `SEM_RED`, `SEM_AMBER`) when the color itself carries meaning (good/bad, success/failure, warning).
 - Common charts: `ComposedChart` with stacked `Area`/`Line`, `BarChart`, custom SVG diagrams
+- **Every data point in a chart must come from the source content.** Do not interpolate, extrapolate, or round numbers to make charts look better.
 
 ## Step 5: Style with Sentry Design System
 
@@ -198,6 +213,7 @@ After initial scaffolding:
 A working React + Vite project that:
 - Renders as a keyboard-navigable slide deck
 - Uses Sentry branding (colors, fonts, icons)
-- Contains data-driven Recharts visualizations
+- Contains Recharts visualizations **only for slides with real quantitative data** from the source content — no fabricated data
+- Omits `Charts.jsx` and the Recharts dependency entirely if no slides have real data
 - Builds to a single distributable HTML file
 - Has smooth fade-in animations on slide transitions
