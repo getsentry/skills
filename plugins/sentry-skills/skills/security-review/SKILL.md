@@ -266,9 +266,6 @@ random.random() for token            # FLAG: Security tokens need secrets module
   ```
 - **Fix**: [How to remediate]
 
-> [!NOTE]
-> Ensure "[Vulnerable code snippet]" doesn't contain exact values of hardcoded secrets. They MUST be masked or redacted in the report.
-
 ### Needs Verification
 
 #### [VERIFY-001] [Potential Issue]
@@ -277,6 +274,9 @@ random.random() for token            # FLAG: Security tokens need secrets module
 ```
 
 If no vulnerabilities found, state: "No high-confidence vulnerabilities identified."
+
+> [!NOTE]
+> Ensure "[Vulnerable code snippet]" doesn't contain exact values of hardcoded secrets. They MUST be masked or redacted in the report.
 
 ---
 
