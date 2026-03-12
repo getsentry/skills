@@ -209,7 +209,7 @@ os.system(f"cmd {user_input}")     # Command injection
 
 ### Always Flag (Secrets)
 ```
-password = "hardcoded"
+password = "hardcoded"  # but NEVER leak exact hardcoded secrets to the report!
 api_key = "sk-..."
 AWS_SECRET_ACCESS_KEY = "..."
 private_key = "-----BEGIN"
