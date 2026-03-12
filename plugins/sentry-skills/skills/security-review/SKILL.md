@@ -267,7 +267,7 @@ random.random() for token            # FLAG: Security tokens need secrets module
 - **Fix**: [How to remediate]
 
 > [!NOTE]
-> Ensure "[Vulnerable code snippet]" doesn't contain exact values of hardcoded snippets, they MUST be masked or redacted in the report.
+> Ensure "[Vulnerable code snippet]" doesn't contain exact values of hardcoded secrets. They MUST be masked or redacted in the report.
 
 ### Needs Verification
 
