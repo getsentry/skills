@@ -209,11 +209,14 @@ os.system(f"cmd {user_input}")     # Command injection
 
 ### Always Flag (Secrets)
 ```
-password = "hardcoded"  # but NEVER leak exact hardcoded secrets to the report!
+password = "hardcoded"
 api_key = "sk-..."
 AWS_SECRET_ACCESS_KEY = "..."
 private_key = "-----BEGIN"
 ```
+
+> [!NOTE]
+> But NEVER leak exact hardcoded secret values to the report!
 
 ### Check Context First (MUST Investigate Before Flagging)
 ```
@@ -262,6 +265,9 @@ random.random() for token            # FLAG: Security tokens need secrets module
   [Vulnerable code snippet]
   ```
 - **Fix**: [How to remediate]
+
+> [!NOTE]
+> Ensure "[Vulnerable code snippet]" doesn't contain exact values of hardcoded snippets, they MUST be masked or redacted in the report.
 
 ### Needs Verification
 
