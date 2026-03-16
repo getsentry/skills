@@ -241,10 +241,10 @@ function App() {
   }, [isEmbed]);
 
   // ── Main window only: broadcast, controls, keyboard ──
-  // Broadcast slide number to speaker notes window (don't broadcast until notes are loaded)
+  // Broadcast slide number to speaker notes window
   const notesBcRef = React.useRef(null);
   useEffect(() => {
-    if (isEmbed || notes.length === 0) return;
+    if (isEmbed) return;
     if (!notesBcRef.current) {
       notesBcRef.current = new BroadcastChannel('speaker-notes');
     }
@@ -325,7 +325,7 @@ The speaker notes window shows a scaled iframe preview on the left and an editab
     .slide-info { font-size: 0.85rem; color: #80708f; font-variant-numeric: tabular-nums; text-align: center; }
     .preview-container {
       background: #000; border-radius: 8px; overflow: hidden;
-      position: relative; width: 100%; padding-bottom: 62.5%; /* 16:10 */
+      position: relative; width: 100%; padding-bottom: 64.2857%; /* 1400:900 */
     }
     .preview-container iframe {
       position: absolute; top: 0; left: 0;
@@ -373,7 +373,7 @@ The speaker notes window shows a scaled iframe preview on the left and an editab
     const controlBc = new BroadcastChannel('speaker-control');
     let currentSlide = 0;
     let allNotes = [];
-    let saveTimeout = null;
+    const saveTimeouts = new Map();
 
     // Fetch notes from disk — the single source of truth
     function fetchNotes() {
@@ -402,8 +402,10 @@ The speaker notes window shows a scaled iframe preview on the left and an editab
 
     function saveNote(index, note) {
       allNotes[index] = note;
-      clearTimeout(saveTimeout);
-      saveTimeout = setTimeout(() => {
+      const existingTimeout = saveTimeouts.get(index);
+      if (existingTimeout) clearTimeout(existingTimeout);
+      const timeout = setTimeout(() => {
+        saveTimeouts.delete(index);
         document.getElementById('status').textContent = 'Saving...';
         fetch('/__save-notes', {
           method: 'POST',
@@ -416,6 +418,7 @@ The speaker notes window shows a scaled iframe preview on the left and an editab
           document.getElementById('status').textContent = 'Error saving';
         });
       }, 500);
+      saveTimeouts.set(index, timeout);
     }
 
     document.getElementById('note').addEventListener('input', (e) => {
@@ -431,11 +434,15 @@ The speaker notes window shows a scaled iframe preview on the left and an editab
 
     bc.onmessage = (e) => {
       const { slide, total } = e.data;
+      const previousSlide = currentSlide;
       currentSlide = slide;
       document.getElementById('info').textContent = `Slide ${slide + 1} / ${total}`;
       document.getElementById('preview').contentWindow.postMessage({ type: 'goto', slide }, '*');
-      // Show note from our local cache, not from the broadcast
-      showNoteForSlide(slide);
+      // Avoid resetting cursor while typing on same slide updates
+      if (slide !== previousSlide) {
+        // Show note from our local cache, not from the broadcast
+        showNoteForSlide(slide);
+      }
     };
 
     document.getElementById('prev').addEventListener('click', () => controlBc.postMessage({ action: 'prev' }));
