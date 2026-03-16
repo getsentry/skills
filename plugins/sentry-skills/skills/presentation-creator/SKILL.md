@@ -512,10 +512,10 @@ A working React + Vite project that:
 - Uses Sentry branding (colors, fonts, icons)
 - Contains Recharts visualizations **only for slides with real quantitative data** from the source content — no fabricated data
 - Omits `Charts.jsx` and the Recharts dependency entirely if no slides have real data
-- Stores speaker notes in `src/notes.json` and fetches them dynamically via `/__get-notes` (never via static import)
-- Has a speaker notes window (press N) with live slide preview, editable textarea, and auto-save to disk via `/__save-notes`
-- The notes window is the source of truth for note content — it fetches from disk on load and keeps a local cache, so edits survive hard refreshes and new tabs
-- The main window broadcasts only the slide number; the notes window broadcasts `note-updated` back to keep React state in sync
-- Properly isolates the embed iframe (`?embed=1`) — no channels, no keyboard, only postMessage goto
 - Builds to a single distributable HTML file
 - Has smooth fade-in animations on slide transitions
+
+If speaker notes are enabled, also:
+- Stores notes in `src/notes.json` fetched dynamically via `/__get-notes` (never via static import)
+- Has a speaker notes window (press N) with live slide preview, editable textarea, and auto-save to disk
+- Isolates the embed iframe (`?embed=1`) to prevent feedback loops
