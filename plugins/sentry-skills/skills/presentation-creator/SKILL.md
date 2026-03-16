@@ -14,6 +14,9 @@ Ask the user:
 2. How many slides (typically 5-8)?
 3. What data/charts are needed? (time series, comparisons, diagrams, zone charts)
 4. What is the narrative arc? (problem → solution, before → after, technical deep-dive)
+5. Do you want speaker notes? (a separate window with slide preview and talking points — useful for rehearsing and presenting)
+
+If the user declines speaker notes, skip `src/notes.json`, `public/notes.html`, the `saveNotesPlugin` in `vite.config.js`, the BroadcastChannel sync, and the embed isolation logic. The `N` key shortcut should also be omitted.
 
 ### Data Assessment (CRITICAL)
 
@@ -33,11 +36,14 @@ Create the project structure:
 ├── index.html
 ├── package.json
 ├── vite.config.js
+├── public/                 # only if speaker notes enabled
+│   └── notes.html
 └── src/
     ├── main.jsx
     ├── App.jsx
     ├── App.css
-    └── Charts.jsx
+    ├── Charts.jsx
+    └── notes.json          # only if speaker notes enabled
 ```
 
 ### index.html
@@ -83,6 +89,58 @@ import { viteSingleFile } from 'vite-plugin-singlefile'
 export default defineConfig({ plugins: [react(), viteSingleFile()] })
 ```
 
+If speaker notes are enabled, add the notes plugin to `vite.config.js`. It exposes two dev-server endpoints: `GET /__get-notes` (reads `src/notes.json` from disk with `Cache-Control: no-store`) and `POST /__save-notes` (writes a single note by index). The notes window fetches notes directly from `/__get-notes` — never from a static import — so edits survive hard refreshes and new tabs.
+
+```javascript
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { viteSingleFile } from 'vite-plugin-singlefile'
+import fs from 'fs'
+import path from 'path'
+
+function saveNotesPlugin() {
+  return {
+    name: 'save-notes',
+    configureServer(server) {
+      server.middlewares.use('/__get-notes', (req, res) => {
+        try {
+          const notesPath = path.resolve('src/notes.json');
+          const notes = fs.readFileSync(notesPath, 'utf-8');
+          res.setHeader('Content-Type', 'application/json');
+          res.setHeader('Cache-Control', 'no-store');
+          res.statusCode = 200;
+          res.end(notes);
+        } catch (e) {
+          res.statusCode = 500;
+          res.end(e.message);
+        }
+      });
+      server.middlewares.use('/__save-notes', (req, res) => {
+        if (req.method !== 'POST') { res.statusCode = 405; res.end(); return; }
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+          try {
+            const { index, note } = JSON.parse(body);
+            const notesPath = path.resolve('src/notes.json');
+            const notes = JSON.parse(fs.readFileSync(notesPath, 'utf-8'));
+            notes[index] = note;
+            fs.writeFileSync(notesPath, JSON.stringify(notes, null, 2) + '\n');
+            res.statusCode = 200;
+            res.end('ok');
+          } catch (e) {
+            res.statusCode = 500;
+            res.end(e.message);
+          }
+        });
+      });
+    }
+  };
+}
+
+export default defineConfig({ plugins: [react(), viteSingleFile(), saveNotesPlugin()] })
+```
+
 ### main.jsx
 
 ```jsx
@@ -122,20 +180,108 @@ Do NOT add category tag pills/badges above headings (e.g., "BACKGROUND", "EXPERI
 
 Implement keyboard navigation (ArrowRight/Space = next, ArrowLeft = prev) and a bottom nav overlay with prev/next buttons, dot indicators, and slide number. The nav has **no border or background** — it floats transparently. A small low-contrast Sentry glyph watermark sits fixed in the top-left corner of every slide.
 
+### Speaker Notes
+
+Store notes in `src/notes.json` — a JSON array with one string per slide:
+
+```json
+[
+  "Welcome everyone...",
+  "• First point\n• Second point"
+]
+```
+
+**CRITICAL: Do NOT use `import NOTES from './notes.json'`.** Static imports get cached by Vite's module system and edits won't survive hard refreshes or new tabs. Instead, fetch notes dynamically at runtime via the `/__get-notes` endpoint:
+
+```jsx
+const [notes, setNotes] = useState([]);
+
+useEffect(() => {
+  fetch('/__get-notes')
+    .then(r => r.json())
+    .then(setNotes)
+    .catch(() => {});
+}, []);
+```
+
+Notes are editable directly in the speaker notes window — the user can click the note area, type, and changes are saved to `src/notes.json` via the Vite save plugin. The notes window fetches its own copy from `/__get-notes` on load and keeps a local cache, so it never depends on the main window for note content. This means notes persist across hard refreshes, new tabs, and can be committed to git.
+
+Press **N** to open the speaker notes window.
+
+### Embed Isolation
+
+The speaker notes window (`public/notes.html`) embeds an iframe of the presentation with `?embed=1`. The App must detect embed mode and behave differently:
+
+- **Main window**: broadcasts slide changes via `BroadcastChannel('speaker-notes')`, listens for control messages via `BroadcastChannel('speaker-control')`, handles keyboard navigation.
+- **Embed iframe** (`?embed=1`): does **nothing** except listen for `postMessage` goto commands. No BroadcastChannels, no keyboard listeners. This prevents feedback loops between the main window and the iframe.
+
 ```jsx
 function App() {
   const [cur, setCur] = useState(0);
+  const [notes, setNotes] = useState([]);
+  const isEmbed = new URLSearchParams(window.location.search).get('embed') === '1';
   const go = useCallback((d) => setCur(c => Math.max(0, Math.min(SLIDES.length - 1, c + d))), []);
 
+  // Fetch notes from disk on mount
   useEffect(() => {
+    fetch('/__get-notes')
+      .then(r => r.json())
+      .then(setNotes)
+      .catch(() => {});
+  }, []);
+
+  // ── Embed mode: only respond to postMessage goto, nothing else ──
+  useEffect(() => {
+    if (!isEmbed) return;
+    const h = (e) => {
+      if (e.data?.type === 'goto') setCur(e.data.slide);
+    };
+    window.addEventListener('message', h);
+    return () => window.removeEventListener('message', h);
+  }, [isEmbed]);
+
+  // ── Main window only: broadcast, controls, keyboard ──
+  // Broadcast slide number to speaker notes window (don't broadcast until notes are loaded)
+  const notesBcRef = React.useRef(null);
+  useEffect(() => {
+    if (isEmbed || notes.length === 0) return;
+    if (!notesBcRef.current) {
+      notesBcRef.current = new BroadcastChannel('speaker-notes');
+    }
+    notesBcRef.current.postMessage({ slide: cur, total: SLIDES.length, note: notes[cur] || '' });
+  }, [cur, isEmbed, notes]);
+
+  // Listen for control messages from speaker notes window
+  useEffect(() => {
+    if (isEmbed) return;
+    const controlBc = new BroadcastChannel('speaker-control');
+    controlBc.onmessage = (e) => {
+      if (e.data.action === 'next') go(1);
+      if (e.data.action === 'prev') go(-1);
+      if (e.data.action === 'note-updated') {
+        setNotes(prev => {
+          const next = [...prev];
+          next[e.data.index] = e.data.note;
+          return next;
+        });
+      }
+    };
+    return () => controlBc.close();
+  }, [go, isEmbed]);
+
+  useEffect(() => {
+    if (isEmbed) return;
     const h = (e) => {
       if (e.target.tagName === 'INPUT') return;
       if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(1); }
       if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+      if (e.key === 'n' || e.key === 'N') {
+        window.open('/notes.html', 'speaker-notes', 'width=1000,height=600');
+      }
     };
     window.addEventListener('keydown', h);
     return () => window.removeEventListener('keydown', h);
-  }, [go]);
+  }, [go, isEmbed]);
 
   return (
     <>
@@ -152,6 +298,157 @@ function App() {
     </>
   );
 }
+```
+
+### public/notes.html
+
+The speaker notes window shows a scaled iframe preview on the left and an editable textarea on the right. **CRITICAL architecture**: the notes window fetches its own notes from `/__get-notes` on load and keeps a local `allNotes` cache. It does NOT rely on the main window's broadcast for note content — only for the current slide number. This ensures notes survive hard refreshes and new tabs. When the user edits a note, it saves to disk via `/__save-notes` and broadcasts `note-updated` back to the main window via the control channel so the main window's React state stays in sync.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Speaker Notes</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Rubik', system-ui, -apple-system, sans-serif;
+      background: #1c1028; color: #e8e4ed;
+      height: 100vh; display: flex;
+    }
+    .left {
+      width: 50%; flex-shrink: 0; padding: 20px;
+      display: flex; flex-direction: column; gap: 12px;
+      border-right: 1px solid rgba(255,255,255,0.1);
+    }
+    .slide-info { font-size: 0.85rem; color: #80708f; font-variant-numeric: tabular-nums; text-align: center; }
+    .preview-container {
+      background: #000; border-radius: 8px; overflow: hidden;
+      position: relative; width: 100%; padding-bottom: 62.5%; /* 16:10 */
+    }
+    .preview-container iframe {
+      position: absolute; top: 0; left: 0;
+      width: 1400px; height: 900px; border: none;
+      pointer-events: none; transform-origin: 0 0;
+    }
+    .controls { display: flex; gap: 8px; justify-content: center; }
+    .controls button {
+      background: rgba(255,255,255,0.1); border: none; color: #e8e4ed;
+      font-size: 1rem; padding: 6px 16px; border-radius: 6px; cursor: pointer;
+    }
+    .controls button:hover { background: rgba(255,255,255,0.2); }
+    .right { flex: 1; padding: 28px 32px; display: flex; flex-direction: column; gap: 12px; }
+    .note-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #6c5fc7; }
+    .note {
+      font-family: 'Rubik', system-ui, sans-serif;
+      font-size: 1.4rem; line-height: 1.6; flex: 1;
+      background: transparent; color: #e8e4ed; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; padding: 16px; resize: none;
+      white-space: pre-wrap; outline: none;
+    }
+    .note:focus { border-color: #6c5fc7; }
+    .note::placeholder { color: #80708f; font-style: italic; }
+    .save-status { font-size: 0.7rem; color: #80708f; text-align: right; min-height: 1em; }
+  </style>
+</head>
+<body>
+  <div class="left">
+    <div class="slide-info" id="info">Press N in the presentation</div>
+    <div class="preview-container" id="previewContainer">
+      <iframe id="preview" src="/?embed=1"></iframe>
+    </div>
+    <div class="controls">
+      <button id="prev">&larr;</button>
+      <button id="next">&rarr;</button>
+    </div>
+  </div>
+  <div class="right">
+    <div class="note-label">Speaker Notes</div>
+    <textarea class="note" id="note" placeholder="Add notes for this slide..."></textarea>
+    <div class="save-status" id="status"></div>
+  </div>
+  <script>
+    const bc = new BroadcastChannel('speaker-notes');
+    const controlBc = new BroadcastChannel('speaker-control');
+    let currentSlide = 0;
+    let allNotes = [];
+    let saveTimeout = null;
+
+    // Fetch notes from disk — the single source of truth
+    function fetchNotes() {
+      return fetch('/__get-notes')
+        .then(r => r.json())
+        .then(data => { allNotes = data; return data; })
+        .catch(() => []);
+    }
+
+    function showNoteForSlide(slide) {
+      document.getElementById('note').value = allNotes[slide] || '';
+    }
+
+    // Load notes on startup
+    fetchNotes().then(() => showNoteForSlide(currentSlide));
+
+    function scalePreview() {
+      const container = document.getElementById('previewContainer');
+      const iframe = document.getElementById('preview');
+      const scale = container.offsetWidth / 1400;
+      iframe.style.transform = `scale(${scale})`;
+    }
+    window.addEventListener('resize', scalePreview);
+    document.getElementById('preview').addEventListener('load', scalePreview);
+    setTimeout(scalePreview, 100);
+
+    function saveNote(index, note) {
+      allNotes[index] = note;
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(() => {
+        document.getElementById('status').textContent = 'Saving...';
+        fetch('/__save-notes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ index, note })
+        }).then(r => {
+          document.getElementById('status').textContent = r.ok ? 'Saved' : 'Error saving';
+          setTimeout(() => { document.getElementById('status').textContent = ''; }, 2000);
+        }).catch(() => {
+          document.getElementById('status').textContent = 'Error saving';
+        });
+      }, 500);
+    }
+
+    document.getElementById('note').addEventListener('input', (e) => {
+      const note = e.target.value;
+      saveNote(currentSlide, note);
+      controlBc.postMessage({ action: 'note-updated', index: currentSlide, note });
+    });
+
+    // Prevent arrow keys from navigating slides while editing
+    document.getElementById('note').addEventListener('keydown', (e) => {
+      e.stopPropagation();
+    });
+
+    bc.onmessage = (e) => {
+      const { slide, total } = e.data;
+      currentSlide = slide;
+      document.getElementById('info').textContent = `Slide ${slide + 1} / ${total}`;
+      document.getElementById('preview').contentWindow.postMessage({ type: 'goto', slide }, '*');
+      // Show note from our local cache, not from the broadcast
+      showNoteForSlide(slide);
+    };
+
+    document.getElementById('prev').addEventListener('click', () => controlBc.postMessage({ action: 'prev' }));
+    document.getElementById('next').addEventListener('click', () => controlBc.postMessage({ action: 'next' }));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'TEXTAREA') return;
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); controlBc.postMessage({ action: 'next' }); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); controlBc.postMessage({ action: 'prev' }); }
+    });
+  </script>
+</body>
+</html>
 ```
 
 ## Step 4: Create Charts (Only When Data Exists)
@@ -215,5 +512,10 @@ A working React + Vite project that:
 - Uses Sentry branding (colors, fonts, icons)
 - Contains Recharts visualizations **only for slides with real quantitative data** from the source content — no fabricated data
 - Omits `Charts.jsx` and the Recharts dependency entirely if no slides have real data
+- Stores speaker notes in `src/notes.json` and fetches them dynamically via `/__get-notes` (never via static import)
+- Has a speaker notes window (press N) with live slide preview, editable textarea, and auto-save to disk via `/__save-notes`
+- The notes window is the source of truth for note content — it fetches from disk on load and keeps a local cache, so edits survive hard refreshes and new tabs
+- The main window broadcasts only the slide number; the notes window broadcasts `note-updated` back to keep React state in sync
+- Properly isolates the embed iframe (`?embed=1`) — no channels, no keyboard, only postMessage goto
 - Builds to a single distributable HTML file
 - Has smooth fade-in animations on slide transitions
