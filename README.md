@@ -53,6 +53,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [find-bugs](plugins/sentry-skills/skills/find-bugs/SKILL.md) | Find bugs, security vulnerabilities, and code quality issues in local branch changes. |
 | [gh-review-requests](plugins/sentry-skills/skills/gh-review-requests/SKILL.md) | Fetch unread GitHub notifications for open PRs where review is requested from a specified team or opened by a team member. |
 | [gha-security-review](plugins/sentry-skills/skills/gha-security-review/SKILL.md) | GitHub Actions security review for workflow exploitation vulnerabilities. |
+| [idiomatic-code](plugins/sentry-skills/skills/idiomatic-code/SKILL.md) | Designs and rewrites public code interfaces, names, and contract docs to be idiomatic, explicit, and easy to consume. |
 | [iterate-pr](plugins/sentry-skills/skills/iterate-pr/SKILL.md) | Iterate on a PR until CI passes. |
 | [pr-writer](plugins/sentry-skills/skills/pr-writer/SKILL.md) | Canonical workflow to create and update pull requests following Sentry conventions. |
 | [security-review](plugins/sentry-skills/skills/security-review/SKILL.md) | Security code review for vulnerabilities. |
