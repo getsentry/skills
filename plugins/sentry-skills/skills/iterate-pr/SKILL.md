@@ -51,7 +51,22 @@ Returns JSON with feedback categorized as:
 Review bot feedback (from Sentry, Warden, Cursor, Bugbot, CodeQL, etc.) appears in `high`/`medium`/`low` with `review_bot: true` — it is NOT placed in the `bot` bucket.
 
 Each feedback item may also include:
-- `thread_id` - GraphQL node ID for inline review comments (used for replies)
+- `thread_id` - GraphQL node ID for inline review comments (used for replies via `reply_to_thread.py`)
+
+### `scripts/reply_to_thread.py`
+
+Replies to PR review threads. Batches multiple replies into a single GraphQL call.
+
+```bash
+uv run ${CLAUDE_SKILL_ROOT}/scripts/reply_to_thread.py THREAD_ID "body" [THREAD_ID "body" ...]
+```
+
+Arguments are alternating `(thread_id, body)` pairs. Example:
+```bash
+uv run ${CLAUDE_SKILL_ROOT}/scripts/reply_to_thread.py \
+  PRRT_abc $'Fixed the null check.\n\n*— Claude Code*' \
+  PRRT_def $'Replaced with path-segment counting.\n\n*— Claude Code*'
+```
 
 ## Workflow
 
@@ -107,13 +122,19 @@ After processing each inline review comment, reply on the PR thread to acknowled
 - `high` and `medium` items — whether fixed or determined to be false positives
 - `low` items — whether fixed or declined by the user
 
-**How to reply:** Use the `addPullRequestReviewThreadReply` GraphQL mutation with `pullRequestReviewThreadId` and `body` inputs.
+**How to reply:** Use `${CLAUDE_SKILL_ROOT}/scripts/reply_to_thread.py`. Batch all replies for a round into a single call:
+
+```bash
+uv run ${CLAUDE_SKILL_ROOT}/scripts/reply_to_thread.py \
+  PRRT_abc $'Fixed — description of change.\n\n*— Claude Code*' \
+  PRRT_def $'Not applicable — reason.\n\n*— Claude Code*'
+```
 
 **Reply format:**
 - 1-2 sentences: what was changed, why it's not an issue, or acknowledgment of declined items
 - End every reply with `\n\n*— Claude Code*`
 - Before replying, check if the thread already has a reply ending with `*- Claude Code*` or `*— Claude Code*` to avoid duplicates on re-loops
-- If the `gh api` call fails, log and continue — do not block the workflow
+- If the script fails, log and continue — do not block the workflow
 
 ### 4. Check CI Status
 
