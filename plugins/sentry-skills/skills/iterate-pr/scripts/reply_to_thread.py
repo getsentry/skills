@@ -52,7 +52,36 @@ def reply_to_threads(pairs: list[tuple[str, str]]) -> dict[str, bool]:
             print(f"GraphQL error: {result.stderr}", file=sys.stderr)
             return {tid: False for tid, _ in pairs}
 
-        return {tid: True for tid, _ in pairs}
+        # Parse response to detect per-alias GraphQL errors
+        try:
+            response = json.loads(result.stdout)
+        except (json.JSONDecodeError, TypeError):
+            print(f"Failed to parse GraphQL response: {result.stdout}", file=sys.stderr)
+            return {tid: False for tid, _ in pairs}
+
+        data = response.get("data") or {}
+        errors = response.get("errors") or []
+
+        # Build a set of alias indices that have errors
+        error_paths = set()
+        for err in errors:
+            for segment in err.get("path") or []:
+                if isinstance(segment, str) and segment.startswith("r"):
+                    error_paths.add(segment)
+
+        results = {}
+        for i, (tid, _) in enumerate(pairs):
+            alias = f"r{i}"
+            if alias in error_paths or data.get(alias) is None:
+                results[tid] = False
+            else:
+                results[tid] = True
+
+        if any(not v for v in results.values()):
+            failed = [tid for tid, ok in results.items() if not ok]
+            print(f"GraphQL partial failure for threads: {failed}", file=sys.stderr)
+
+        return results
     except subprocess.TimeoutExpired:
         print("Request timed out", file=sys.stderr)
         return {tid: False for tid, _ in pairs}
