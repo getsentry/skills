@@ -53,6 +53,14 @@ Review bot feedback (from Sentry, Warden, Cursor, Bugbot, CodeQL, etc.) appears 
 Each feedback item may also include:
 - `thread_id` - GraphQL node ID for inline review comments (used for replies)
 
+### `scripts/trigger_review_bots.py`
+
+Detects active review bots on the repo and triggers them on draft PRs. Scans review/comment authors from the last 10 merged PRs via a single GraphQL query to discover which bots are present, then posts trigger comments for each one. Minimizes (hides) previous trigger comments before posting new ones. Exits early on non-draft PRs.
+
+```bash
+uv run ${CLAUDE_SKILL_ROOT}/scripts/trigger_review_bots.py [--pr NUMBER]
+```
+
 ## Workflow
 
 ### 1. Identify PR
@@ -63,11 +71,19 @@ gh pr view --json number,url,headRefName
 
 Stop if no PR exists for the current branch.
 
-### 2. Gather Review Feedback
+### 2. Trigger Review Bots
+
+**Always run this step** — the script exits early on non-draft PRs:
+
+```bash
+uv run ${CLAUDE_SKILL_ROOT}/scripts/trigger_review_bots.py
+```
+
+### 3. Gather Review Feedback
 
 Run `${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py` to get categorized feedback already posted on the PR.
 
-### 3. Handle Feedback by LOGAF Priority
+### 4. Handle Feedback by LOGAF Priority
 
 **Auto-fix (no prompt):**
 - `high` - must address (blockers, security, changes requested)
@@ -115,13 +131,13 @@ After processing each inline review comment, reply on the PR thread to acknowled
 - Before replying, check if the thread already has a reply ending with `*- Claude Code*` or `*— Claude Code*` to avoid duplicates on re-loops
 - If the `gh api` call fails, log and continue — do not block the workflow
 
-### 4. Check CI Status
+### 5. Check CI Status
 
 Run `${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py` to get structured failure data.
 
 **Wait if pending:** If review bot checks (sentry, warden, cursor, bugbot, seer, codeql) are still running, wait before proceeding—they post actionable feedback that must be evaluated. Informational bots (codecov) are not worth waiting for.
 
-### 5. Fix CI Failures
+### 6. Fix CI Failures
 
 For each failure in the script output:
 1. Read the `log_snippet` and trace backwards from the error to understand WHY it failed — not just what failed
@@ -131,7 +147,7 @@ For each failure in the script output:
 
 Do NOT assume what failed based on check name alone—always read the logs. Do NOT "quick fix and hope" — understand the failure thoroughly before changing code.
 
-### 6. Verify Locally, Then Commit and Push
+### 7. Verify Locally, Then Commit and Push
 
 Before committing, verify your fixes locally:
 - If you fixed a test failure: re-run that specific test locally
@@ -146,23 +162,29 @@ git commit -m "fix: <descriptive message>"
 git push
 ```
 
-### 7. Monitor CI and Address Feedback
+After pushing, trigger review bots so they re-review the latest changes:
+
+```bash
+uv run ${CLAUDE_SKILL_ROOT}/scripts/trigger_review_bots.py
+```
+
+### 8. Monitor CI and Address Feedback
 
 Poll CI status and review feedback in a loop instead of blocking:
 
 1. Run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py` to get current CI status
 2. If all checks passed → proceed to exit conditions
-3. If any checks failed (none pending) → return to step 5
+3. If any checks failed (none pending) → return to step 6
 4. If checks are still pending:
    a. Run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py` for new review feedback
-   b. Address any new high/medium feedback immediately (same as step 3)
+   b. Address any new high/medium feedback immediately (run without `--summary` to get full details)
    c. If changes were needed, commit and push (this restarts CI), then continue polling
-   d. Sleep 30 seconds, then repeat from sub-step 1
-5. After all checks pass, do a final feedback check: `sleep 10`, then run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py`. Address any new high/medium feedback — if changes are needed, return to step 6.
+   d. Sleep 30 seconds (don't increase on subsequent iterations), then repeat from sub-step 1
+5. After all checks pass, do a final feedback check: `sleep 10`, then run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py`. Address any new high/medium feedback — if changes are needed, return to step 7.
 
-### 8. Repeat
+### 9. Repeat
 
-If step 7 required code changes (from new feedback after CI passed), return to step 2 for a fresh cycle. CI failures during monitoring are already handled within step 7's polling loop.
+If step 8 required code changes (from new feedback after CI passed), return to step 3 for a fresh cycle. CI failures during monitoring are already handled within step 8's polling loop.
 
 ## Exit Conditions
 
