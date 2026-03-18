@@ -11,8 +11,6 @@ allowed-tools: Read, Grep, Glob, Bash
 
 Scan agent skills for security issues before adoption. Detects prompt injection, malicious code, excessive permissions, secret exposure, and supply chain risks.
 
-**Requires**: The `uv` CLI for python package management, install guide at https://docs.astral.sh/uv/getting-started/installation/
-
 **Important**: Run all scripts from the repository root using the full path via `${CLAUDE_SKILL_ROOT}`.
 
 ## Bundled Script

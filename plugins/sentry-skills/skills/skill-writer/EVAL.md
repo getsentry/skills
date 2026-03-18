@@ -78,8 +78,6 @@ Where `<eval-prompt-file>` contains the exact eval prompt from this file.
 
 Validate the generated skill output:
 
-**Requires**: The `uv` CLI for python package management, install guide at https://docs.astral.sh/uv/getting-started/installation/
-
 ```bash
 uv run "<repo-root>/plugins/sentry-skills/skills/skill-writer/scripts/quick_validate.py" \
   /tmp/sentry-skills-eval-run/plugins/sentry-skills/skills/pi-agent-integration-eval \
