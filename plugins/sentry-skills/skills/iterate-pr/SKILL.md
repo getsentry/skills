@@ -9,6 +9,8 @@ Continuously iterate on the current branch until all CI checks pass and review f
 
 **Requires**: GitHub CLI (`gh`) authenticated.
 
+**Requires**: The `uv` CLI for python package management, install guide at https://docs.astral.sh/uv/getting-started/installation/
+
 **Important**: All scripts must be run from the repository root directory (where `.git` is located), not from the skill directory. Use the full path to the script via `${CLAUDE_SKILL_ROOT}`.
 
 ## Bundled Scripts
