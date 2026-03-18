@@ -41,10 +41,11 @@ def reply_to_threads(pairs: list[tuple[str, str]]) -> list[tuple[str, bool]]:
     # Build aliased mutation
     mutations = []
     for i, (thread_id, body) in enumerate(pairs):
+        escaped_thread_id = json.dumps(thread_id)
         escaped_body = json.dumps(_normalize_body(body))  # handles newlines, quotes
         mutations.append(
             f"  r{i}: addPullRequestReviewThreadReply(input: {{"
-            f'pullRequestReviewThreadId: "{thread_id}", '
+            f"pullRequestReviewThreadId: {escaped_thread_id}, "
             f"body: {escaped_body}"
             f"}}) {{ clientMutationId }}"
         )
