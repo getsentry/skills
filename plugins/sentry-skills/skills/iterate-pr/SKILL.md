@@ -18,10 +18,12 @@ Continuously iterate on the current branch until all CI checks pass and review f
 Fetches CI check status and extracts failure snippets from logs.
 
 ```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py [--pr NUMBER]
+uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py [--pr NUMBER] [--summary]
 ```
 
-Returns JSON:
+Use `--summary` for a compact human-readable view (ideal for quick status checks and polling). Omit for full JSON when you need to process individual check details.
+
+Returns JSON (without `--summary`):
 ```json
 {
   "pr": {"number": 123, "branch": "feat/foo"},
@@ -38,10 +40,12 @@ Returns JSON:
 Fetches and categorizes PR review feedback using the [LOGAF scale](https://develop.sentry.dev/engineering-practices/code-review/#logaf-scale).
 
 ```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py [--pr NUMBER]
+uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py [--pr NUMBER] [--summary]
 ```
 
-Returns JSON with feedback categorized as:
+Use `--summary` for a compact human-readable view. Omit for full JSON when you need to process individual feedback items.
+
+Returns JSON (without `--summary`) with feedback categorized as:
 - `high` - Must address before merge (`h:`, blocker, changes requested)
 - `medium` - Should address (`m:`, standard feedback)
 - `low` - Optional (`l:`, nit, style, suggestion)
@@ -150,15 +154,15 @@ git push
 
 Poll CI status and review feedback in a loop instead of blocking:
 
-1. Run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py` to get current CI status
+1. Run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py --summary` to get current CI status
 2. If all checks passed → proceed to exit conditions
-3. If any checks failed (none pending) → return to step 5
+3. If any checks failed (none pending) → run without `--summary` for full failure details, then return to step 5
 4. If checks are still pending:
-   a. Run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py` for new review feedback
-   b. Address any new high/medium feedback immediately (same as step 3)
+   a. Run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py --summary` for new review feedback
+   b. Address any new high/medium feedback immediately (run without `--summary` to get full details)
    c. If changes were needed, commit and push (this restarts CI), then continue polling
    d. Sleep 30 seconds, then repeat from sub-step 1
-5. After all checks pass, do a final feedback check: `sleep 10`, then run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py`. Address any new high/medium feedback — if changes are needed, return to step 6.
+5. After all checks pass, do a final feedback check: `sleep 10`, then run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py --summary`. Address any new high/medium feedback — if changes are needed, return to step 6.
 
 ### 8. Repeat
 

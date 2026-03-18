@@ -307,9 +307,42 @@ def extract_feedback_item(
     return item
 
 
+def format_summary(output: dict[str, Any]) -> str:
+    """Format a compact summary of PR feedback."""
+    s = output["summary"]
+    pr = output["pr"]
+    lines = [f"PR #{pr['number']} — {s['needs_attention']} need attention ({s['high']} high, {s['medium']} medium, {s['low']} low)"]
+
+    if pr.get("review_decision"):
+        lines.append(f"  Review: {pr['review_decision']}")
+
+    if output.get("action_required"):
+        lines.append(f"  Action: {output['action_required']}")
+
+    feedback = output["feedback"]
+    for priority in ("high", "medium", "low"):
+        for item in feedback[priority]:
+            location = ""
+            if item.get("path"):
+                location = f" in {item['path']}"
+                if item.get("line"):
+                    location += f":{item['line']}"
+            bot_tag = " [review-bot]" if item.get("review_bot") else ""
+            lines.append(f"  [{priority.upper()}] @{item['author']}{bot_tag}{location}")
+            lines.append(f"    {item['body'][:120]}")
+
+    if s["resolved"]:
+        lines.append(f"  ({s['resolved']} resolved threads skipped)")
+    if s["bot_comments"]:
+        lines.append(f"  ({s['bot_comments']} bot comments skipped)")
+
+    return "\n".join(lines)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Fetch and categorize PR feedback")
     parser.add_argument("--pr", type=int, help="PR number (defaults to current branch PR)")
+    parser.add_argument("--summary", action="store_true", help="Output compact summary instead of full JSON")
     args = parser.parse_args()
 
     # Get repo info
@@ -468,7 +501,10 @@ def main():
     else:
         output["action_required"] = None
 
-    print(json.dumps(output, indent=2))
+    if args.summary:
+        print(format_summary(output))
+    else:
+        print(json.dumps(output, indent=2))
 
 
 if __name__ == "__main__":
