@@ -64,20 +64,7 @@ def minimize_comment(node_id: str) -> bool:
       }
     }
     """
-    try:
-        subprocess.run(
-            [
-                "gh", "api", "graphql",
-                "-f", f"query={query}",
-                "-F", f"id={node_id}",
-            ],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        return True
-    except subprocess.CalledProcessError:
-        return False
+    return run_gh(["api", "graphql", "-f", f"query={query}", "-F", f"id={node_id}"]) is not None
 
 
 def detect_and_trigger(pr_number: int | None = None) -> dict[str, Any]:
@@ -134,22 +121,15 @@ def detect_and_trigger(pr_number: int | None = None) -> dict[str, Any]:
     }
     """
 
-    try:
-        result = subprocess.run(
-            [
-                "gh", "api", "graphql",
-                "-f", f"query={query}",
-                "-F", f"owner={owner}",
-                "-F", f"repo={repo}",
-                "-F", f"pr={pr_number}",
-            ],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        data = json.loads(result.stdout)
-    except (subprocess.CalledProcessError, json.JSONDecodeError) as e:
-        return {"error": f"GraphQL query failed: {e}"}
+    data = run_gh([
+        "api", "graphql",
+        "-f", f"query={query}",
+        "-F", f"owner={owner}",
+        "-F", f"repo={repo}",
+        "-F", f"pr={pr_number}",
+    ])
+    if not data:
+        return {"error": "GraphQL query failed"}
 
     repo_data = data.get("data", {}).get("repository", {})
     pr_data = repo_data.get("pullRequest", {})
@@ -191,23 +171,13 @@ def detect_and_trigger(pr_number: int | None = None) -> dict[str, Any]:
     # Post new trigger comments
     triggered = []
     for bot_username, trigger_command in bots_to_trigger.items():
-        try:
-            subprocess.run(
-                [
-                    "gh", "api",
-                    f"repos/{owner}/{repo}/issues/{pr_number}/comments",
-                    "-f", f"body={trigger_command}",
-                ],
-                capture_output=True,
-                text=True,
-                check=True,
-            )
+        result = run_gh([
+            "api",
+            f"repos/{owner}/{repo}/issues/{pr_number}/comments",
+            "-f", f"body={trigger_command}",
+        ])
+        if result is not None:
             triggered.append(trigger_command)
-        except subprocess.CalledProcessError as e:
-            print(
-                f"Failed to trigger {bot_username}: {e.stderr}",
-                file=sys.stderr,
-            )
 
     output: dict[str, Any] = {"is_draft": True, "triggered": triggered}
     if minimized:
