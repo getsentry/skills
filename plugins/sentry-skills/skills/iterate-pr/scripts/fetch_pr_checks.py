@@ -168,9 +168,40 @@ def get_run_logs(run_id: int) -> str | None:
         return None
 
 
+def format_summary(output: dict[str, Any]) -> str:
+    """Format a compact summary of check status."""
+    s = output["summary"]
+    pr = output["pr"]
+    lines = [f"PR #{pr['number']} ({pr['branch']}) — {s['passed']}/{s['total']} passed"]
+
+    if s["failed"]:
+        lines.append(f"  {s['failed']} failed, {s['pending']} pending")
+    elif s["pending"]:
+        lines.append(f"  {s['pending']} pending")
+    else:
+        lines.append("  All checks passed")
+
+    non_pass = [c for c in output["checks"] if c["status"] != "pass"]
+    for c in non_pass:
+        status = c["status"].upper()
+        line = f"  [{status}] {c['name']}"
+        if c.get("run_id"):
+            line += f" (run {c['run_id']})"
+        lines.append(line)
+        if c.get("log_snippet"):
+            snippet_lines = c["log_snippet"].split("\n")[:5]
+            for sl in snippet_lines:
+                lines.append(f"    {sl}")
+            if len(c["log_snippet"].split("\n")) > 5:
+                lines.append(f"    ... ({len(c['log_snippet'].split(chr(10)))} lines total)")
+
+    return "\n".join(lines)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Fetch PR CI checks with failure snippets")
     parser.add_argument("--pr", type=int, help="PR number (defaults to current branch PR)")
+    parser.add_argument("--summary", action="store_true", help="Output compact summary instead of full JSON")
     args = parser.parse_args()
 
     # Get PR info
@@ -235,7 +266,10 @@ def main():
         "checks": processed_checks,
     }
 
-    print(json.dumps(output, indent=2))
+    if args.summary:
+        print(format_summary(output))
+    else:
+        print(json.dumps(output, indent=2))
 
 
 if __name__ == "__main__":
