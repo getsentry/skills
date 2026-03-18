@@ -180,7 +180,7 @@ Poll CI status and review feedback in a loop instead of blocking:
    a. Run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py` for new review feedback
    b. Address any new high/medium feedback immediately (same as step 3)
    c. If changes were needed, commit and push (this restarts CI), then continue polling
-   d. Sleep 30 seconds, then repeat from sub-step 1
+   d. Sleep 30 seconds (don't increase on subsequent iterations), then repeat from sub-step 1
 5. After all checks pass, do a final feedback check: `sleep 10`, then run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py`. Address any new high/medium feedback — if changes are needed, return to step 6.
 
 ### 8. Repeat
