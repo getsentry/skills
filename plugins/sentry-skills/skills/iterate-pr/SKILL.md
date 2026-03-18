@@ -64,8 +64,8 @@ uv run ${CLAUDE_SKILL_ROOT}/scripts/reply_to_thread.py THREAD_ID "body" [THREAD_
 Arguments are alternating `(thread_id, body)` pairs. Example:
 ```bash
 uv run ${CLAUDE_SKILL_ROOT}/scripts/reply_to_thread.py \
-  PRRT_abc "Fixed the null check.\n\n*— Claude Code*" \
-  PRRT_def "Replaced with path-segment counting.\n\n*— Claude Code*"
+  PRRT_abc $'Fixed the null check.\n\n*— Claude Code*' \
+  PRRT_def $'Replaced with path-segment counting.\n\n*— Claude Code*'
 ```
 
 ## Workflow
@@ -126,8 +126,8 @@ After processing each inline review comment, reply on the PR thread to acknowled
 
 ```bash
 uv run ${CLAUDE_SKILL_ROOT}/scripts/reply_to_thread.py \
-  PRRT_abc "Fixed — description of change.\n\n*— Claude Code*" \
-  PRRT_def "Not applicable — reason.\n\n*— Claude Code*"
+  PRRT_abc $'Fixed — description of change.\n\n*— Claude Code*' \
+  PRRT_def $'Not applicable — reason.\n\n*— Claude Code*'
 ```
 
 **Reply format:**

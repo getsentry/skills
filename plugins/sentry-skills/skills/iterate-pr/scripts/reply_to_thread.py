@@ -15,6 +15,7 @@ Example:
     python reply_to_thread.py PRRT_abc "Fixed the issue.\n\n*— Claude Code*"
     python reply_to_thread.py PRRT_abc "Fixed." PRRT_def "Also fixed."
 """
+
 from __future__ import annotations
 
 import argparse
@@ -23,20 +24,29 @@ import subprocess
 import sys
 
 
-def reply_to_threads(pairs: list[tuple[str, str]]) -> dict[str, bool]:
+def _normalize_body(body: str) -> str:
+    """Normalize escaped newlines from shell input.
+
+    Bash double quotes keep "\\n" literal, but reply bodies should contain
+    actual newlines for readability/signatures.
+    """
+    return body.replace("\\r\\n", "\\n").replace("\\n", "\n")
+
+
+def reply_to_threads(pairs: list[tuple[str, str]]) -> list[tuple[str, bool]]:
     """Reply to one or more review threads in a single GraphQL call.
 
-    Returns a dict mapping thread_id -> success.
+    Returns a per-operation list of (thread_id, success) tuples.
     """
     # Build aliased mutation
     mutations = []
     for i, (thread_id, body) in enumerate(pairs):
-        escaped_body = json.dumps(body)  # handles newlines, quotes
+        escaped_body = json.dumps(_normalize_body(body))  # handles newlines, quotes
         mutations.append(
-            f'  r{i}: addPullRequestReviewThreadReply(input: {{'
+            f"  r{i}: addPullRequestReviewThreadReply(input: {{"
             f'pullRequestReviewThreadId: "{thread_id}", '
-            f'body: {escaped_body}'
-            f'}}) {{ clientMutationId }}'
+            f"body: {escaped_body}"
+            f"}}) {{ clientMutationId }}"
         )
 
     query = "mutation {\n" + "\n".join(mutations) + "\n}"
@@ -50,14 +60,14 @@ def reply_to_threads(pairs: list[tuple[str, str]]) -> dict[str, bool]:
         )
         if result.returncode != 0:
             print(f"GraphQL error: {result.stderr}", file=sys.stderr)
-            return {tid: False for tid, _ in pairs}
+            return [(tid, False) for tid, _ in pairs]
 
         # Parse response to detect per-alias GraphQL errors
         try:
             response = json.loads(result.stdout)
         except (json.JSONDecodeError, TypeError):
             print(f"Failed to parse GraphQL response: {result.stdout}", file=sys.stderr)
-            return {tid: False for tid, _ in pairs}
+            return [(tid, False) for tid, _ in pairs]
 
         data = response.get("data") or {}
         errors = response.get("errors") or []
@@ -69,22 +79,22 @@ def reply_to_threads(pairs: list[tuple[str, str]]) -> dict[str, bool]:
                 if isinstance(segment, str) and segment.startswith("r"):
                     error_paths.add(segment)
 
-        results = {}
+        operation_results = []
         for i, (tid, _) in enumerate(pairs):
             alias = f"r{i}"
             if alias in error_paths or data.get(alias) is None:
-                results[tid] = False
+                operation_results.append((tid, False))
             else:
-                results[tid] = True
+                operation_results.append((tid, True))
 
-        if any(not v for v in results.values()):
-            failed = [tid for tid, ok in results.items() if not ok]
+        if any(not ok for _, ok in operation_results):
+            failed = [tid for tid, ok in operation_results if not ok]
             print(f"GraphQL partial failure for threads: {failed}", file=sys.stderr)
 
-        return results
+        return operation_results
     except subprocess.TimeoutExpired:
         print("Request timed out", file=sys.stderr)
-        return {tid: False for tid, _ in pairs}
+        return [(tid, False) for tid, _ in pairs]
 
 
 def main():
@@ -110,11 +120,22 @@ def main():
     results = reply_to_threads(pairs)
 
     # Output results
-    success = all(results.values())
+    success = all(ok for _, ok in results)
+    by_thread = {}
+    for tid, ok in results:
+        by_thread.setdefault(tid, []).append(ok)
+
     output = {
-        "replied": sum(1 for v in results.values() if v),
-        "failed": sum(1 for v in results.values() if not v),
-        "threads": {tid: "ok" if ok else "failed" for tid, ok in results.items()},
+        "replied": sum(1 for _, ok in results if ok),
+        "failed": sum(1 for _, ok in results if not ok),
+        "operations": [
+            {"thread_id": tid, "status": "ok" if ok else "failed"}
+            for tid, ok in results
+        ],
+        "threads": {
+            tid: "ok" if all(statuses) else "failed"
+            for tid, statuses in by_thread.items()
+        },
     }
     print(json.dumps(output, indent=2))
 
