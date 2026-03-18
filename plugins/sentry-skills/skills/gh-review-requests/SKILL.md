@@ -10,6 +10,8 @@ Fetch unread `review_requested` notifications for open (unmerged) PRs, filtered 
 
 **Requires**: GitHub CLI (`gh`) authenticated.
 
+**Requires**: The `uv` CLI for python package management, install guide at https://docs.astral.sh/uv/getting-started/installation/
+
 ## Step 1: Identify the Team
 
 If the user has not specified a team, ask:
