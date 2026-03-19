@@ -158,7 +158,7 @@ Run `uv run <skill-dir>/scripts/tool.py`.
 Treat portability as the default requirement for generated skills.
 
 - Prefer cross-agent wording such as "skill root", "repository root", and relative paths like `references/...` or `scripts/...`
-- Avoid provider-specific environment variables, directory names, or invocation contracts in generic skills
+- Avoid provider-specific environment variables, directory names, or invocation contracts in skills that should remain provider-agnostic
 - Only introduce provider-specific instructions when the skill is intentionally scoped to that provider, and label that scope explicitly in the description and body
 
 ```markdown

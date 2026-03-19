@@ -38,7 +38,7 @@ If you must run the validator from another working directory, convert both paths
 - `references/troubleshooting-workarounds.md` exists with sufficient depth
 - `SKILL.md` and `references/*.md` avoid host-specific absolute filesystem paths
 
-4. Confirm portability for generic skills:
+4. Confirm portability for skills that are expected to be portable by default:
 - bundled file references use skill-root-relative paths such as `references/...`, `scripts/...`, or `assets/...`
 - provider-specific path variables (for example `${CLAUDE_SKILL_ROOT}`) are absent unless the skill is intentionally provider-specific
 - provider-specific behavior, if any, is labeled as compatibility guidance rather than the primary workflow
