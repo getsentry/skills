@@ -15,7 +15,7 @@ Before committing, always check the current branch:
 git branch --show-current
 ```
 
-**If you're on `main` or `master`, you MUST create a feature branch first** — unless the user explicitly asked to commit to main. Do not ask the user whether to create a branch; just proceed with branch creation. The `create-branch` skill will still propose a branch name for the user to confirm.
+**If you're on `main` or `master`, you MUST create a feature branch first** — unless the user explicitly asked to commit to main. Do not ask the user whether to create a branch; just proceed with branch creation. The `create-branch` skill should derive and create a suitable branch name automatically.
 
 Use the `create-branch` skill to create the branch. After `create-branch` completes, verify the current branch has changed before proceeding:
 
@@ -23,7 +23,7 @@ Use the `create-branch` skill to create the branch. After `create-branch` comple
 git branch --show-current
 ```
 
-If still on `main` or `master` (e.g., the user aborted branch creation), stop — do not commit.
+If still on `main` or `master`, stop — do not commit.
 
 ## Format
 
