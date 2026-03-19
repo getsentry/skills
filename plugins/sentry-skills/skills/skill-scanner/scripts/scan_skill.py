@@ -384,13 +384,13 @@ def check_structural_attacks(skill_dir: Path, content: str, frontmatter: dict[st
     # 1. Symlinks — files that resolve to paths outside the skill directory
     for path in skill_dir.rglob("*"):
         if path.is_symlink():
-            target = str(path.resolve())
-            skill_root = str(skill_dir.resolve())
+            target = path.resolve()
+            is_internal = target.is_relative_to(skill_dir.resolve())
             findings.append({
                 "type": "Symlink Detected",
-                "severity": "critical" if not target.startswith(skill_root) else "medium",
+                "severity": "medium" if is_internal else "critical",
                 "location": str(path.relative_to(skill_dir)),
-                "description": f"Symlink points to {path.readlink()} (resolves to {target}). "
+                "description": f"Symlink points to {path.readlink()} (resolves to {str(target)}). "
                               "Symlinks can trick agents into reading sensitive files (e.g., ~/.ssh/id_rsa) "
                               "disguised as example/reference files.",
                 "category": "Symlink Exfiltration",
@@ -453,8 +453,8 @@ def check_structural_attacks(skill_dir: Path, content: str, frontmatter: dict[st
     # 5. npm postinstall — bundled package.json with lifecycle scripts
     for pkg_json in skill_dir.rglob("package.json"):
         try:
-            pkg = json.loads(pkg_json.read_text())
-        except (json.JSONDecodeError, OSError):
+            pkg = json.loads(pkg_json.read_text(encoding="utf-8", errors="replace"))
+        except (json.JSONDecodeError, OSError, ValueError):
             continue
         scripts = pkg.get("scripts", {})
         lifecycle_hooks = ["preinstall", "install", "postinstall", "preuninstall", "postuninstall"]
@@ -470,35 +470,40 @@ def check_structural_attacks(skill_dir: Path, content: str, frontmatter: dict[st
                     "category": "Supply Chain",
                 })
 
-    # 6. Image metadata — PNG/JPEG files with text metadata chunks
+    # 6. Image metadata — parse PNG chunks properly to find tEXt/iTXt metadata
+    import struct
     for img_path in skill_dir.rglob("*.png"):
         try:
-            # Read PNG text chunks without PIL — check for tEXt/iTXt chunks
             data = img_path.read_bytes()
-            # PNG tEXt chunks contain keyword\0text
-            if b"tEXt" in data or b"iTXt" in data:
-                # Try to extract readable text after tEXt marker
-                for marker in [b"tEXt", b"iTXt"]:
-                    idx = data.find(marker)
-                    while idx != -1:
-                        # Extract text after the chunk type (skip length + type)
-                        chunk_data = data[idx + 4:idx + 500]
-                        text = chunk_data.split(b"\x00", 1)
-                        if len(text) > 1:
-                            keyword = text[0].decode("ascii", errors="ignore")
-                            value = text[1][:200].decode("utf-8", errors="ignore")
-                            if value.strip():
-                                findings.append({
-                                    "type": "Image Metadata Text",
-                                    "severity": "high",
-                                    "location": str(img_path.relative_to(skill_dir)),
-                                    "description": f"PNG contains text metadata ('{keyword}'): {value[:100]}. "
-                                                  "Hidden instructions in image metadata can be read by "
-                                                  "multimodal LLMs when they inspect the file.",
-                                    "category": "Image Injection",
-                                })
-                        idx = data.find(marker, idx + 1)
-        except OSError:
+            # PNG files start with 8-byte signature, then chunks
+            # Each chunk: 4-byte length (big-endian), 4-byte type, data, 4-byte CRC
+            if data[:8] != b"\x89PNG\r\n\x1a\n":
+                continue
+            offset = 8
+            while offset + 8 <= len(data):
+                chunk_len = struct.unpack(">I", data[offset:offset + 4])[0]
+                chunk_type = data[offset + 4:offset + 8]
+                chunk_data = data[offset + 8:offset + 8 + chunk_len]
+
+                if chunk_type in (b"tEXt", b"iTXt"):
+                    parts = chunk_data.split(b"\x00", 1)
+                    if len(parts) > 1:
+                        keyword = parts[0].decode("ascii", errors="ignore")
+                        value = parts[1][:200].decode("utf-8", errors="ignore")
+                        if value.strip():
+                            findings.append({
+                                "type": "Image Metadata Text",
+                                "severity": "high",
+                                "location": str(img_path.relative_to(skill_dir)),
+                                "description": f"PNG contains text metadata ('{keyword}'): {value[:100]}. "
+                                              "Hidden instructions in image metadata can be read by "
+                                              "multimodal LLMs when they inspect the file.",
+                                "category": "Image Injection",
+                            })
+
+                # Advance to next chunk: length + type(4) + data + CRC(4)
+                offset += 4 + 4 + chunk_len + 4
+        except (OSError, struct.error):
             continue
 
     return findings
