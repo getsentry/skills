@@ -456,7 +456,7 @@ def check_structural_attacks(skill_dir: Path, content: str, frontmatter: dict[st
             pkg = json.loads(pkg_json.read_text(encoding="utf-8", errors="replace"))
         except (json.JSONDecodeError, OSError, ValueError):
             continue
-        scripts = pkg.get("scripts", {})
+        scripts = pkg.get("scripts") or {}
         lifecycle_hooks = ["preinstall", "install", "postinstall", "preuninstall", "postuninstall"]
         for hook in lifecycle_hooks:
             if hook in scripts:
@@ -485,12 +485,22 @@ def check_structural_attacks(skill_dir: Path, content: str, frontmatter: dict[st
                 chunk_type = data[offset + 4:offset + 8]
                 chunk_data = data[offset + 8:offset + 8 + chunk_len]
 
-                if chunk_type in (b"tEXt", b"iTXt"):
+                keyword = ""
+                value = ""
+                if chunk_type == b"tEXt":
+                    # tEXt: keyword\0text
                     parts = chunk_data.split(b"\x00", 1)
                     if len(parts) > 1:
                         keyword = parts[0].decode("ascii", errors="ignore")
-                        value = parts[1][:200].decode("utf-8", errors="ignore")
-                        if value.strip():
+                        value = parts[1][:200].decode("latin-1", errors="ignore")
+                elif chunk_type == b"iTXt":
+                    # iTXt: keyword\0comprFlag\0comprMethod\0langTag\0transKeyword\0text
+                    parts = chunk_data.split(b"\x00", 4)
+                    if len(parts) >= 5:
+                        keyword = parts[0].decode("ascii", errors="ignore")
+                        value = parts[4][:200].decode("utf-8", errors="ignore")
+
+                if keyword and value.strip():
                             findings.append({
                                 "type": "Image Metadata Text",
                                 "severity": "high",
