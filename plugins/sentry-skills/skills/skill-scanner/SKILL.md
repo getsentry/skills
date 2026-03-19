@@ -90,7 +90,8 @@ This phase is agent-only — no pattern matching. Read the full SKILL.md instruc
 **Config/memory poisoning**:
 - Instructions to modify `CLAUDE.md`, `MEMORY.md`, `settings.json`, `.mcp.json`, or hook configurations
 - Instructions to add itself to allowlists or auto-approve permissions
-- Writing to `~/.claude/` or any agent configuration directory
+- Writing to `~/.claude/`, `~/.agents/`, or any agent configuration directory
+- Scripts that append to global config files — the poisoned instructions persist after skill removal
 
 **Scope creep**:
 - Instructions that exceed the skill's stated purpose
@@ -101,6 +102,14 @@ This phase is agent-only — no pattern matching. Read the full SKILL.md instruc
 - Reading environment variables beyond what's needed
 - Listing directory contents outside the skill's scope
 - Accessing git history, credentials, or user data unnecessarily
+
+**Structural attacks** (check scanner output for these):
+- **Symlinks**: Files that resolve outside the skill directory — can disguise reads of `~/.ssh/id_rsa`, `~/.aws/credentials`, etc. as "example" files
+- **Frontmatter hooks**: `PostToolUse`/`PreToolUse` hooks in YAML — execute shell commands automatically, the model cannot prevent it
+- **`!`command`` syntax**: Runs shell commands at skill load time during template expansion, before the model sees the prompt
+- **Test files**: `conftest.py`, `test_*.py`, `*.test.js` — test runners auto-discover and execute these as side effects of `pytest` or `npm test`
+- **npm lifecycle hooks**: `postinstall` scripts in bundled `package.json` — run automatically on `npm install`
+- **Image metadata**: PNG files with text in metadata chunks (tEXt/iTXt) — multimodal LLMs can read hidden instructions from image metadata
 
 ### Phase 6: Script Analysis
 
