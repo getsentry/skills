@@ -9,7 +9,17 @@ Use this path to create or update the skill files.
 3. `description` must contain realistic trigger phrases.
 4. Keep body imperative and concise.
 5. Use SKILL.md as index/orchestration for complex workflows.
-6. Keep paths portable: do not hardcode host-specific absolute filesystem paths (for example `<home>/...` or `<drive>:\Users\...`) in `SKILL.md` or `references/`.
+6. Keep bundled-file references relative to the skill root: use `references/...`, `scripts/...`, and `assets/...` for files that ship with the skill.
+7. Keep paths portable: do not hardcode host-specific absolute filesystem paths (for example `<home>/...` or `<drive>:\Users\...`) in `SKILL.md` or `references/`.
+
+## Path handling rules
+
+1. Treat the skill directory containing `SKILL.md` as the root for bundled references.
+2. Prefer relative references in skill content even when the repository also exposes mirrored or symlinked paths.
+3. Reserve repo-root paths for repository registration instructions only (for example `README.md`, `.claude/settings.json`).
+4. If the repository has multiple visible layouts for the same skill tree, inspect the workspace and edit the canonical location rather than assuming one layout from a generic template.
+5. Do not use provider-specific path variables such as `${CLAUDE_SKILL_ROOT}` in skills that are meant to stay provider-agnostic; use skill-root-relative paths instead.
+6. Only keep provider-specific path conventions when the skill is intentionally provider-specific and that scope is made explicit.
 
 ## Supporting files
 

@@ -31,3 +31,5 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 ## Changelog
 
 - 2026-03-05: Initialized `SOURCES.md` with baseline source pack (local canonical, Codex upstream, Claude upstream, spec, and repo conventions).
+- 2026-03-19: Clarified path-resolution guidance so bundled skill references stay skill-root-relative while registration steps are resolved from the repository's active layout.
+- 2026-03-19: Made portability a default authoring rule and disallowed provider-specific path variables in generic skills.

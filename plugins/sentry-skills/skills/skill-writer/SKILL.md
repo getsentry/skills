@@ -28,10 +28,13 @@ Load only the path(s) required for the task:
 
 ## Step 1: Resolve target and path
 
-1. Resolve target skill path and intended operation (`create`, `update`, `synthesize`, `iterate`).
-2. Read `references/mode-selection.md` and select the required path(s).
-3. Classify the skill (`workflow-process`, `integration-documentation`, `security-review`, `skill-authoring`, `generic`).
-4. Ask one direct question if class or depth requirements are ambiguous; otherwise state explicit assumptions.
+1. Resolve target skill root and intended operation (`create`, `update`, `synthesize`, `iterate`).
+2. Distinguish skill-internal paths from repo registration paths:
+   - inside a skill, reference bundled files relative to that skill root (for example `references/foo.md`, `scripts/check.py`)
+   - for repository registration edits, use the repository's actual canonical files/locations after inspecting the workspace
+3. Read `references/mode-selection.md` and select the required path(s).
+4. Classify the skill (`workflow-process`, `integration-documentation`, `security-review`, `skill-authoring`, `generic`).
+5. Ask one direct question if class or depth requirements are ambiguous; otherwise state explicit assumptions.
 
 ## Step 2: Run synthesis when needed
 
@@ -74,7 +77,7 @@ Read `references/description-optimization.md`.
 
 1. Validate should-trigger and should-not-trigger query sets.
 2. Reduce false positives and false negatives with targeted description edits.
-3. Keep trigger language generic across Codex and Claude.
+3. Keep trigger language generic across providers unless the skill is intentionally provider-specific.
 
 ## Step 6: Evaluate outcomes
 
@@ -89,7 +92,7 @@ Read `references/evaluation-path.md`.
 
 Read `references/registration-validation.md`.
 
-1. Apply repository registration steps.
+1. Apply repository registration steps for the active layout you verified in the workspace.
 2. Run quick validation with strict depth gates.
 3. Reject shallow outputs that fail depth gates or required artifact checks.
 

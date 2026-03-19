@@ -121,7 +121,7 @@ Pick one term for each concept and use it throughout the skill. Inconsistent ter
 
 Information should live in either SKILL.md or reference files, not both. Prefer reference files for detailed content and SKILL.md for the core procedural workflow.
 
-Similarly, don't repeat conventions already in `CLAUDE.md` or `AGENTS.md`. Reference them instead: "Follow the commit conventions in CLAUDE.md" rather than copying the entire format spec.
+Similarly, don't repeat conventions already in project agent docs such as `AGENTS.md` or `CLAUDE.md`. Reference them instead of copying the entire format spec.
 
 ## Avoid Time-Sensitive Information
 
@@ -152,6 +152,24 @@ Run `python <absolute-path>/tool.py`.
 Read `<repo-root>/README.md`.
 Run `uv run <skill-dir>/scripts/tool.py`.
 ```
+
+## Default To Portable Skills
+
+Treat portability as the default requirement for generated skills.
+
+- Prefer cross-agent wording such as "skill root", "repository root", and relative paths like `references/...` or `scripts/...`
+- Avoid provider-specific environment variables, directory names, or invocation contracts in skills that should remain provider-agnostic
+- Only introduce provider-specific instructions when the skill is intentionally scoped to that provider, and label that scope explicitly in the description and body
+
+```markdown
+# Bad
+Run `uv run ${CLAUDE_SKILL_ROOT}/scripts/check.py`
+
+# Good
+Run `uv run scripts/check.py`
+```
+
+If a host requires a special runtime variable or working-directory convention, document it as a compatibility note, not as the primary path model for the skill.
 
 ## Long Reference Files
 
