@@ -18,6 +18,7 @@ Use this path to improve skill triggering quality and reduce false matches.
 2. Include what the skill does and when to use it.
 3. Avoid implementation details that do not help triggering.
 4. Avoid provider-specific phrasing unless the skill is intentionally provider-specific.
+5. For generic skills, avoid naming Claude, Codex, or any provider in ways that would narrow portability expectations.
 
 ## Required output
 
