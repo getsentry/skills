@@ -16,7 +16,7 @@ Before merging, test your changes locally:
 
    ```bash
    claude plugin marketplace add ~/path/to/sentry-skills
-   claude plugin install sentry-skills
+   claude plugin install sentry-skills@sentry-skills
    ```
 
 2. **Restart Claude Code** to pick up changes
