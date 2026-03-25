@@ -63,11 +63,11 @@ Replies to PR review threads. Batches multiple replies into a single GraphQL cal
 uv run ${CLAUDE_SKILL_ROOT}/scripts/reply_to_thread.py THREAD_ID "body" [THREAD_ID "body" ...]
 ```
 
-Arguments are alternating `(thread_id, body)` pairs. Example:
+Arguments are alternating `(thread_id, body)` pairs. The script automatically appends `*— Claude Code*` attribution if not already present. Example:
 ```bash
 uv run ${CLAUDE_SKILL_ROOT}/scripts/reply_to_thread.py \
-  PRRT_abc $'Fixed the null check.\n\n*— Claude Code*' \
-  PRRT_def $'Replaced with path-segment counting.\n\n*— Claude Code*'
+  PRRT_abc "Fixed the null check." \
+  PRRT_def "Replaced with path-segment counting."
 ```
 
 ## Workflow
@@ -128,13 +128,13 @@ After processing each inline review comment, reply on the PR thread to acknowled
 
 ```bash
 uv run ${CLAUDE_SKILL_ROOT}/scripts/reply_to_thread.py \
-  PRRT_abc $'Fixed — description of change.\n\n*— Claude Code*' \
-  PRRT_def $'Not applicable — reason.\n\n*— Claude Code*'
+  PRRT_abc "Fixed — description of change." \
+  PRRT_def "Not applicable — reason."
 ```
 
 **Reply format:**
 - 1-2 sentences: what was changed, why it's not an issue, or acknowledgment of declined items
-- End every reply with `\n\n*— Claude Code*`
+- The script automatically appends `*— Claude Code*` attribution if not already present
 - Before replying, check if the thread already has a reply ending with `*- Claude Code*` or `*— Claude Code*` to avoid duplicates on re-loops
 - If the script fails, log and continue — do not block the workflow
 
