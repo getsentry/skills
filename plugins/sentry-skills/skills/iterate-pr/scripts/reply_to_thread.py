@@ -30,7 +30,19 @@ def _normalize_body(body: str) -> str:
     Bash double quotes keep "\\n" literal, but reply bodies should contain
     actual newlines for readability/signatures.
     """
-    return body.replace("\\r\\n", "\\n").replace("\\n", "\n")
+    normalized = body.replace("\\r\\n", "\\n").replace("\\n", "\n")
+    
+    # Add Claude Code attribution if not already present
+    attribution_variants = ["*— Claude Code*", "*- Claude Code*"]
+    if not any(variant in normalized for variant in attribution_variants):
+        # Ensure proper spacing before attribution
+        if normalized and not normalized.endswith("\n"):
+            normalized += "\n"
+        if normalized and not normalized.endswith("\n\n"):
+            normalized += "\n"
+        normalized += "*— Claude Code*"
+    
+    return normalized
 
 
 def reply_to_threads(pairs: list[tuple[str, str]]) -> list[tuple[str, bool]]:
