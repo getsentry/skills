@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 
@@ -33,8 +34,14 @@ def _normalize_body(body: str) -> str:
     normalized = body.replace("\\r\\n", "\\n").replace("\\n", "\n")
     
     # Add Claude Code attribution if not already present
-    attribution_variants = ["*— Claude Code*", "*- Claude Code*"]
-    if not any(variant in normalized for variant in attribution_variants):
+    # Check if the last line matches the bot signature pattern: *— Bot Name* or *- Bot Name*
+    lines = normalized.rstrip().split("\n")
+    last_line = lines[-1] if lines else ""
+    
+    # Match bot signatures like "*— Claude Code*", "*- Any Bot*", etc.
+    bot_signature_pattern = r"^\*[—-]\s+.+\*$"
+    
+    if not re.match(bot_signature_pattern, last_line.strip()):
         # Ensure proper spacing before attribution
         if normalized and not normalized.endswith("\n"):
             normalized += "\n"
