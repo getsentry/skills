@@ -7,7 +7,7 @@ argument-hint: '[optional description of the work]'
 # Create Branch
 
 Create a git branch following Sentry naming conventions.
-Keep this workflow non-interactive unless the user explicitly asks to choose the name manually.
+**Do NOT ask the user to confirm or approve the branch name.** Generate the name, create the branch, and move on. This workflow must be fully non-interactive unless the user explicitly asks to choose the name manually.
 
 ## Workflow
 
@@ -68,7 +68,7 @@ Keep this workflow non-interactive unless the user explicitly asks to choose the
    ```bash
    git checkout -b <branch-name>
    ```
-   Report the final branch name, but do not stop for confirmation.
+   Report the final branch name. **Never** ask "does this look good?" or wait for approval — just create it and move on.
 
 ## References
 
