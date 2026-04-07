@@ -52,24 +52,6 @@ Returns JSON with feedback categorized as:
 
 Review bot feedback (from Sentry, Warden, Cursor, Bugbot, CodeQL, etc.) appears in `high`/`medium`/`low` with `review_bot: true` — it is NOT placed in the `bot` bucket.
 
-Each feedback item may also include:
-- `thread_id` - GraphQL node ID for inline review comments (used for replies via `reply_to_thread.py`)
-
-### `scripts/reply_to_thread.py`
-
-Replies to PR review threads. Batches multiple replies into a single GraphQL call.
-
-```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/reply_to_thread.py THREAD_ID "body" [THREAD_ID "body" ...]
-```
-
-Arguments are alternating `(thread_id, body)` pairs. The script automatically appends `*— Claude Code*` attribution if not already present. Example:
-```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/reply_to_thread.py \
-  PRRT_abc "Fixed the null check." \
-  PRRT_def "Replaced with path-segment counting."
-```
-
 ## Workflow
 
 ### 1. Identify PR
@@ -97,7 +79,7 @@ When fixing feedback:
 
 This includes review bot feedback (items with `review_bot: true`). Treat it the same as human feedback:
 - Real issue found → fix it
-- False positive → skip, but explain why in a brief comment
+- False positive → skip, but explain why
 - Never silently ignore review bot feedback — always verify the finding
 
 **Prompt user for selection:**
@@ -115,28 +97,6 @@ Which would you like to address? (e.g., "1,3" or "all" or "none")
 **Skip silently:**
 - `resolved` threads
 - `bot` comments (informational only — Codecov, Dependabot, etc.)
-
-#### Replying to Comments
-
-After processing each inline review comment, reply on the PR thread to acknowledge the action taken. Only reply to items with a `thread_id` (inline review comments).
-
-**When to reply:**
-- `high` and `medium` items — whether fixed or determined to be false positives
-- `low` items — whether fixed or declined by the user
-
-**How to reply:** Use `${CLAUDE_SKILL_ROOT}/scripts/reply_to_thread.py`. Batch all replies for a round into a single call:
-
-```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/reply_to_thread.py \
-  PRRT_abc "Fixed — description of change." \
-  PRRT_def "Not applicable — reason."
-```
-
-**Reply format:**
-- 1-2 sentences: what was changed, why it's not an issue, or acknowledgment of declined items
-- The script automatically appends `*— Claude Code*` attribution if not already present
-- Before replying, check if the thread already has a reply ending with `*- Claude Code*` or `*— Claude Code*` to avoid duplicates on re-loops
-- If the script fails, log and continue — do not block the workflow
 
 ### 4. Check CI Status
 
