@@ -52,24 +52,6 @@ Returns JSON with feedback categorized as:
 
 Review bot feedback (from Sentry, Warden, Cursor, Bugbot, CodeQL, etc.) appears in `high`/`medium`/`low` with `review_bot: true` — it is NOT placed in the `bot` bucket.
 
-Each feedback item may also include:
-- `thread_id` - GraphQL node ID for inline review comments (used for replies via `reply_to_thread.py`)
-
-### `scripts/reply_to_thread.py`
-
-Replies to PR review threads. Batches multiple replies into a single GraphQL call.
-
-```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/reply_to_thread.py THREAD_ID "body" [THREAD_ID "body" ...]
-```
-
-Arguments are alternating `(thread_id, body)` pairs. The script automatically appends `*— Claude Code*` attribution if not already present. Example:
-```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/reply_to_thread.py \
-  PRRT_abc "Fixed the null check." \
-  PRRT_def "Replaced with path-segment counting."
-```
-
 ## Workflow
 
 ### 1. Identify PR
@@ -97,7 +79,7 @@ When fixing feedback:
 
 This includes review bot feedback (items with `review_bot: true`). Treat it the same as human feedback:
 - Real issue found → fix it
-- False positive → skip, but explain why in a brief comment
+- False positive → skip, but explain why
 - Never silently ignore review bot feedback — always verify the finding
 
 **Prompt user for selection:**
@@ -116,28 +98,6 @@ Which would you like to address? (e.g., "1,3" or "all" or "none")
 - `resolved` threads
 - `bot` comments (informational only — Codecov, Dependabot, etc.)
 
-#### Replying to Comments
-
-After processing each inline review comment, reply on the PR thread to acknowledge the action taken. Only reply to items with a `thread_id` (inline review comments).
-
-**When to reply:**
-- `high` and `medium` items — whether fixed or determined to be false positives
-- `low` items — whether fixed or declined by the user
-
-**How to reply:** Use `${CLAUDE_SKILL_ROOT}/scripts/reply_to_thread.py`. Batch all replies for a round into a single call:
-
-```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/reply_to_thread.py \
-  PRRT_abc "Fixed — description of change." \
-  PRRT_def "Not applicable — reason."
-```
-
-**Reply format:**
-- 1-2 sentences: what was changed, why it's not an issue, or acknowledgment of declined items
-- The script automatically appends `*— Claude Code*` attribution if not already present
-- Before replying, check if the thread already has a reply ending with `*- Claude Code*` or `*— Claude Code*` to avoid duplicates on re-loops
-- If the script fails, log and continue — do not block the workflow
-
 ### 4. Check CI Status
 
 Run `${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py` to get structured failure data.
@@ -146,13 +106,17 @@ Run `${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py` to get structured failure 
 
 ### 5. Fix CI Failures
 
-For each failure in the script output:
-1. Read the `log_snippet` and trace backwards from the error to understand WHY it failed — not just what failed
-2. Read the relevant code and check for related issues (e.g., if a type error in one call site, check other call sites)
-3. Fix the root cause with minimal, targeted changes
-4. Find existing tests for the affected code and run them. If the fix introduces behavior not covered by existing tests, extend them to cover it (add a test case, not a whole new test file)
+**Investigation is mandatory before any fix.** Do not guess, assume, or infer the cause from the check name or a surface-level reading of the error. You must trace the failure to its root cause in the actual code.
 
-Do NOT assume what failed based on check name alone—always read the logs. Do NOT "quick fix and hope" — understand the failure thoroughly before changing code.
+For each failure:
+
+1. **Read the full log, not just the snippet.** Use `gh run view <run-id> --log-failed` if the snippet is truncated or ambiguous. Identify the exact failing assertion, exception, or lint rule.
+2. **Trace backwards from the failure to the cause.** Follow the stack trace or error message into the source code. Read the relevant functions, types, and call sites — not just the line flagged. Do not stop at the first plausible explanation.
+3. **Verify your understanding before touching code.** You should be able to state: "This fails because X, which was introduced/affected by Y." If you cannot state that clearly, keep investigating.
+4. **Do not assume the feedback is wrong.** If a check flags something that seems incorrect, investigate fully before concluding it's a false positive. Most apparent false positives turn out to be real issues on closer inspection.
+5. **Check for related instances.** If a type error, import issue, or logic bug exists at one call site, search for the same pattern in nearby code and related files. Fix all instances.
+6. **Fix the root cause with minimal, targeted changes.** Do not paper over the symptom with a workaround.
+7. **Extend tests when needed.** If the fix introduces behavior not covered by existing tests, add a test case (not a whole new test file).
 
 ### 6. Verify Locally, Then Commit and Push
 
