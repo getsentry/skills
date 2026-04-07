@@ -106,13 +106,17 @@ Run `${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py` to get structured failure 
 
 ### 5. Fix CI Failures
 
-For each failure in the script output:
-1. Read the `log_snippet` and trace backwards from the error to understand WHY it failed — not just what failed
-2. Read the relevant code and check for related issues (e.g., if a type error in one call site, check other call sites)
-3. Fix the root cause with minimal, targeted changes
-4. Find existing tests for the affected code and run them. If the fix introduces behavior not covered by existing tests, extend them to cover it (add a test case, not a whole new test file)
+**Investigation is mandatory before any fix.** Do not guess, assume, or infer the cause from the check name or a surface-level reading of the error. You must trace the failure to its root cause in the actual code.
 
-Do NOT assume what failed based on check name alone—always read the logs. Do NOT "quick fix and hope" — understand the failure thoroughly before changing code.
+For each failure:
+
+1. **Read the full log, not just the snippet.** Use `gh run view <run-id> --log-failed` if the snippet is truncated or ambiguous. Identify the exact failing assertion, exception, or lint rule.
+2. **Trace backwards from the failure to the cause.** Follow the stack trace or error message into the source code. Read the relevant functions, types, and call sites — not just the line flagged. Do not stop at the first plausible explanation.
+3. **Verify your understanding before touching code.** You should be able to state: "This fails because X, which was introduced/affected by Y." If you cannot state that clearly, keep investigating.
+4. **Do not assume the feedback is wrong.** If a check flags something that seems incorrect, investigate fully before concluding it's a false positive. Most apparent false positives turn out to be real issues on closer inspection.
+5. **Check for related instances.** If a type error, import issue, or logic bug exists at one call site, search for the same pattern in nearby code and related files. Fix all instances.
+6. **Fix the root cause with minimal, targeted changes.** Do not paper over the symptom with a workaround.
+7. **Extend tests when needed.** If the fix introduces behavior not covered by existing tests, add a test case (not a whole new test file).
 
 ### 6. Verify Locally, Then Commit and Push
 
