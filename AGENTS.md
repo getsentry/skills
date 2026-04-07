@@ -8,9 +8,8 @@ plugins/sentry-skills/skills/<skill-name>/SKILL.md
 ## Creating/Updating Skills
 ALWAYS use `/skill-writer` — it handles requirements, writing, registration, and validation.
 
-### Alias Policy
-- Do **not** list alias/symlink skills in "Available Skills" documentation tables.
-- List only canonical skills in public skill inventories (for example `pr-writer`, `skill-writer`).
+- Do **not** create alias or symlink skills
+- List only canonical skills in public skill inventories (for example `pr-writer`, `skill-writer`)
 
 ### Registration Checklist
 1. Create `plugins/sentry-skills/skills/<skill-name>/SKILL.md`
