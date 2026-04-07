@@ -150,7 +150,6 @@ If this is a Sentry project (or sentry-skills plugin is installed), include:
   "Skill(sentry-skills:code-simplifier)",
   "Skill(sentry-skills:commit)",
   "Skill(sentry-skills:create-branch)",
-  "Skill(sentry-skills:create-pr)",
   "Skill(sentry-skills:django-access-review)",
   "Skill(sentry-skills:django-perf-review)",
   "Skill(sentry-skills:doc-coauthoring)",

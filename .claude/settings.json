@@ -8,7 +8,6 @@
       "WebFetch(domain:docs.github.com)",
       "WebFetch(domain:cli.github.com)",
       "WebFetch(domain:agentskills.io)",
-
       "Bash(ls:*)",
       "Bash(pwd:*)",
       "Bash(find:*)",
@@ -19,7 +18,6 @@
       "Bash(tail:*)",
       "Bash(cat:*)",
       "Bash(tree:*)",
-
       "Bash(git status:*)",
       "Bash(git log:*)",
       "Bash(git diff:*)",
@@ -29,7 +27,6 @@
       "Bash(git tag:*)",
       "Bash(git stash list:*)",
       "Bash(git rev-parse:*)",
-
       "Bash(gh pr view:*)",
       "Bash(gh pr list:*)",
       "Bash(gh pr checks:*)",
@@ -41,7 +38,6 @@
       "Bash(gh run logs:*)",
       "Bash(gh repo view:*)",
       "Bash(gh api:*)",
-
       "Skill(sentry-skills:agents-md)",
       "Skill(sentry-skills:blog-writing-guide)",
       "Skill(sentry-skills:brand-guidelines)",
@@ -50,7 +46,6 @@
       "Skill(sentry-skills:code-simplifier)",
       "Skill(sentry-skills:commit)",
       "Skill(sentry-skills:create-branch)",
-      "Skill(sentry-skills:create-pr)",
       "Skill(sentry-skills:django-access-review)",
       "Skill(sentry-skills:django-perf-review)",
       "Skill(sentry-skills:doc-coauthoring)",
@@ -73,3 +68,4 @@
     "plugin-dev@claude-plugins-official": true
   }
 }
+

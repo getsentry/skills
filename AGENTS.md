@@ -9,7 +9,7 @@ plugins/sentry-skills/skills/<skill-name>/SKILL.md
 ALWAYS use `/skill-writer` — it handles requirements, writing, registration, and validation. (`/skill-creator` remains an alias.)
 
 ### Alias Policy
-- Keep alias skills (for example `create-pr`, `skill-creator`) only for backward compatibility.
+- Keep alias skills (for example `skill-creator`) only for backward compatibility.
 - Do **not** list alias/symlink skills in "Available Skills" documentation tables.
 - List only canonical skills in public skill inventories (for example `pr-writer`, `skill-writer`).
 
