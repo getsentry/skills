@@ -17,14 +17,14 @@ jobs:
       WARDEN_MODEL: ${{ secrets.WARDEN_MODEL }}
       WARDEN_SENTRY_DSN: ${{ secrets.WARDEN_SENTRY_DSN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
-      - uses: actions/create-github-app-token@v1
+      - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1
         id: app-token
         with:
           app-id: ${{ secrets.WARDEN_APP_ID }}
           private-key: ${{ secrets.WARDEN_PRIVATE_KEY }}
 
-      - uses: getsentry/warden@v0
+      - uses: getsentry/warden@34257abaeda3b030eb45a0971060d509ce0fea51 # v0
         with:
           github-token: ${{ steps.app-token.outputs.token }}
