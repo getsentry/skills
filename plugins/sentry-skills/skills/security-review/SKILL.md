@@ -242,6 +242,8 @@ random.random() for token            # FLAG: Security tokens need secrets module
 
 ## Output Format
 
+**Evidence and secrets:** When including code snippets as evidence, **never reproduce actual secret values** (passwords, API keys, tokens, private keys). Redact them with placeholders (e.g. `api_key = "sk-***REDACTED***"`, `password = "[REDACTED]"`) so the report does not leak credentials.
+
 ```markdown
 ## Security Review: [File/Component Name]
 
@@ -259,7 +261,7 @@ random.random() for token            # FLAG: Security tokens need secrets module
 - **Impact**: [What an attacker could do]
 - **Evidence**:
   ```python
-  [Vulnerable code snippet]
+  [Vulnerable code snippet — redact any secret values; use placeholders]
   ```
 - **Fix**: [How to remediate]
 
