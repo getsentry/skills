@@ -56,6 +56,38 @@ For engineering deep-dives, also address:
 5. **What did we try that didn't work?** (Builds trust)
 6. **What are the known limitations?** (Shows intellectual honesty)
 
+## Formatting for Skimmability
+
+People scroll. Shorter paragraphs are almost always better for keeping people reading.
+
+**Break paragraphs at contrast points.** When a sentence introduces a "but," "however," or shifts perspective, start a new paragraph. Don't bury the turn inside a block of text.
+
+**Bad:**
+> Traditional monitoring tracks requests and latency. That works for stateless HTTP services. AI agents are different. A single run might involve multiple LLM calls, tool executions, and handoffs.
+
+**Good:**
+> Traditional monitoring tracks requests and latency. That works for stateless HTTP services.
+>
+> AI agents are different. A single run might involve multiple LLM calls, tool executions, and handoffs.
+
+The line break before the contrasting point creates visual emphasis. This is standard in online writing even though it breaks traditional paragraph rules.
+
+**One idea per paragraph.** If a paragraph covers two distinct points, split it. Three-sentence paragraphs are fine. One-sentence paragraphs are fine for emphasis.
+
+**No em dashes.** Use commas, periods, or line breaks instead. Em dashes are fine in print but create visual clutter in blog formatting.
+
+## SEO for Developer Content
+
+When targeting a competitive search query:
+
+**Lead generic, close specific.** The first 50-60% of the post should be tool-agnostic educational content (definitions, concepts, metrics, best practices). Introduce your product as an implementation example in the second half. Google ranks guides higher than product pages for informational queries.
+
+**Put keywords in H2s.** Section headings like "Background" and "Architecture" are invisible to search. Use headings that contain the target keywords: "Key metrics for AI agent monitoring" beats "What to measure."
+
+**Include a definitional section.** For any head term ("agent observability", "error monitoring"), top-ranking pages almost always have a "What is X?" section. Include one even if it feels basic.
+
+**Add an FAQ.** 3-4 questions targeting long-tail keywords at the bottom of the post. These can win featured snippets and People Also Ask boxes.
+
 ## Section Headings Must Convey Information
 
 **Weak:** "Background," "Architecture," "Results," "Conclusion"
