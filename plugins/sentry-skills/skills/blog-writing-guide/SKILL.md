@@ -92,13 +92,33 @@ When targeting a competitive search query:
 
 LLM-generated prose has tells. Flag and rewrite these:
 
-- **Staccato dramatic fragments** — "No errors. No timeouts. Every span green." Write normal sentences.
-- **Bumper-sticker aphorisms** — "You can't fix what you can't see." Explain the point instead of coining a phrase.
-- **Three-beat reveals** — "Not X. Not Y. It was Z." Flatten into one sentence.
-- **Smug simplicity** — "That's it." after a code block. Let the code speak.
-- **Parallel structure ad copy** — "X tells you A. Y tells you B." Combine into a natural sentence.
-- **Personality only in the bookends** — AI drafts open personal, go impersonal for 80%, then close with a CTA. Keep the author's voice throughout.
-- **Product-page closers** — "Try X for free. Included on all plans." Connect back to the story instead.
+**Staccato dramatic fragments.**
+- Bad: "No errors. No timeouts. Every span green."
+- Good: "There were no errors, no timeouts, every span was green."
+
+**Bumper-sticker aphorisms.**
+- Bad: "You can't fix what you can't see."
+- Good: "Without traces spanning the full agent graph, you're stuck reading each agent's logs in isolation."
+
+**Three-beat reveals.**
+- Bad: "Not an agent bug. Not a prompt bug. A tool returned weak results."
+- Good: "The root cause wasn't the agent or the prompt — a tool returned weak results that cascaded through the pipeline."
+
+**Smug simplicity.**
+- Bad: [code block] "That's it. That's all you need."
+- Good: [code block] then explain what the code does, or just move on.
+
+**Parallel structure ad copy.**
+- Bad: "Token counts tell you what's expensive. Prompts tell you what's broken."
+- Good: "Token counts show cost, but the prompts and responses are where you'll actually find bugs."
+
+**Personality only in the bookends.** AI drafts open with a personal anecdote, go impersonal for 80% of the post, then close with a CTA. The author's voice should persist throughout.
+- Bad: Personal intro → clinical middle → "Try Sentry for free."
+- Good: "This is the one that got me" / "Based on debugging this system" / "I would have blamed the wrong agent" woven through the post.
+
+**Product-page closers.**
+- Bad: "Try Sentry for free. AI monitoring is included on all plans."
+- Good: Link to the source code, connect back to the opening story, or give the reader a concrete next step that isn't a signup page.
 
 ## Section Headings Must Convey Information
 
