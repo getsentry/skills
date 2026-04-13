@@ -88,6 +88,18 @@ When targeting a competitive search query:
 
 **Add an FAQ.** 3-4 questions targeting long-tail keywords at the bottom of the post. These can win featured snippets and People Also Ask boxes.
 
+## AI Writing Patterns to Avoid
+
+LLM-generated prose has tells. Flag and rewrite these:
+
+- **Staccato dramatic fragments** — "No errors. No timeouts. Every span green." Write normal sentences.
+- **Bumper-sticker aphorisms** — "You can't fix what you can't see." Explain the point instead of coining a phrase.
+- **Three-beat reveals** — "Not X. Not Y. It was Z." Flatten into one sentence.
+- **Smug simplicity** — "That's it." after a code block. Let the code speak.
+- **Parallel structure ad copy** — "X tells you A. Y tells you B." Combine into a natural sentence.
+- **Personality only in the bookends** — AI drafts open personal, go impersonal for 80%, then close with a CTA. Keep the author's voice throughout.
+- **Product-page closers** — "Try X for free. Included on all plans." Connect back to the story instead.
+
 ## Section Headings Must Convey Information
 
 **Weak:** "Background," "Architecture," "Results," "Conclusion"
