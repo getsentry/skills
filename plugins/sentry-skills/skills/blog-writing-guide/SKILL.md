@@ -93,32 +93,32 @@ When targeting a competitive search query:
 LLM-generated prose has tells. Flag and rewrite these:
 
 **Staccato dramatic fragments.**
-- Bad: "No errors. No timeouts. Every span green."
-- Good: "There were no errors, no timeouts, every span was green."
+- Bad: "No errors. No warnings. Everything green."
+- Good: "There were no errors, no warnings, everything looked fine."
 
 **Bumper-sticker aphorisms.**
 - Bad: "You can't fix what you can't see."
-- Good: "Without traces spanning the full agent graph, you're stuck reading each agent's logs in isolation."
+- Good: "Without visibility into the full request lifecycle, you're guessing."
 
 **Three-beat reveals.**
-- Bad: "Not an agent bug. Not a prompt bug. A tool returned weak results."
-- Good: "The root cause wasn't the agent or the prompt — a tool returned weak results that cascaded through the pipeline."
+- Bad: "Not a config issue. Not a code bug. The deploy was stale."
+- Good: "It wasn't a config issue or a code bug. The deploy was stale."
 
 **Smug simplicity.**
 - Bad: [code block] "That's it. That's all you need."
 - Good: [code block] then explain what the code does, or just move on.
 
 **Parallel structure ad copy.**
-- Bad: "Token counts tell you what's expensive. Prompts tell you what's broken."
-- Good: "Token counts show cost, but the prompts and responses are where you'll actually find bugs."
+- Bad: "Metrics tell you what's broken. Traces tell you why."
+- Good: "Metrics show what's broken, but traces are where you'll actually figure out why."
 
 **Personality only in the bookends.** AI drafts open with a personal anecdote, go impersonal for 80% of the post, then close with a CTA. The author's voice should persist throughout.
 - Bad: Personal intro → clinical middle → "Try Sentry for free."
-- Good: "This is the one that got me" / "Based on debugging this system" / "I would have blamed the wrong agent" woven through the post.
+- Good: First-person asides woven through the post: "this is the part that tripped me up" / "I would have blamed the wrong service."
 
 **Product-page closers.**
-- Bad: "Try Sentry for free. AI monitoring is included on all plans."
-- Good: Link to the source code, connect back to the opening story, or give the reader a concrete next step that isn't a signup page.
+- Bad: "Try Sentry for free. Error monitoring is included on all plans."
+- Good: Link to source code, connect back to the opening story, or give the reader a concrete next step that isn't a signup page.
 
 ## Section Headings Must Convey Information
 
