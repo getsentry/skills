@@ -82,7 +82,7 @@ When targeting a competitive search query:
 
 **Lead generic, close specific.** The first 50-60% of the post should be tool-agnostic educational content (definitions, concepts, metrics, best practices). Introduce your product as an implementation example in the second half. Google ranks guides higher than product pages for informational queries.
 
-**Put keywords in H2s.** Section headings like "Background" and "Architecture" are invisible to search. Use headings that contain the target keywords: "Key metrics for AI agent monitoring" beats "What to measure."
+**Put keywords in H2s.** Generic headings are invisible to search. "Key metrics for AI agent monitoring" beats "What to measure." (See **Section Headings** below for good/bad examples.)
 
 **Include a definitional section.** For any head term ("agent observability", "error monitoring"), top-ranking pages almost always have a "What is X?" section. Include one even if it feels basic.
 
@@ -115,10 +115,6 @@ LLM-generated prose has tells. Flag and rewrite these:
 **Personality only in the bookends.** AI drafts open with a personal anecdote, go impersonal for 80% of the post, then close with a CTA. The author's voice should persist throughout.
 - Bad: Personal intro → clinical middle → "Try Sentry for free."
 - Good: First-person asides woven through the post: "this is the part that tripped me up" / "I would have blamed the wrong service."
-
-**Product-page closers.**
-- Bad: "Try Sentry for free. Error monitoring is included on all plans."
-- Good: Link to source code, connect back to the opening story, or give the reader a concrete next step that isn't a signup page.
 
 ## Section Headings Must Convey Information
 
@@ -154,7 +150,7 @@ The title is the highest-leverage sentence in the post. It must stop a developer
 
 ## The Closing
 
-End with something useful — a link to docs, a way to try it, a call to give feedback. Never end with generic hype ("We can't wait to see what you build!") or recaps of what you just said.
+End with something useful: a link to docs, source code, a way to try it, or a call to give feedback. Never end with generic hype ("We can't wait to see what you build!"), recaps of what you just said, or product-page CTAs ("Try Sentry for free. Included on all plans."). Connect back to the story you opened with, or give the reader something concrete to do next.
 
 ## Post Types
 
