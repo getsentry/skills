@@ -56,6 +56,66 @@ For engineering deep-dives, also address:
 5. **What did we try that didn't work?** (Builds trust)
 6. **What are the known limitations?** (Shows intellectual honesty)
 
+## Formatting for Skimmability
+
+People scroll. Shorter paragraphs are almost always better for keeping people reading.
+
+**Break paragraphs at contrast points.** When a sentence introduces a "but," "however," or shifts perspective, start a new paragraph. Don't bury the turn inside a block of text.
+
+**Bad:**
+> Traditional monitoring tracks requests and latency. That works for stateless HTTP services. AI agents are different. A single run might involve multiple LLM calls, tool executions, and handoffs.
+
+**Good:**
+> Traditional monitoring tracks requests and latency. That works for stateless HTTP services.
+>
+> AI agents are different. A single run might involve multiple LLM calls, tool executions, and handoffs.
+
+The line break before the contrasting point creates visual emphasis. This is standard in online writing even though it breaks traditional paragraph rules.
+
+**One idea per paragraph.** If a paragraph covers two distinct points, split it. Three-sentence paragraphs are fine. One-sentence paragraphs are fine for emphasis.
+
+**No em dashes.** Use commas, periods, or line breaks instead. Em dashes are fine in print but create visual clutter in blog formatting.
+
+## SEO for Developer Content
+
+When targeting a competitive search query:
+
+**Lead generic, close specific.** The first 50-60% of the post should be tool-agnostic educational content (definitions, concepts, metrics, best practices). Introduce your product as an implementation example in the second half. Google ranks guides higher than product pages for informational queries.
+
+**Put keywords in H2s.** Generic headings are invisible to search. "Key metrics for AI agent monitoring" beats "What to measure." (See **Section Headings** below for good/bad examples.)
+
+**Include a definitional section.** For any head term ("agent observability", "error monitoring"), top-ranking pages almost always have a "What is X?" section. Include one even if it feels basic.
+
+**Add an FAQ.** 3-4 questions targeting long-tail keywords at the bottom of the post. These can win featured snippets and People Also Ask boxes.
+
+## AI Writing Patterns to Avoid
+
+LLM-generated prose has tells. Flag and rewrite these:
+
+**Staccato dramatic fragments.**
+- Bad: "No errors. No warnings. Everything green."
+- Good: "There were no errors, no warnings, everything looked fine."
+
+**Bumper-sticker aphorisms.**
+- Bad: "You can't fix what you can't see."
+- Good: "Without visibility into the full request lifecycle, you're guessing."
+
+**Three-beat reveals.**
+- Bad: "Not a config issue. Not a code bug. The deploy was stale."
+- Good: "It wasn't a config issue or a code bug. The deploy was stale."
+
+**Smug simplicity.**
+- Bad: [code block] "That's it. That's all you need."
+- Good: [code block] then explain what the code does, or just move on.
+
+**Parallel structure ad copy.**
+- Bad: "Metrics tell you what's broken. Traces tell you why."
+- Good: "Metrics show what's broken, but traces are where you'll actually figure out why."
+
+**Personality only in the bookends.** AI drafts open with a personal anecdote, go impersonal for 80% of the post, then close with a CTA. The author's voice should persist throughout.
+- Bad: Personal intro → clinical middle → "Try Sentry for free."
+- Good: First-person asides woven through the post: "this is the part that tripped me up" / "I would have blamed the wrong service."
+
 ## Section Headings Must Convey Information
 
 **Weak:** "Background," "Architecture," "Results," "Conclusion"
@@ -90,7 +150,7 @@ The title is the highest-leverage sentence in the post. It must stop a developer
 
 ## The Closing
 
-End with something useful — a link to docs, a way to try it, a call to give feedback. Never end with generic hype ("We can't wait to see what you build!") or recaps of what you just said.
+End with something useful: a link to docs, source code, a way to try it, or a call to give feedback. Never end with generic hype ("We can't wait to see what you build!"), recaps of what you just said, or product-page CTAs ("Try Sentry for free. Included on all plans."). Connect back to the story you opened with, or give the reader something concrete to do next.
 
 ## Post Types
 
