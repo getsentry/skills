@@ -72,6 +72,7 @@ Use this structure for PR descriptions (ignoring any repository PR templates):
 - "Test plan" sections
 - Checkbox lists of testing steps
 - Redundant summaries of the diff
+- Customer data — customer/org names, user emails, support ticket contents, or PII. Describe the technical symptom, not who hit it, and if available, reference the internal ticket (e.g. `Fixes SENTRY-1234`). PRs are typically public on open-source repos.
 
 **Do include:**
 - Clear explanation of what and why
