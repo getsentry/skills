@@ -68,6 +68,7 @@ The header is required. Scope is optional. All lines must stay under 100 charact
 - Include motivation for the change
 - Contrast with previous behavior when relevant
 - Use real newlines in commit bodies; never include literal `\n` sequences
+- Never include customer data — customer/org names, user emails, support ticket contents, or PII. Describe the technical symptom, not who hit it, and if available, reference the internal ticket (e.g. `Fixes SENTRY-1234`).
 
 ## Commit Command Hygiene
 
