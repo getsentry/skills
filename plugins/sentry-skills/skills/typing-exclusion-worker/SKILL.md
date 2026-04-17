@@ -1,6 +1,6 @@
 ---
 name: typing-exclusion-worker
-description: Remove assigned mypy exclusion modules in small scoped batches, fix typing issues, run validation, and produce a structured completion summary. Use when running parallel typing-debt workers or when asked to remove modules from pyproject mypy exclusion overrides.
+description: "Python typing exclusion worker: remove assigned mypy exclusion modules in small scoped batches, fix typing issues, run validation, and produce a structured completion summary. Use when running parallel typing-debt workers or when asked to remove modules from pyproject mypy exclusion overrides."
 ---
 
 # Typing Exclusion Worker
