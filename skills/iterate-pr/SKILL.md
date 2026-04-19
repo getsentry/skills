@@ -135,17 +135,50 @@ git push
 
 ### 7. Monitor CI and Address Feedback
 
-Poll CI status and review feedback in a loop instead of blocking:
+Keep monitoring CI status and review feedback in a loop instead of blocking:
 
 1. Run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py` to get current CI status
-2. If all checks passed → proceed to exit conditions
-3. If any checks failed (none pending) → return to step 5
+2. If all checks passed, proceed to exit conditions
+3. If any checks failed (none pending), return to step 5
 4. If checks are still pending:
    a. Run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py` for new review feedback
    b. Address any new high/medium feedback immediately (same as step 3)
-   c. If changes were needed, commit and push (this restarts CI), then continue polling
+   c. If changes were needed, commit and push (this restarts CI), then continue monitoring from the refreshed branch state
    d. Sleep 30 seconds (don't increase on subsequent iterations), then repeat from sub-step 1
-5. After all checks pass, do a final feedback check: `sleep 10`, then run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py`. Address any new high/medium feedback — if changes are needed, return to step 6.
+5. After all checks pass, wait 10 seconds for late-arriving review bot comments, then run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py`. Address any new high/medium feedback — if changes are needed, return to step 6.
+
+If you're in Claude Code, you can replace the sleep-based wait above with `MonitorTool` so the polling happens in the background instead of consuming context. This is a Claude-only optimization, not the default workflow for other agents.
+
+```sh
+while true; do
+  total=$(gh pr checks --json bucket --jq 'length') || { sleep 30; continue; }
+  if [ "$total" = "0" ]; then
+    sleep 15
+    continue
+  fi
+
+  pending=$(gh pr checks --json bucket --jq '[.[] | select(.bucket == "pending")] | length') || { sleep 30; continue; }
+  if [ "$pending" = "0" ]; then
+    failed=$(gh pr checks --json bucket --jq '[.[] | select(.bucket == "fail")] | length') || { sleep 30; continue; }
+    if [ "$failed" != "0" ]; then
+      echo "CHECKS_DONE_WITH_FAILURES"
+    else
+      echo "ALL_CHECKS_PASSED"
+    fi
+    gh pr checks | head -20
+    exit 0
+  fi
+  sleep 30
+done
+```
+
+Run that shell loop through `MonitorTool` with `persistent: false`. Set `timeout_ms` to match the repository's normal CI duration instead of hardcoding a 15-minute timeout.
+
+After `MonitorTool` reports completion, re-run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py`:
+- If any checks failed, return to step 5.
+- If all checks passed, continue to sub-step 5 above.
+
+If you pushed new changes while monitoring, start a fresh monitor so it watches the new set of CI runs.
 
 ### 8. Repeat
 
