@@ -12,10 +12,10 @@ Load only the references you need:
 
 | Task | Read |
 |------|------|
-| Create a new agent prompt | `references/core-patterns.md`, `references/prompt-learnings.md`, `references/model-family-notes.md`, `references/transformed-examples.md` |
-| Refine an existing prompt | `references/meta-optimization-loop.md`, `references/prompt-learnings.md`, `references/model-family-notes.md`, `references/transformed-examples.md` |
-| Port a prompt between model families | `references/model-family-notes.md`, `references/prompt-learnings.md`, `references/core-patterns.md` |
-| Diagnose repeated prompt failures | `references/meta-optimization-loop.md`, `references/prompt-learnings.md`, `references/core-patterns.md` |
+| Create a new agent prompt | `references/core-patterns.md`, `references/model-family-notes.md`, `references/transformed-examples.md` |
+| Refine an existing prompt | `references/meta-optimization-loop.md`, `references/core-patterns.md`, `references/model-family-notes.md`, `references/transformed-examples.md` |
+| Port a prompt between model families | `references/model-family-notes.md`, `references/core-patterns.md` |
+| Diagnose repeated prompt failures | `references/meta-optimization-loop.md`, `references/core-patterns.md` |
 | Explain the provenance behind this workflow | `SOURCES.md` |
 
 ## Step 1: Define the prompt contract
@@ -59,49 +59,34 @@ Read `references/core-patterns.md`.
 - stable policy and behavioral defaults belong in `system` or `developer`
 - variable inputs, retrieved context, and task instances belong in templated user-facing sections
 
-2. Use markers only when they reduce ambiguity:
+2. Keep one authoritative instruction per behavior:
+- if a rule appears in more than one layer, choose one owner for it
+- stable cross-task rules belong in `system` or `developer`
+- examples should teach format, edge-case handling, or tool behavior, not restate the whole policy
+- user payloads should carry task-local facts, not durable policy
+
+3. Use markers only when they reduce ambiguity:
 - use markdown headings or XML-style tags to separate instructions, context, examples, tool rules, and output contracts
 - keep tag names descriptive and consistent
 - do not wrap every sentence in markup
 
-3. Make the prompt easy to execute:
+4. Make the prompt easy to execute:
 - put one high-value behavior per bullet or line when the task is fragile
 - prefer positive instructions over "do not do X" lists
 - place tool-use rules, escalation boundaries, and stop conditions in explicit sections
 - keep persona light unless it changes behavior in a useful way
+- use the shortest wording that preserves the intended behavioral constraint
+- cut motivational filler, repeated reminders, and examples that do not improve evals
+- for long-context prompts, place evidence before the final query and keep the actual ask in a clear terminal section
+- keep instructions, evidence, and schemas in distinct blocks so the model does not have to infer what is policy versus data
 
-4. Treat examples as first-class prompt assets:
+5. Treat examples as first-class prompt assets:
+- start simple before adding examples
 - add examples only when they improve format control, edge-case handling, or tool behavior
 - keep examples structurally consistent
 - prefer positive demonstrations over anti-pattern-only demonstrations
 
-## Step 4: Apply the prompt learnings
-
-Read `references/prompt-learnings.md`.
-
-1. Run a compaction pass before you call the prompt "done":
-- remove duplicated instructions across `system`, `developer`, examples, and user payloads
-- keep one authoritative instruction per behavior
-- cut persona text, motivation text, and examples that do not improve evals
-- prefer shorter wording when the shorter version preserves the same behavioral constraint
-
-2. Run a layering pass:
-- stable cross-task rules belong in `system` or `developer`
-- bulky task-local material belongs in the variable context section
-- examples should teach only what the rules alone are not reliably teaching
-
-3. Run an ordering pass:
-- for long-context prompts, place long documents and raw context before the final query
-- keep the actual ask in a clear terminal section
-- separate instructions from evidence so the model does not have to infer which text is policy and which text is data
-
-4. Run a marker pass:
-- keep markers only where they improve boundary clarity
-- remove decorative tags that add token cost without improving disambiguation
-
-5. Record what you removed as well as what you added. Prompt optimization includes deletion, not just accumulation.
-
-## Step 5: Run the meta optimization loop
+## Step 4: Run the meta optimization loop
 
 Read `references/meta-optimization-loop.md`.
 
@@ -125,12 +110,19 @@ Read `references/meta-optimization-loop.md`.
 
 5. Compare candidates on the same eval slice.
 6. Keep the best candidate and log what changed and why.
-7. Test the winner on a holdout slice before finalizing.
-8. Stop when scores plateau, edits oscillate, or the remaining issue is outside prompt control.
+7. Preserve the evidence for each round:
+- prompt version
+- eval case
+- model output
+- failure reason
+- relevant scores
 
-Keep edits minimal and causal. If you change everything at once, you learn nothing about what actually helped.
+8. Test the winner on a holdout slice before finalizing.
+9. Stop when scores plateau, edits oscillate, cost rises without quality gain, or the remaining issue is outside prompt control.
 
-## Step 6: Produce a reusable deliverable
+Keep edits minimal and causal. Record what you removed as well as what you added. If you change everything at once, you learn nothing about what actually helped.
+
+## Step 5: Produce a reusable deliverable
 
 Return:
 
@@ -144,7 +136,7 @@ Return:
 
 If the user supplied an existing prompt, include a concise diff-style explanation of the biggest behavioral changes.
 
-## Step 7: Guard against common failure modes
+## Step 6: Guard against common failure modes
 
 Read `references/transformed-examples.md` when the task is ambiguous or the first draft is weak.
 

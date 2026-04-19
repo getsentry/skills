@@ -8,6 +8,7 @@ Collect these before iterating:
 
 - current prompt or first draft
 - target model family
+- optimizer model, if different from the deployment model
 - representative eval cases
 - scoring rubric
 - known failures
@@ -27,6 +28,16 @@ Score at least:
 - refusal and escalation correctness
 - brevity or verbosity
 - robustness on ambiguous inputs
+- cost, latency, or tool-call efficiency when those matter
+
+Preserve a structured evidence pack for each run:
+
+- prompt version
+- eval case
+- model output
+- relevant trace or tool behavior
+- failure reason
+- scores
 
 ### 2. Failure clustering
 
@@ -39,6 +50,7 @@ Group failures before editing:
 - weak tool instructions
 - weak stop conditions
 - provider mismatch
+- prompt bloat or duplicated rules
 
 Do not patch each failing case independently if the same root cause appears in multiple places.
 
@@ -79,6 +91,7 @@ Keep a short log:
 | 1 | Tool-use rules are too vague | Added explicit tool criteria | Better tool selection, same formatting | Yes |
 
 This prevents looping back into edits that already failed.
+Record deletions and compaction edits, not just additions.
 
 ### 7. Holdout validation
 
@@ -96,6 +109,7 @@ Stop prompt editing when:
 - edits oscillate between two behaviors
 - the remaining failures are caused by model or tool limitations
 - you are clearly overfitting to the eval slice
+- cost rises without enough quality gain to justify the extra prompt complexity
 
 ## Practical defaults
 
@@ -103,6 +117,8 @@ Stop prompt editing when:
 - Keep at least one holdout case.
 - Edit one or two causal dimensions per round.
 - Optimize examples, tool descriptions, and output contracts alongside the core prompt.
+- For repeated optimization, keep fixed train, validation, and holdout slices so before/after comparisons stay meaningful.
+- When budget allows, consider using a stronger optimizer pass than the eventual deployment model.
 
 ## What this loop is borrowing from
 
@@ -110,5 +126,6 @@ Stop prompt editing when:
 - explicit critique before revision
 - lightweight reflection memory across rounds
 - holdout validation to resist overfitting
+- structured evidence capture so revisions are grounded in actual outputs and scores
 
 Use the loop pragmatically. The point is to learn which edits change behavior, not to imitate a paper mechanically.

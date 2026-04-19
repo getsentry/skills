@@ -50,6 +50,25 @@ Keep these layers separate:
 - structured output demonstrations
 
 If a rule should apply across tasks, keep it out of the user payload and put it in the stable layer.
+Keep one authoritative owner for each major behavior rule instead of repeating it across all layers.
+
+Collapse common duplicates such as:
+
+- verbosity rules
+- "check before guessing"
+- ask-first versus act-now behavior
+- output format rules
+- refusal and escalation boundaries
+
+When prompts are long, separate policy from evidence explicitly:
+
+- instructions in one block
+- retrieved documents in another
+- examples in another
+- tool rules and schemas in their own labeled sections
+
+For long-context prompts, place long evidence before the final query and keep the actual ask in a terminal section.
+Do not cargo-cult this ordering into short prompts that do not need it.
 
 ## Portable agent prompt skeleton
 
@@ -109,6 +128,8 @@ Use markdown headings instead of tags if that fits the target stack better.
 - State what counts as refusal, escalation, or defer.
 - Separate hard constraints from preferences.
 - Keep progress-update style explicit if the user should see it.
+- Use the shortest wording that preserves the intended behavioral constraint.
+- Remove persona, motivation, or reminder text that does not change measured behavior.
 
 ## Examples
 
@@ -125,6 +146,8 @@ Examples hurt when they:
 - overfit the model to one narrow phrasing
 - use inconsistent structure
 - show anti-patterns without a corrected version
+- restate rules that are already clear in the instructions
+- remain in the prompt after they stop improving evals
 
 ## Symptom to fix mapping
 
@@ -135,5 +158,6 @@ Examples hurt when they:
 | The agent stays too passive | Add explicit default behavior and action bias |
 | The agent is too aggressive | Add ask-first and escalation boundaries |
 | Responses are verbose | Tighten output sections and verbosity constraints |
+| The prompt is long but still unstable | Remove duplicate rules and choose one owner per behavior |
 | Long context causes confusion | Separate context from instructions and move the query to a clear terminal section |
 | The prompt works on one provider but not another | Split base prompt from provider-specific adapter notes |

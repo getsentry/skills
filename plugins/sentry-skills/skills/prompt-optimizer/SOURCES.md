@@ -122,3 +122,4 @@ Further retrieval is currently low-yield for this first version. The source pack
 
 - 2026-04-18: Created the initial `prompt-optimizer` skill, references, and provenance record.
 - 2026-04-18: Added an explicit prompt learnings pass covering compaction, deduplication, and context ordering.
+- 2026-04-18: Folded the prompt learnings back into the core shaping and iteration guidance to keep the workflow compact.
