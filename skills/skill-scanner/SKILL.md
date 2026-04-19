@@ -34,7 +34,7 @@ Returns JSON with findings, URLs, structure info, and severity counts. The scrip
 Determine the scan target:
 
 - If the user provides a skill directory path, use it directly
-- If the user names a skill, look for it under `plugins/*/skills/<name>/` or `.claude/skills/<name>/`
+- If the user names a skill, look for it under `skills/<name>/`, `plugins/*/skills/<name>/`, or `.claude/skills/<name>/`
 - If the user says "scan all skills", discover all `*/SKILL.md` files and scan each
 
 Validate the target contains a `SKILL.md` file. List the skill structure:

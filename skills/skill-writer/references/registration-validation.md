@@ -12,8 +12,9 @@ Apply repository registration and quality checks before completion.
 
 For this repository today:
 
-- skill sources live under `plugins/sentry-skills/skills/`
-- `.agents/skills` is a symlinked mirror of that tree, not a separate registration target
+- canonical `sentry-skills` sources live under `skills/`
+- `plugins/sentry-skills/skills` is a symlinked mirror of that tree for plugin consumers
+- `.agents/skills` is a symlinked mirror of that tree for local agent tooling
 - repository-level registration files still live at `README.md` and `.claude/settings.json`
 
 ## Validation checklist

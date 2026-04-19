@@ -14,6 +14,8 @@ claude plugin marketplace add getsentry/skills
 claude plugin install sentry-skills@sentry-skills
 ```
 
+If you use `claude plugin marketplace add --sparse` for this repo, include `skills` alongside `.claude-plugin` and `plugins`.
+
 Restart Claude Code after installation. Skills activate automatically when relevant.
 
 **Update:**
@@ -39,29 +41,29 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 
 | Skill | Description |
 |-------|-------------|
-| [agents-md](plugins/sentry-skills/skills/agents-md/SKILL.md) | This skill should be used when the user asks to "create AGENTS.md", "update AGENTS.md", "maintain agent docs", "set up CLAUDE.md", or needs to keep agent instructions concise. |
-| [blog-writing-guide](plugins/sentry-skills/skills/blog-writing-guide/SKILL.md) | Write, review, and improve blog posts for the Sentry engineering blog following Sentry's specific writing standards, voice, and quality bar. |
-| [brand-guidelines](plugins/sentry-skills/skills/brand-guidelines/SKILL.md) | Write copy following Sentry brand guidelines. |
-| [claude-settings-audit](plugins/sentry-skills/skills/claude-settings-audit/SKILL.md) | Analyze a repository to generate recommended Claude Code settings.json permissions. |
-| [code-review](plugins/sentry-skills/skills/code-review/SKILL.md) | Perform code reviews following Sentry engineering practices. |
-| [code-simplifier](plugins/sentry-skills/skills/code-simplifier/SKILL.md) | Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality. |
-| [commit](plugins/sentry-skills/skills/commit/SKILL.md) | ALWAYS use this skill when committing code changes — never commit directly without it. |
-| [create-branch](plugins/sentry-skills/skills/create-branch/SKILL.md) | Create git branches following Sentry naming conventions. |
-| [django-access-review](plugins/sentry-skills/skills/django-access-review/SKILL.md) | Django access control and IDOR security review. |
-| [django-perf-review](plugins/sentry-skills/skills/django-perf-review/SKILL.md) | Django performance code review. |
-| [doc-coauthoring](plugins/sentry-skills/skills/doc-coauthoring/SKILL.md) | Guide users through a structured workflow for co-authoring documentation. |
-| [find-bugs](plugins/sentry-skills/skills/find-bugs/SKILL.md) | Find bugs, security vulnerabilities, and code quality issues in local branch changes. |
-| [gh-review-requests](plugins/sentry-skills/skills/gh-review-requests/SKILL.md) | Fetch unread GitHub notifications for open PRs where review is requested from a specified team or opened by a team member. |
-| [gha-security-review](plugins/sentry-skills/skills/gha-security-review/SKILL.md) | GitHub Actions security review for workflow exploitation vulnerabilities. |
-| [iterate-pr](plugins/sentry-skills/skills/iterate-pr/SKILL.md) | Iterate on a PR until CI passes. |
-| [pr-writer](plugins/sentry-skills/skills/pr-writer/SKILL.md) | Canonical workflow to create and update pull requests following Sentry conventions. |
-| [prompt-optimizer](plugins/sentry-skills/skills/prompt-optimizer/SKILL.md) | Create, optimize, and iteratively refine agent prompts and system prompts. |
-| [security-review](plugins/sentry-skills/skills/security-review/SKILL.md) | Security code review for vulnerabilities. |
-| [skill-scanner](plugins/sentry-skills/skills/skill-scanner/SKILL.md) | Scan agent skills for security issues. |
-| [skill-writer](plugins/sentry-skills/skills/skill-writer/SKILL.md) | Canonical workflow to synthesize, create, and iteratively improve agent skills for this repository. |
-| [sred-project-organizer](plugins/sentry-skills/skills/sred-project-organizer/SKILL.md) | Take a list of projects and their related documentation, and organize them into the SRED format for submission. |
-| [sred-work-summary](plugins/sentry-skills/skills/sred-work-summary/SKILL.md) | Go back through the previous year of work and create a Notion doc that groups relevant links into projects that can then be documented as SRED projects. |
-| [typing-exclusion-worker](plugins/sentry-skills/skills/typing-exclusion-worker/SKILL.md) | Python typing exclusion worker: remove assigned mypy exclusion modules in small scoped batches, fix typing issues, run validation, and produce a structured completion summary. |
+| [agents-md](skills/agents-md/SKILL.md) | This skill should be used when the user asks to "create AGENTS.md", "update AGENTS.md", "maintain agent docs", "set up CLAUDE.md", or needs to keep agent instructions concise. |
+| [blog-writing-guide](skills/blog-writing-guide/SKILL.md) | Write, review, and improve blog posts for the Sentry engineering blog following Sentry's specific writing standards, voice, and quality bar. |
+| [brand-guidelines](skills/brand-guidelines/SKILL.md) | Write copy following Sentry brand guidelines. |
+| [claude-settings-audit](skills/claude-settings-audit/SKILL.md) | Analyze a repository to generate recommended Claude Code settings.json permissions. |
+| [code-review](skills/code-review/SKILL.md) | Perform code reviews following Sentry engineering practices. |
+| [code-simplifier](skills/code-simplifier/SKILL.md) | Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality. |
+| [commit](skills/commit/SKILL.md) | ALWAYS use this skill when committing code changes — never commit directly without it. |
+| [create-branch](skills/create-branch/SKILL.md) | Create git branches following Sentry naming conventions. |
+| [django-access-review](skills/django-access-review/SKILL.md) | Django access control and IDOR security review. |
+| [django-perf-review](skills/django-perf-review/SKILL.md) | Django performance code review. |
+| [doc-coauthoring](skills/doc-coauthoring/SKILL.md) | Guide users through a structured workflow for co-authoring documentation. |
+| [find-bugs](skills/find-bugs/SKILL.md) | Find bugs, security vulnerabilities, and code quality issues in local branch changes. |
+| [gh-review-requests](skills/gh-review-requests/SKILL.md) | Fetch unread GitHub notifications for open PRs where review is requested from a specified team or opened by a team member. |
+| [gha-security-review](skills/gha-security-review/SKILL.md) | GitHub Actions security review for workflow exploitation vulnerabilities. |
+| [iterate-pr](skills/iterate-pr/SKILL.md) | Iterate on a PR until CI passes. |
+| [pr-writer](skills/pr-writer/SKILL.md) | Canonical workflow to create and update pull requests following Sentry conventions. |
+| [prompt-optimizer](skills/prompt-optimizer/SKILL.md) | Create, optimize, and iteratively refine agent prompts and system prompts. |
+| [security-review](skills/security-review/SKILL.md) | Security code review for vulnerabilities. |
+| [skill-scanner](skills/skill-scanner/SKILL.md) | Scan agent skills for security issues. |
+| [skill-writer](skills/skill-writer/SKILL.md) | Canonical workflow to synthesize, create, and iteratively improve agent skills for this repository. |
+| [sred-project-organizer](skills/sred-project-organizer/SKILL.md) | Take a list of projects and their related documentation, and organize them into the SRED format for submission. |
+| [sred-work-summary](skills/sred-work-summary/SKILL.md) | Go back through the previous year of work and create a Notion doc that groups relevant links into projects that can then be documented as SRED projects. |
+| [typing-exclusion-worker](skills/typing-exclusion-worker/SKILL.md) | Python typing exclusion worker: remove assigned mypy exclusion modules in small scoped batches, fix typing issues, run validation, and produce a structured completion summary. |
 
 ## Available Subagents
 
@@ -80,40 +82,48 @@ claude plugin marketplace add ~/sentry-skills
 claude plugin install sentry-skills
 ```
 
+If you use `claude plugin marketplace add --sparse` for this repo, include `skills` alongside `.claude-plugin` and `plugins`.
+
 ### Repository Structure
 
 ```
 sentry-skills/
 ├── .claude-plugin/
 │   └── marketplace.json      # Marketplace manifest
+├── .agents/
+│   └── skills -> ../skills   # Local mirror for agent tooling
+├── skills/
+│   ├── code-review/
+│   │   └── SKILL.md
+│   └── commit/
+│       └── SKILL.md
 ├── plugins/
 │   └── sentry-skills/
 │       ├── .claude-plugin/
 │       │   └── plugin.json   # Plugin manifest
 │       ├── agents/
 │       │   └── code-simplifier.md
-│       └── skills/
-│           ├── code-review/
-│           │   └── SKILL.md
-│           └── commit/
-│               └── SKILL.md
+│       └── skills -> ../../skills
 ├── AGENTS.md                 # Agent-facing documentation
 ├── CLAUDE.md                 # Symlink to AGENTS.md
 └── README.md                 # This file
 ```
 
+The canonical skill source for the `sentry-skills` plugin lives at repo-root `skills/`.
+`plugins/sentry-skills/skills` and `.agents/skills` are mirrors of that tree.
+
 ### Creating New Skills
 
 Skills follow the [Agent Skills specification](https://agentskills.io/specification). Each skill requires a `SKILL.md` file with YAML frontmatter.
 
-For repeatable `skill-writer` evaluation prompts, see [plugins/sentry-skills/skills/skill-writer/EVAL.md](plugins/sentry-skills/skills/skill-writer/EVAL.md).
+For repeatable `skill-writer` evaluation prompts, see [skills/skill-writer/EVAL.md](skills/skill-writer/EVAL.md).
 
 #### Skill Template
 
-Create a new directory under `plugins/sentry-skills/skills/`:
+Create a new directory under `skills/`:
 
 ```
-plugins/sentry-skills/skills/my-skill/
+skills/my-skill/
 └── SKILL.md
 ```
 
@@ -231,7 +241,7 @@ When vendoring a skill or agent from an external source, retain proper attributi
 
 2. **Include a LICENSE file** in the skill directory if the original has specific licensing requirements:
    ```
-   plugins/sentry-skills/skills/vendored-skill/
+   skills/vendored-skill/
    ├── SKILL.md
    └── LICENSE      # Original license text
    ```
