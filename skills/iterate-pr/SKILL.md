@@ -135,15 +135,28 @@ git push
 
 ### 7. Monitor CI and Address Feedback
 
-Use the MonitorTool to poll CI status instead of sleep loops. The MonitorTool runs a script in the background and delivers each stdout line as a notification.
+Keep monitoring CI status and review feedback in a loop instead of blocking:
 
 1. Run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py` to get current CI status
 2. If all checks passed, proceed to exit conditions
 3. If any checks failed (none pending), return to step 5
-4. If checks are still pending, use the MonitorTool to wait until all checks reach a terminal state:
+4. If checks are still pending:
+   a. Run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py` for new review feedback
+   b. Address any new high/medium feedback immediately (same as step 3)
+   c. If changes were needed, commit and push (this restarts CI), then continue monitoring from the refreshed branch state
+   d. Sleep 30 seconds (don't increase on subsequent iterations), then repeat from sub-step 1
+5. After all checks pass, wait 10 seconds for late-arriving review bot comments, then run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py`. Address any new high/medium feedback — if changes are needed, return to step 6.
+
+If you're in Claude Code, you can replace the sleep-based wait above with `MonitorTool` so the polling happens in the background instead of consuming context. This is a Claude-only optimization, not the default workflow for other agents.
 
 ```sh
 while true; do
+  total=$(gh pr checks --json bucket --jq 'length') || { sleep 30; continue; }
+  if [ "$total" = "0" ]; then
+    sleep 15
+    continue
+  fi
+
   pending=$(gh pr checks --json bucket --jq '[.[] | select(.bucket == "pending")] | length') || { sleep 30; continue; }
   if [ "$pending" = "0" ]; then
     failed=$(gh pr checks --json bucket --jq '[.[] | select(.bucket == "fail")] | length') || { sleep 30; continue; }
@@ -159,16 +172,13 @@ while true; do
 done
 ```
 
-Set `persistent: false` with `timeout_ms: 900000` (15 min). The `|| { sleep 30; continue; }` retries on transient API errors instead of killing the monitor.
+Run that shell loop through `MonitorTool` with `persistent: false`. Set `timeout_ms` to match the repository's normal CI duration instead of hardcoding a 15-minute timeout.
 
-After the monitor fires, re-run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py` and branch: if any checks failed, return to step 5. If all passed, continue to sub-step 5.
+After `MonitorTool` reports completion, re-run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py`:
+- If any checks failed, return to step 5.
+- If all checks passed, continue to sub-step 5 above.
 
-While waiting, address any pending feedback:
-   a. Run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py` for new review feedback
-   b. Address any new high/medium feedback immediately (same as step 3)
-   c. If changes were needed, commit and push (this restarts CI), then start a new monitor
-
-5. After all checks pass, wait 10 seconds for any late-arriving review bot comments, then run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py`. Address any new high/medium feedback. If changes are needed, return to step 6.
+If you pushed new changes while monitoring, start a fresh monitor so it watches the new set of CI runs.
 
 ### 8. Repeat
 
