@@ -19,7 +19,7 @@ Before merging, test your changes locally:
    claude plugin install sentry-skills
    ```
 
-   If you use `claude plugin marketplace add --sparse` for this repo, include `skills` in addition to `.claude-plugin` and `plugins`.
+   If you use `claude plugin marketplace add --sparse` for this repo, include `skills` and `agents` in addition to `.claude-plugin` because the root plugin manifest loads repo-root `skills/` and `agents/`.
 
 2. **Restart Claude Code** to pick up changes
 

@@ -9,6 +9,7 @@ Apply registration and quality checks before completion.
 3. Default to `.agents/skills/<name>/` when there is no stronger prior art.
 4. If the workspace clearly uses a different canonical layout, follow that layout instead of forcing `.agents/skills/`.
 5. Common established alternatives include:
+   - `skills/<name>/` when the workspace uses a canonical root skill tree
    - `.claude/skills/<name>/` for project-scoped Claude skills
    - `plugins/<plugin>/skills/<name>/` for plugin-scoped skills
    - another repository-managed skill root that is already established by neighboring skills or docs

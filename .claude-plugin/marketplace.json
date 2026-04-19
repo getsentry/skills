@@ -13,7 +13,7 @@
       "author": {
         "name": "Sentry"
       },
-      "source": "./plugins/sentry-skills",
+      "source": "./",
       "category": "productivity"
     }
   ]

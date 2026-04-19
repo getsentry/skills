@@ -36,7 +36,7 @@ Load only the path(s) required for the task:
 3. Choose the target skill root from observed conventions:
    - default to `.agents/skills/<name>/`
    - if the workspace clearly uses another established layout, follow that layout instead
-   - common established alternatives include `.claude/skills/<name>/`, `plugins/<plugin>/skills/<name>/`, or another repo-managed skill root with clear prior art
+   - common established alternatives include `skills/<name>/` when the workspace uses a canonical root skill tree, `.claude/skills/<name>/`, `plugins/<plugin>/skills/<name>/`, or another repo-managed skill root with clear prior art
 4. If multiple plausible locations exist and the canonical one is still unclear after inspection, ask the user where the skill should go before editing files.
 5. Distinguish skill-internal paths from repo registration paths:
    - inside a skill, reference bundled files relative to that skill root (for example `references/foo.md`, `scripts/check.py`)

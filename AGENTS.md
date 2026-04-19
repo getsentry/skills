@@ -5,13 +5,13 @@
 skills/<skill-name>/SKILL.md
 ```
 
-If you use Claude marketplace sparse checkouts for this repo, include `skills` alongside `.claude-plugin` and `plugins` so the plugin mirrors resolve correctly.
+If you use Claude marketplace sparse checkouts for this repo, include `skills` and `agents` alongside `.claude-plugin` because the root plugin manifest loads repo-root `skills/` and `agents/`.
 
 ## Creating/Updating Skills
 ALWAYS use `/skill-writer` — it handles requirements, writing, registration, and validation.
 
 - Do **not** create per-skill alias or symlink skills
-- The repo-level `plugins/sentry-skills/skills` and `.agents/skills` paths are maintained as mirrors of canonical `skills/`
+- The repo-level `.agents/skills` path is a convenience mirror of canonical `skills/`
 - List only canonical skills in public skill inventories (for example `pr-writer`, `skill-writer`)
 
 ### Registration Checklist

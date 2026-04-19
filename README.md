@@ -14,7 +14,7 @@ claude plugin marketplace add getsentry/skills
 claude plugin install sentry-skills@sentry-skills
 ```
 
-If you use `claude plugin marketplace add --sparse` for this repo, include `skills` alongside `.claude-plugin` and `plugins`.
+If you use `claude plugin marketplace add --sparse` for this repo, include `skills` and `agents` alongside `.claude-plugin` because the root plugin manifest loads repo-root `skills/` and `agents/`.
 
 Restart Claude Code after installation. Skills activate automatically when relevant.
 
@@ -69,8 +69,8 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 
 | Subagent | Description |
 |----------|-------------|
-| [code-simplifier](plugins/sentry-skills/agents/code-simplifier.md) | Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality |
-| [senpai](plugins/sentry-skills/agents/senpai.md) | Senior engineer and technical mentor for new Sentry hires. Explains infrastructure, architecture, and engineering concepts step-by-step with references |
+| [code-simplifier](agents/code-simplifier.md) | Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality |
+| [senpai](agents/senpai.md) | Senior engineer and technical mentor for new Sentry hires. Explains infrastructure, architecture, and engineering concepts step-by-step with references |
 
 ## Contributing
 
@@ -82,35 +82,32 @@ claude plugin marketplace add ~/sentry-skills
 claude plugin install sentry-skills
 ```
 
-If you use `claude plugin marketplace add --sparse` for this repo, include `skills` alongside `.claude-plugin` and `plugins`.
+If you use `claude plugin marketplace add --sparse` for this repo, include `skills` and `agents` alongside `.claude-plugin` because the root plugin manifest loads repo-root `skills/` and `agents/`.
 
 ### Repository Structure
 
 ```
 sentry-skills/
 ├── .claude-plugin/
-│   └── marketplace.json      # Marketplace manifest
+│   ├── marketplace.json      # Marketplace manifest
+│   └── plugin.json           # Root plugin manifest for sentry-skills
 ├── .agents/
 │   └── skills -> ../skills   # Local mirror for agent tooling
+├── agents/
+│   ├── code-simplifier.md
+│   └── senpai.md
 ├── skills/
 │   ├── code-review/
 │   │   └── SKILL.md
 │   └── commit/
 │       └── SKILL.md
-├── plugins/
-│   └── sentry-skills/
-│       ├── .claude-plugin/
-│       │   └── plugin.json   # Plugin manifest
-│       ├── agents/
-│       │   └── code-simplifier.md
-│       └── skills -> ../../skills
 ├── AGENTS.md                 # Agent-facing documentation
 ├── CLAUDE.md                 # Symlink to AGENTS.md
 └── README.md                 # This file
 ```
 
 The canonical skill source for the `sentry-skills` plugin lives at repo-root `skills/`.
-`plugins/sentry-skills/skills` and `.agents/skills` are mirrors of that tree.
+`.agents/skills` mirrors that tree for local agent tooling, and the root plugin manifest loads repo-root `skills/` and `agents/`.
 
 ### Creating New Skills
 
@@ -197,13 +194,18 @@ This repository is a Claude Code **marketplace** - a collection of plugins that 
 ```json
 {
   "plugins": [
-    { "name": "sentry-skills", "source": "./plugins/sentry-skills" },
+    {
+      "name": "sentry-skills",
+      "source": "./"
+    },
     { "name": "infra-skills", "source": "./plugins/infra-skills" }
   ]
 }
 ```
 
-Each plugin lives in its own directory under `plugins/` with its own `plugin.json` manifest. Users can install individual plugins:
+Marketplace entries point at a plugin source directory. That source can be a dedicated plugin directory with its own `.claude-plugin/plugin.json`, or repo root when the root also carries a plugin manifest. The `sentry-skills` entry in this repo uses repo root as its plugin source so it can keep canonical `skills/` and `agents/` at top level.
+
+Users can install individual plugins:
 
 ```bash
 # Install just the global skills
