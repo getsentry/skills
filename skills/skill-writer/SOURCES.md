@@ -6,8 +6,8 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 
 | Source | Type | Trust tier | Retrieved | Confidence | Contribution | Usage constraints | Notes |
 |---|---|---|---|---|---|---|---|
-| `skills/skill-writer/SKILL.md` | local canonical | canonical | 2026-04-19 | high | Baseline orchestration, path model, quality gates | local repository authority | Primary source of current behavior |
-| `skills/skill-writer/references/*.md` | local canonical | canonical | 2026-04-19 | high | Detailed path guidance, examples, validation requirements | local repository authority | Includes synthesis/iteration/evaluation paths |
+| `SKILL.md` | local canonical | canonical | 2026-04-19 | high | Baseline orchestration, path model, quality gates | local active skill root | Primary source of current behavior |
+| `references/*.md` | local canonical | canonical | 2026-04-19 | high | Detailed path guidance, examples, validation requirements | local active skill root | Includes synthesis/iteration/evaluation paths |
 | `https://agentskills.io/specification` | external canonical spec | canonical | 2026-03-05 | high | Portable skill spec requirements | spec-level constraints take precedence over local preferences | Cross-agent compatibility baseline |
 | `AGENTS.md` | repo convention | canonical | 2026-03-05 | high | Repository-specific workflow requirements | repository-local policy | Registration + validator expectations |
 | `README.md` | repo convention | canonical | 2026-03-05 | high | Skill table format and authoring conventions | repository-local policy | Registration and discoverability source |
@@ -29,4 +29,4 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 - 2026-03-05: Initialized `SOURCES.md` with baseline source pack (local canonical, Codex upstream, Claude upstream, spec, and repo conventions).
 - 2026-03-19: Clarified path-resolution guidance so bundled skill references stay skill-root-relative while registration steps are resolved from the repository's active layout.
 - 2026-03-19: Made portability a default authoring rule and disallowed provider-specific path variables in generic skills.
-- 2026-04-19: Updated canonical source paths from `plugins/sentry-skills/skills/...` to repo-root `skills/...` after the repository layout change.
+- 2026-04-19: Restored `.agents/skills` as the default authoring target and kept repository-specific layouts as an inspected override rather than the default.

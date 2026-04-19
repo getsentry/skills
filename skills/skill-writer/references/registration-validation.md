@@ -1,20 +1,26 @@
 # Registration and Validation
 
-Apply repository registration and quality checks before completion.
+Apply registration and quality checks before completion.
 
 ## Registration checklist
 
-1. Inspect the workspace and identify the canonical skill root for this repository before editing skill files.
+1. Inspect the workspace and identify the active skill layout before editing files.
 2. Create/update `<skill-root>/SKILL.md` and any bundled `references/`, `scripts/`, or `assets/` beneath that root.
-3. Add/update canonical skill in `README.md` Available Skills table (alphabetical; exclude alias/symlink entries).
-4. Add/update `Skill(sentry-skills:<name>)` in `.claude/settings.json`.
-5. Add/update the skill allowlist in this repository's canonical `claude-settings-audit` skill.
+3. By default, create or update the skill under `.agents/skills/<name>/`.
+4. If the workspace clearly uses a different canonical layout, follow that layout instead of forcing `.agents/skills/`.
+5. Only apply repository-specific registration steps when the workspace conventions explicitly require them.
+
+When a repository does maintain its own skill catalog, verify and update any required registration files such as:
+
+- public skill inventories or tables
+- project or plugin settings files
+- allowlists used by other skills or automation
 
 For this repository today:
 
-- canonical `sentry-skills` sources live under `skills/`
-- `plugins/sentry-skills/skills` is a symlinked mirror of that tree for plugin consumers
-- `.agents/skills` is a symlinked mirror of that tree for local agent tooling
+- default authoring target remains `.agents/skills/`
+- `.agents/skills` is a symlinked mirror of canonical repo-root `skills/`
+- `plugins/sentry-skills/skills` is another mirror of that same tree for plugin consumers
 - repository-level registration files still live at `README.md` and `.claude/settings.json`
 
 ## Validation checklist
