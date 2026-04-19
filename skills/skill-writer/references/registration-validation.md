@@ -6,22 +6,20 @@ Apply registration and quality checks before completion.
 
 1. Inspect the workspace and identify the active skill layout before editing files.
 2. Create/update `<skill-root>/SKILL.md` and any bundled `references/`, `scripts/`, or `assets/` beneath that root.
-3. By default, create or update the skill under `.agents/skills/<name>/`.
+3. Default to `.agents/skills/<name>/` when there is no stronger prior art.
 4. If the workspace clearly uses a different canonical layout, follow that layout instead of forcing `.agents/skills/`.
-5. Only apply repository-specific registration steps when the workspace conventions explicitly require them.
+5. Common established alternatives include:
+   - `.claude/skills/<name>/` for project-scoped Claude skills
+   - `plugins/<plugin>/skills/<name>/` for plugin-scoped skills
+   - another repository-managed skill root that is already established by neighboring skills or docs
+6. If multiple plausible locations exist and inspection does not make the canonical target clear, ask the user before editing files.
+7. Only apply repository-specific registration steps when the workspace conventions explicitly require them.
 
 When a repository does maintain its own skill catalog, verify and update any required registration files such as:
 
 - public skill inventories or tables
 - project or plugin settings files
 - allowlists used by other skills or automation
-
-For this repository today:
-
-- default authoring target remains `.agents/skills/`
-- `.agents/skills` is a symlinked mirror of canonical repo-root `skills/`
-- `plugins/sentry-skills/skills` is another mirror of that same tree for plugin consumers
-- repository-level registration files still live at `README.md` and `.claude/settings.json`
 
 ## Validation checklist
 
@@ -60,6 +58,7 @@ If you must run the validator from another working directory, convert both paths
 ## Required output
 
 - Registration changes summary
+- Selected skill root and why it was chosen
 - Validator output
 - Evaluation summary status
 - Any residual risks or open gaps

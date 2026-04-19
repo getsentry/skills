@@ -29,12 +29,21 @@ Load only the path(s) required for the task:
 ## Step 1: Resolve target and path
 
 1. Resolve target skill root and intended operation (`create`, `update`, `synthesize`, `iterate`).
-2. Distinguish skill-internal paths from repo registration paths:
+2. Inspect workspace prior art before choosing where the skill belongs:
+   - existing skill directories and neighboring skills
+   - repository docs such as `AGENTS.md`, `README.md`, and `CONTRIBUTING.md`
+   - plugin manifests or other layout-defining files when present
+3. Choose the target skill root from observed conventions:
+   - default to `.agents/skills/<name>/`
+   - if the workspace clearly uses another established layout, follow that layout instead
+   - common established alternatives include `.claude/skills/<name>/`, `plugins/<plugin>/skills/<name>/`, or another repo-managed skill root with clear prior art
+4. If multiple plausible locations exist and the canonical one is still unclear after inspection, ask the user where the skill should go before editing files.
+5. Distinguish skill-internal paths from repo registration paths:
    - inside a skill, reference bundled files relative to that skill root (for example `references/foo.md`, `scripts/check.py`)
    - for repository registration edits, use the repository's actual canonical files/locations after inspecting the workspace
-3. Read `references/mode-selection.md` and select the required path(s).
-4. Classify the skill (`workflow-process`, `integration-documentation`, `security-review`, `skill-authoring`, `generic`).
-5. Ask one direct question if class or depth requirements are ambiguous; otherwise state explicit assumptions.
+6. Read `references/mode-selection.md` and select the required path(s).
+7. Classify the skill (`workflow-process`, `integration-documentation`, `security-review`, `skill-authoring`, `generic`).
+8. Ask one direct question if class, target location, or depth requirements are ambiguous; otherwise state explicit assumptions.
 
 ## Step 2: Run synthesis when needed
 
