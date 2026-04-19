@@ -54,6 +54,7 @@
       "Skill(sentry-skills:gha-security-review)",
       "Skill(sentry-skills:iterate-pr)",
       "Skill(sentry-skills:pr-writer)",
+      "Skill(sentry-skills:prompt-optimizer)",
       "Skill(sentry-skills:security-review)",
       "Skill(sentry-skills:skill-scanner)",
       "Skill(sentry-skills:skill-writer)",

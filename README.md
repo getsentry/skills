@@ -55,6 +55,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [gha-security-review](plugins/sentry-skills/skills/gha-security-review/SKILL.md) | GitHub Actions security review for workflow exploitation vulnerabilities. |
 | [iterate-pr](plugins/sentry-skills/skills/iterate-pr/SKILL.md) | Iterate on a PR until CI passes. |
 | [pr-writer](plugins/sentry-skills/skills/pr-writer/SKILL.md) | Canonical workflow to create and update pull requests following Sentry conventions. |
+| [prompt-optimizer](plugins/sentry-skills/skills/prompt-optimizer/SKILL.md) | Create, optimize, and iteratively refine agent prompts and system prompts. |
 | [security-review](plugins/sentry-skills/skills/security-review/SKILL.md) | Security code review for vulnerabilities. |
 | [skill-scanner](plugins/sentry-skills/skills/skill-scanner/SKILL.md) | Scan agent skills for security issues. |
 | [skill-writer](plugins/sentry-skills/skills/skill-writer/SKILL.md) | Canonical workflow to synthesize, create, and iteratively improve agent skills for this repository. |
