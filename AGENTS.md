@@ -2,20 +2,23 @@
 
 ## Skill Structure
 ```
-plugins/sentry-skills/skills/<skill-name>/SKILL.md
+skills/<skill-name>/SKILL.md
 ```
+
+If you use Claude marketplace sparse checkouts for this repo, include `skills` and `agents` alongside `.claude-plugin` because the root plugin manifest loads repo-root `skills/` and `agents/`.
 
 ## Creating/Updating Skills
 ALWAYS use `/skill-writer` — it handles requirements, writing, registration, and validation.
 
-- Do **not** create alias or symlink skills
+- Do **not** create per-skill alias or symlink skills
+- The repo-level `.agents/skills` path is a convenience mirror of canonical `skills/`
 - List only canonical skills in public skill inventories (for example `pr-writer`, `skill-writer`)
 
 ### Registration Checklist
-1. Create `plugins/sentry-skills/skills/<skill-name>/SKILL.md`
+1. Create `skills/<skill-name>/SKILL.md`
 2. Add to `README.md` Available Skills table (alphabetical by canonical skill name; exclude aliases/symlinks)
 3. Add to `.claude/settings.json`: `Skill(sentry-skills:<skill-name>)`
-4. Add to allowlist in `plugins/sentry-skills/skills/claude-settings-audit/SKILL.md`
+4. Add to allowlist in `skills/claude-settings-audit/SKILL.md`
 
 ## Key Conventions
 - Frontmatter `---` must be the **first line** of SKILL.md — no comments before it

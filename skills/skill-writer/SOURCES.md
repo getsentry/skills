@@ -6,8 +6,8 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 
 | Source | Type | Trust tier | Retrieved | Confidence | Contribution | Usage constraints | Notes |
 |---|---|---|---|---|---|---|---|
-| `plugins/sentry-skills/skills/skill-writer/SKILL.md` | local canonical | canonical | 2026-03-05 | high | Baseline orchestration, path model, quality gates | local repository authority | Primary source of current behavior |
-| `plugins/sentry-skills/skills/skill-writer/references/*.md` | local canonical | canonical | 2026-03-05 | high | Detailed path guidance, examples, validation requirements | local repository authority | Includes synthesis/iteration/evaluation paths |
+| `SKILL.md` | local canonical | canonical | 2026-04-19 | high | Baseline orchestration, path model, quality gates | local active skill root | Primary source of current behavior |
+| `references/*.md` | local canonical | canonical | 2026-04-19 | high | Detailed path guidance, examples, validation requirements | local active skill root | Includes synthesis/iteration/evaluation paths |
 | `https://agentskills.io/specification` | external canonical spec | canonical | 2026-03-05 | high | Portable skill spec requirements | spec-level constraints take precedence over local preferences | Cross-agent compatibility baseline |
 | `AGENTS.md` | repo convention | canonical | 2026-03-05 | high | Repository-specific workflow requirements | repository-local policy | Registration + validator expectations |
 | `README.md` | repo convention | canonical | 2026-03-05 | high | Skill table format and authoring conventions | repository-local policy | Registration and discoverability source |
@@ -18,6 +18,7 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 3. Provenance is stored in `SOURCES.md`, not SKILL header comments.
 4. Case-study style examples are required for deeper, reusable synthesis outcomes.
 5. Path guidance in `skill-writer` is agent-generic (no Claude-only root assumptions in workflow docs).
+6. Skill placement defaults to `.agents/skills` unless workspace prior art establishes another location.
 
 ## Open gaps
 
@@ -29,3 +30,5 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 - 2026-03-05: Initialized `SOURCES.md` with baseline source pack (local canonical, Codex upstream, Claude upstream, spec, and repo conventions).
 - 2026-03-19: Clarified path-resolution guidance so bundled skill references stay skill-root-relative while registration steps are resolved from the repository's active layout.
 - 2026-03-19: Made portability a default authoring rule and disallowed provider-specific path variables in generic skills.
+- 2026-04-19: Restored `.agents/skills` as the default authoring target and kept repository-specific layouts as an inspected override rather than the default.
+- 2026-04-19: Added explicit prior-art inspection and user-confirmation guidance when the correct skill root is unclear.

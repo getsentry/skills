@@ -19,6 +19,8 @@ Before merging, test your changes locally:
    claude plugin install sentry-skills
    ```
 
+   If you use `claude plugin marketplace add --sparse` for this repo, include `skills` and `agents` in addition to `.claude-plugin` because the root plugin manifest loads repo-root `skills/` and `agents/`.
+
 2. **Restart Claude Code** to pick up changes
 
 3. **Invoke the skill** in a relevant context
@@ -42,7 +44,7 @@ All changes go through the PR flow, but formal review is optional.
 
 ## Adding a New Skill
 
-1. Create `plugins/sentry-skills/skills/<skill-name>/SKILL.md`
+1. Create `skills/<skill-name>/SKILL.md`
 
 2. Add required YAML frontmatter:
 
@@ -61,6 +63,6 @@ All changes go through the PR flow, but formal review is optional.
    "Skill(sentry-skills:skill-name)"
    ```
 
-5. Update the skills allowlist in `plugins/sentry-skills/skills/claude-settings-audit/SKILL.md`
+5. Update the skills allowlist in `skills/claude-settings-audit/SKILL.md`
 
 See [README.md](README.md) for the full skill template and optional frontmatter fields.

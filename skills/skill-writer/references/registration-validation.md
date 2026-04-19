@@ -1,20 +1,26 @@
 # Registration and Validation
 
-Apply repository registration and quality checks before completion.
+Apply registration and quality checks before completion.
 
 ## Registration checklist
 
-1. Inspect the workspace and identify the canonical skill root for this repository before editing skill files.
+1. Inspect the workspace and identify the active skill layout before editing files.
 2. Create/update `<skill-root>/SKILL.md` and any bundled `references/`, `scripts/`, or `assets/` beneath that root.
-3. Add/update canonical skill in `README.md` Available Skills table (alphabetical; exclude alias/symlink entries).
-4. Add/update `Skill(sentry-skills:<name>)` in `.claude/settings.json`.
-5. Add/update the skill allowlist in this repository's canonical `claude-settings-audit` skill.
+3. Default to `.agents/skills/<name>/` when there is no stronger prior art.
+4. If the workspace clearly uses a different canonical layout, follow that layout instead of forcing `.agents/skills/`.
+5. Common established alternatives include:
+   - `skills/<name>/` when the workspace uses a canonical root skill tree
+   - `.claude/skills/<name>/` for project-scoped Claude skills
+   - `plugins/<plugin>/skills/<name>/` for plugin-scoped skills
+   - another repository-managed skill root that is already established by neighboring skills or docs
+6. If multiple plausible locations exist and inspection does not make the canonical target clear, ask the user before editing files.
+7. Only apply repository-specific registration steps when the workspace conventions explicitly require them.
 
-For this repository today:
+When a repository does maintain its own skill catalog, verify and update any required registration files such as:
 
-- skill sources live under `plugins/sentry-skills/skills/`
-- `.agents/skills` is a symlinked mirror of that tree, not a separate registration target
-- repository-level registration files still live at `README.md` and `.claude/settings.json`
+- public skill inventories or tables
+- project or plugin settings files
+- allowlists used by other skills or automation
 
 ## Validation checklist
 
@@ -53,6 +59,7 @@ If you must run the validator from another working directory, convert both paths
 ## Required output
 
 - Registration changes summary
+- Selected skill root and why it was chosen
 - Validator output
 - Evaluation summary status
 - Any residual risks or open gaps

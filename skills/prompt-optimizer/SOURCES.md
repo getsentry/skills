@@ -4,7 +4,7 @@ This file tracks the material synthesized into `prompt-optimizer`.
 
 ## Selected profile
 
-- `plugins/sentry-skills/skills/skill-writer/references/examples/workflow-process-skill.md`
+- `skills/skill-writer/references/examples/workflow-process-skill.md`
 
 Why: this skill is a repeatable prompt-optimization workflow with explicit preconditions, ordered execution, validation, and failure handling.
 
@@ -12,8 +12,8 @@ Why: this skill is a repeatable prompt-optimization workflow with explicit preco
 
 | Source | Type | Trust tier | Retrieved | Confidence | Contribution | Usage constraints | Notes |
 |---|---|---|---|---|---|---|---|
-| `plugins/sentry-skills/skills/skill-writer/SKILL.md` | local canonical | canonical | 2026-04-18 | high | Baseline synthesis, authoring, and registration workflow | local repository authority | Primary workflow source |
-| `plugins/sentry-skills/skills/skill-writer/references/*.md` | local canonical | canonical | 2026-04-18 | high | Structure, depth gates, transformed example requirements, validation expectations | local repository authority | Includes authoring and workflow patterns |
+| `skills/skill-writer/SKILL.md` | local canonical | canonical | 2026-04-19 | high | Baseline synthesis, authoring, and registration workflow | local repository authority | Primary workflow source |
+| `skills/skill-writer/references/*.md` | local canonical | canonical | 2026-04-19 | high | Structure, depth gates, transformed example requirements, validation expectations | local repository authority | Includes authoring and workflow patterns |
 | `README.md` | repo convention | canonical | 2026-04-18 | high | Skill template, naming, registration conventions | repository-local policy | Canonical public skill inventory |
 | `CONTRIBUTING.md` | repo convention | canonical | 2026-04-18 | high | Local testing and registration checklist | repository-local policy | Confirms registration steps |
 | `AGENTS.md` | repo convention | canonical | 2026-04-18 | high | Mandatory use of `skill-writer`, registration checklist, portability conventions | repository-local policy | Highest-priority local instruction source |
