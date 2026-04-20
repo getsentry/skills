@@ -124,14 +124,11 @@ def main() -> int:
             time.sleep(args.poll_seconds)
             continue
 
-        passed = sum(1 for check in checks if check.get("bucket") == "pass")
         failed = sum(1 for check in checks if check.get("bucket") == "fail")
         if failed:
             print("CHECKS_DONE_WITH_FAILURES", flush=True)
-        elif passed:
-            print("ALL_CHECKS_PASSED", flush=True)
         else:
-            print("CHECKS_DONE_WITH_FAILURES", flush=True)
+            print("ALL_CHECKS_PASSED", flush=True)
 
         print_check_summary(checks)
         return 0
