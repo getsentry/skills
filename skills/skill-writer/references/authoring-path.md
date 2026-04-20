@@ -18,8 +18,8 @@ Use this path to create or update the skill files.
 2. Prefer relative references in skill content even when the repository also exposes mirrored or symlinked paths.
 3. Reserve repo-root paths for repository registration instructions only (for example `README.md`, `.claude/settings.json`).
 4. If the repository has multiple visible layouts for the same skill tree, inspect the workspace and edit the canonical location rather than assuming one layout from a generic template.
-5. Do not use provider-specific path variables such as `${CLAUDE_SKILL_ROOT}` in skills that are meant to stay provider-agnostic; use skill-root-relative paths instead.
-6. Only keep provider-specific path conventions when the skill is intentionally provider-specific and that scope is made explicit.
+5. Follow repository prior art for bundled file paths. If the workspace already standardizes on a root variable such as `${CLAUDE_SKILL_ROOT}`, keep using it consistently instead of inventing a different path model.
+6. If the workspace does not have an established provider-specific convention, prefer skill-root-relative references such as `references/...`, `scripts/...`, and `assets/...`.
 
 ## Supporting files
 
