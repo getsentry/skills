@@ -46,7 +46,7 @@ If you must run the validator from another working directory, convert both paths
 
 4. Confirm portability for skills that are expected to be portable by default:
 - bundled file references use skill-root-relative paths such as `references/...`, `scripts/...`, or `assets/...`
-- provider-specific path variables (for example `${CLAUDE_SKILL_ROOT}`) are absent unless the skill is intentionally provider-specific
+- provider-specific path variables (for example `${CLAUDE_SKILL_ROOT}`) either follow established repository prior art or are explicitly scoped, rather than being introduced ad hoc
 - provider-specific behavior, if any, is labeled as compatibility guidance rather than the primary workflow
 
 5. Confirm evaluation outputs as applicable:

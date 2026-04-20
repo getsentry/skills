@@ -158,18 +158,19 @@ Run `uv run <skill-dir>/scripts/tool.py`.
 Treat portability as the default requirement for generated skills.
 
 - Prefer cross-agent wording such as "skill root", "repository root", and relative paths like `references/...` or `scripts/...`
-- Avoid provider-specific environment variables, directory names, or invocation contracts in skills that should remain provider-agnostic
-- Only introduce provider-specific instructions when the skill is intentionally scoped to that provider, and label that scope explicitly in the description and body
+- Avoid inventing provider-specific environment variables, directory names, or invocation contracts when the workspace does not already rely on them
+- Reuse established repository conventions such as `${CLAUDE_SKILL_ROOT}` when that is how bundled skill files are already addressed in the workspace
+- Only introduce new provider-specific instructions when the skill is intentionally scoped to that provider, and label that scope explicitly in the description and body
 
 ```markdown
-# Bad
-Run `uv run ${CLAUDE_SKILL_ROOT}/scripts/check.py`
+# Bad (in a repo that already standardizes on `${CLAUDE_SKILL_ROOT}`)
+Run `uv run scripts/check.py`
 
 # Good
-Run `uv run scripts/check.py`
+Run `uv run ${CLAUDE_SKILL_ROOT}/scripts/check.py`
 ```
 
-If a host requires a special runtime variable or working-directory convention, document it as a compatibility note, not as the primary path model for the skill.
+If the workspace does not already establish a provider-specific root variable, prefer skill-root-relative references instead.
 
 ## Long Reference Files
 

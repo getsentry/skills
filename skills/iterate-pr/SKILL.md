@@ -52,6 +52,18 @@ Returns JSON with feedback categorized as:
 
 Review bot feedback (from Sentry, Warden, Cursor, Bugbot, CodeQL, etc.) appears in `high`/`medium`/`low` with `review_bot: true` — it is NOT placed in the `bot` bucket.
 
+### `scripts/monitor_pr_checks.py`
+
+Monitors PR checks until they all reach a terminal state. Retries transient `gh` failures, treats `skipping` and `cancel` as terminal states, and waits for checks to register after a fresh push instead of exiting early.
+
+```bash
+uv run ${CLAUDE_SKILL_ROOT}/scripts/monitor_pr_checks.py [--pr NUMBER]
+```
+
+Prints one terminal marker followed by a tab-separated check summary:
+- `ALL_CHECKS_PASSED`
+- `CHECKS_DONE_WITH_FAILURES`
+
 ## Workflow
 
 ### 1. Identify PR
@@ -149,30 +161,13 @@ Keep monitoring CI status and review feedback in a loop instead of blocking:
 
 If you're in Claude Code, you can replace the sleep-based wait above with `MonitorTool` so the polling happens in the background instead of consuming context. This is a Claude-only optimization, not the default workflow for other agents.
 
-```sh
-while true; do
-  total=$(gh pr checks --json bucket --jq 'length') || { sleep 30; continue; }
-  if [ "$total" = "0" ]; then
-    sleep 15
-    continue
-  fi
+Run the bundled monitor script through `MonitorTool` with `persistent: false`:
 
-  pending=$(gh pr checks --json bucket --jq '[.[] | select(.bucket == "pending")] | length') || { sleep 30; continue; }
-  if [ "$pending" = "0" ]; then
-    failed=$(gh pr checks --json bucket --jq '[.[] | select(.bucket == "fail")] | length') || { sleep 30; continue; }
-    if [ "$failed" != "0" ]; then
-      echo "CHECKS_DONE_WITH_FAILURES"
-    else
-      echo "ALL_CHECKS_PASSED"
-    fi
-    gh pr checks | head -20
-    exit 0
-  fi
-  sleep 30
-done
+```bash
+uv run ${CLAUDE_SKILL_ROOT}/scripts/monitor_pr_checks.py
 ```
 
-Run that shell loop through `MonitorTool` with `persistent: false`. Set `timeout_ms` to match the repository's normal CI duration instead of hardcoding a 15-minute timeout.
+Set `timeout_ms` to match the repository's normal CI duration instead of hardcoding a 15-minute timeout.
 
 After `MonitorTool` reports completion, re-run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py`:
 - If any checks failed, return to step 5.
