@@ -30,16 +30,18 @@ import time
 from typing import Any
 
 
-def run_gh_json(args: list[str]) -> list[dict[str, Any]] | dict[str, Any] | None:
+def run_gh_json(
+    args: list[str],
+    allowed_returncodes: tuple[int, ...] = (0,),
+) -> list[dict[str, Any]] | dict[str, Any] | None:
     """Run a gh command that returns JSON."""
-    try:
-        result = subprocess.run(
-            ["gh"] + args,
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-    except subprocess.CalledProcessError:
+    result = subprocess.run(
+        ["gh"] + args,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode not in allowed_returncodes:
         return None
 
     if not result.stdout.strip():
@@ -72,7 +74,7 @@ def get_checks(pr_number: int) -> list[dict[str, Any]] | None:
         str(pr_number),
         "--json",
         "name,bucket,link",
-    ])
+    ], allowed_returncodes=(0, 1, 8))
     return checks if isinstance(checks, list) else None
 
 
@@ -122,11 +124,14 @@ def main() -> int:
             time.sleep(args.poll_seconds)
             continue
 
+        passed = sum(1 for check in checks if check.get("bucket") == "pass")
         failed = sum(1 for check in checks if check.get("bucket") == "fail")
         if failed:
             print("CHECKS_DONE_WITH_FAILURES", flush=True)
-        else:
+        elif passed:
             print("ALL_CHECKS_PASSED", flush=True)
+        else:
+            print("CHECKS_DONE_WITH_FAILURES", flush=True)
 
         print_check_summary(checks)
         return 0
