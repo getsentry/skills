@@ -119,7 +119,7 @@ Pick one term for each concept and use it throughout the skill. Inconsistent ter
 
 ## Independence
 
-A skill must never reference another skill. Do not name another skill in SKILL.md or its references — not as an instruction (`run the X skill`, `use \`sentry-skills:Y\``, `hand off to Z`), not as a "see also", and not by path (`skills/other-skill/...`). Other skills may not be installed, may be renamed, or may be overridden by a user's own skill of the same name; any named reference silently breaks in all three cases.
+A skill's runtime behavior must not depend on another skill being present. Do not instruct the agent to invoke another skill by name (`run the X skill`, `use \`sentry-skills:Y\``, `hand off to Z`), and do not treat another skill's files as runtime resources (`load skills/other-skill/references/foo.md`). Other skills may not be installed, may be renamed, or may be overridden by a user's own skill of the same name; any runtime dependency silently breaks in all three cases.
 
 State the intent directly and trust the agent's skill discovery to pick up whatever skill matches:
 
@@ -128,6 +128,8 @@ State the intent directly and trust the agent's skill discovery to pick up whate
 | "If you're on `main`, create a feature branch first." | "Use the `create-branch` skill to create the branch." |
 | "If there are uncommitted changes, commit them first." | "Run the `sentry-skills:commit` skill before proceeding." |
 | "For deeper guidance on X, see `references/x.md`." | "See the `other-skill` skill for X." |
+
+Mentioning another skill's name in non-runtime content — provenance logs, audit allowlists, eval prompts meant to be copy-pasted by a human — is fine. The rule targets runtime behavior, not any mention of a skill's name.
 
 ## Avoid Duplication
 
