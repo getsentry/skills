@@ -121,6 +121,12 @@ Why: this skill is a repeatable prompt-optimization workflow with explicit preco
 - "Port this prompt from GPT to Gemini."
 - "Make this tool-using prompt more reliable."
 - "Tune this prompt wording with a proper eval loop."
+- "How should I expose tools in my agent's system prompt?"
+- "Design tool policy for our harness prompt."
+- "Stop the model from narrating 'let me check' before tool calls."
+- "How should I disclose skills in the system prompt — eager or lazy?"
+- "Route between two adjacent skills that keep mis-matching."
+- "Split platform rules out of our customer-authored persona file."
 
 ### Should not trigger
 
@@ -130,6 +136,8 @@ Why: this skill is a repeatable prompt-optimization workflow with explicit preco
 - "Summarize this document."
 - "Design a new model architecture."
 - "Tune only the temperature and top-p settings."
+- "Implement a new MCP server." (this is a tool/server authoring task, not a prompt task)
+- "Write the SKILL.md body for a new skill." (this is a skill-authoring task — use `skill-writer`)
 
 ## Open gaps
 

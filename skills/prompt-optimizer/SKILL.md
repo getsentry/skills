@@ -1,6 +1,6 @@
 ---
 name: prompt-optimizer
-description: Create, optimize, and iteratively refine agent prompts and system prompts. Use when asked to "improve a prompt", "optimize a system prompt", "rewrite an agent prompt", "tune prompt wording", "make this prompt more reliable", or "adapt a prompt for OpenAI, Claude, or Gemini". Handles model-specific prompt guidance, prompt markers/tags, eval design, and meta optimization loops for new and existing prompts.
+description: Create, optimize, and iteratively refine agent prompts and system prompts. Use when asked to "improve a prompt", "optimize a system prompt", "rewrite an agent prompt", "tune prompt wording", "make this prompt more reliable", "adapt a prompt for OpenAI, Claude, or Gemini", "design tool policy for an agent prompt", "how should I expose tools in a prompt", or "how should I disclose skills in an agent". Handles model-specific prompt guidance, prompt markers/tags, tool disclosure and tool-call narration, skill disclosure and routing, layered platform/deployer prompts, eval design, and meta optimization loops.
 ---
 
 # Prompt Optimizer
@@ -55,75 +55,22 @@ Read `references/model-family-notes.md`.
 
 ## Step 3: Shape the prompt deliberately
 
-Read `references/core-patterns.md`. When the prompt surface includes tools or a skill layer, also read `references/tools.md` or `references/skills.md` respectively.
+Read `references/core-patterns.md`. When the prompt surface includes tools or a skill layer, also read `references/tools.md` or `references/skills.md`. Reach for `references/transformed-examples.md` when the task is under-specified or the first draft is weak.
 
-1. Separate durable behavior from task-local context:
-- stable policy and behavioral defaults belong in `system` or `developer`
-- variable inputs, retrieved context, and task instances belong in templated user-facing sections
-- when the system prompt is assembled at runtime from a platform layer and a deployer-authored persona layer (e.g., `SOUL.md`, `CLAUDE.md`, `AGENTS.md`), see "Layered prompts with multiple owners" in `references/core-patterns.md` — platform behavior rules must not depend on what the deployer layer contains
+Apply, in order:
 
-2. Keep one authoritative instruction per behavior:
-- if a rule appears in more than one layer, choose one owner for it
-- stable cross-task rules belong in `system` or `developer`
-- examples should teach format, edge-case handling, or tool behavior, not restate the whole policy
-- user payloads should carry task-local facts, not durable policy
-
-3. Use markers only when they reduce ambiguity:
-- use markdown headings or XML-style tags to separate instructions, context, examples, tool rules, and output contracts
-- keep tag names descriptive and consistent
-- do not wrap every sentence in markup
-
-4. Make the prompt easy to execute:
-- put one high-value behavior per bullet or line when the task is fragile
-- prefer positive instructions over "do not do X" lists
-- place tool-use rules, escalation boundaries, and stop conditions in explicit sections
-- keep persona light unless it changes behavior in a useful way
-- use the shortest wording that preserves the intended behavioral constraint
-- cut motivational filler, repeated reminders, and examples that do not improve evals
-- for long-context prompts, place evidence before the final query and keep the actual ask in a clear terminal section
-- keep instructions, evidence, and schemas in distinct blocks so the model does not have to infer what is policy versus data
-
-5. Treat examples as first-class prompt assets:
-- start simple before adding examples
-- add examples only when they improve format control, edge-case handling, or tool behavior
-- keep examples structurally consistent
-- prefer positive demonstrations over anti-pattern-only demonstrations
+1. Layer the prompt — stable behavior in `system`/`developer`, task-local context in templated user sections, examples as a third layer.
+2. Place directives in canonical rules sections (`<behavior>`, `<tool_policy>`, `<constraints>`, `<workflow>`), not buried inside descriptive markers.
+3. Keep one authoritative owner per rule. Collapse duplicates.
+4. Cross-check the symptom-to-fix table in `core-patterns.md` before adding new instructions.
 
 ## Step 4: Run the meta optimization loop
 
 Read `references/meta-optimization-loop.md`.
 
-1. Start with the current prompt or a simple first draft.
-2. Score it on a representative slice:
-- at least one happy-path case
-- at least one failure replay
-- at least one ambiguous case
-- at least one edge case
-- at least one "should refuse", "should ask", or "should defer" case when relevant
+Baseline on a representative slice → cluster failures → write critiques as concrete edits → generate a small candidate beam (minimal-diff repair, structure-first rewrite, example-or-tool-rule variant) → compare on the same slice → keep the best → validate on a holdout → stop when scores plateau, edits oscillate, or cost rises without gain.
 
-3. Turn failures into explicit criticisms:
-- identify what the prompt under-specified, over-specified, or contradicted
-- write critiques as actionable edits, not vague complaints
-
-4. Generate a small beam of candidate prompts:
-- one minimal-diff repair
-- one structure-first rewrite
-- one example- or tool-rule-centered variant when that is the likely bottleneck
-- one provider-specific adapter when cross-model behavior is the issue
-
-5. Compare candidates on the same eval slice.
-6. Keep the best candidate and log what changed and why.
-7. Preserve the evidence for each round:
-- prompt version
-- eval case
-- model output
-- failure reason
-- relevant scores
-
-8. Test the winner on a holdout slice before finalizing.
-9. Stop when scores plateau, edits oscillate, cost rises without quality gain, or the remaining issue is outside prompt control.
-
-Keep edits minimal and causal. Record what you removed as well as what you added. If you change everything at once, you learn nothing about what actually helped.
+Record what you remove as well as what you add.
 
 ## Step 5: Produce a reusable deliverable
 
@@ -138,24 +85,6 @@ Return:
 7. `Residual Risks`
 
 If the user supplied an existing prompt, include a concise diff-style explanation of the biggest behavioral changes.
-
-## Step 6: Guard against common failure modes
-
-Read `references/transformed-examples.md` when the task is ambiguous or the first draft is weak.
-
-Do not:
-
-- optimize wording before defining the eval target
-- mix instructions, examples, and raw context without boundaries
-- keep the same rule in multiple layers unless there is a proven reason
-- let stable rules drift into the user payload just because the current prompt template makes it convenient
-- ask reasoning models to reveal chain-of-thought just because the task is hard
-- keep contradictory legacy instructions in the same prompt
-- overfit to one or two examples
-- keep examples that do not improve measured behavior
-- solve tool-use failures only in the system prompt when the real problem is the tool description or schema
-- add markers everywhere and mistake structure for clarity
-- use a bloated persona as a substitute for concrete behavior rules
 
 ## Output standard
 
