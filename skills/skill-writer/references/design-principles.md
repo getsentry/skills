@@ -117,6 +117,20 @@ Pick one term for each concept and use it throughout the skill. Inconsistent ter
 | "field" everywhere | "field", "box", "element", "control" |
 | "extract" everywhere | "extract", "pull", "get", "retrieve" |
 
+## Independence
+
+A skill's runtime behavior must not depend on another skill being present. Do not instruct the agent to invoke another skill by name (`run the X skill`, `use \`sentry-skills:Y\``, `hand off to Z`), and do not treat another skill's files as runtime resources (`load skills/other-skill/references/foo.md`). Other skills may not be installed, may be renamed, or may be overridden by a user's own skill of the same name; any runtime dependency silently breaks in all three cases.
+
+State the intent directly and trust the agent's skill discovery to pick up whatever skill matches:
+
+| Do | Don't |
+|----|-------|
+| "If you're on `main`, create a feature branch first." | "Use the `create-branch` skill to create the branch." |
+| "If there are uncommitted changes, commit them first." | "Run the `sentry-skills:commit` skill before proceeding." |
+| "For deeper guidance on X, see `references/x.md`." | "See the `other-skill` skill for X." |
+
+Mentioning another skill's name in non-runtime content — provenance logs, audit allowlists, eval prompts meant to be copy-pasted by a human — is fine. The rule targets runtime behavior, not any mention of a skill's name.
+
 ## Avoid Duplication
 
 Information should live in either SKILL.md or reference files, not both. Prefer reference files for detailed content and SKILL.md for the core procedural workflow.
