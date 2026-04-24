@@ -59,6 +59,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [presentation-creator](skills/presentation-creator/SKILL.md) | Create data-driven presentation slides using React, Vite, and Recharts with Sentry branding. |
 | [pr-writer](skills/pr-writer/SKILL.md) | Canonical workflow to create and update pull requests following Sentry conventions. |
 | [prompt-optimizer](skills/prompt-optimizer/SKILL.md) | Create, optimize, and iteratively refine agent prompts and system prompts. |
+| [replay-ux-research](skills/replay-ux-research/SKILL.md) | Analyze Sentry session replays to surface UX patterns, pain points, and user journeys for a given product area. |
 | [security-review](skills/security-review/SKILL.md) | Security code review for vulnerabilities. |
 | [skill-scanner](skills/skill-scanner/SKILL.md) | Scan agent skills for security issues. |
 | [skill-writer](skills/skill-writer/SKILL.md) | Canonical workflow to synthesize, create, and iteratively improve agent skills for this repository. |
