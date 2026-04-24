@@ -10,7 +10,7 @@ Analyze session replays from real external users of sentry.io to surface UX patt
 
 ## Inputs
 
-`$ARGUMENTS` is the product area to research (e.g., "issues", "alerts", "dashboards", "performance", "replays", "crons", "releases", "insights").
+`$ARGUMENTS` is the product area to research (e.g., "issues", "traces", "dashboards", "replays", "monitors", "releases", "alerts").
 
 If `$ARGUMENTS` is empty, ask the user which product area to research.
 
