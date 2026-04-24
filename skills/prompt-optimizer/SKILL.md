@@ -14,6 +14,8 @@ Load only the references you need:
 |------|------|
 | Create a new agent prompt | `references/core-patterns.md`, `references/model-family-notes.md`, `references/transformed-examples.md` |
 | Refine an existing prompt | `references/meta-optimization-loop.md`, `references/core-patterns.md`, `references/model-family-notes.md`, `references/transformed-examples.md` |
+| Shape tool disclosure, tool policy, or tool-call narration | `references/tools.md`, `references/core-patterns.md` |
+| Shape skill disclosure, invocation, or routing between skills | `references/skills.md`, `references/core-patterns.md` |
 | Port a prompt between model families | `references/model-family-notes.md`, `references/core-patterns.md` |
 | Diagnose repeated prompt failures | `references/meta-optimization-loop.md`, `references/core-patterns.md` |
 | Explain the provenance behind this workflow | `SOURCES.md` |
@@ -53,7 +55,7 @@ Read `references/model-family-notes.md`.
 
 ## Step 3: Shape the prompt deliberately
 
-Read `references/core-patterns.md`.
+Read `references/core-patterns.md`. When the prompt surface includes tools or a skill layer, also read `references/tools.md` or `references/skills.md` respectively.
 
 1. Separate durable behavior from task-local context:
 - stable policy and behavioral defaults belong in `system` or `developer`
