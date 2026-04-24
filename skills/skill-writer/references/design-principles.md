@@ -117,6 +117,18 @@ Pick one term for each concept and use it throughout the skill. Inconsistent ter
 | "field" everywhere | "field", "box", "element", "control" |
 | "extract" everywhere | "extract", "pull", "get", "retrieve" |
 
+## Independence
+
+A skill must never reference another skill. Do not name another skill in SKILL.md or its references — not as an instruction (`run the X skill`, `use \`sentry-skills:Y\``, `hand off to Z`), not as a "see also", and not by path (`skills/other-skill/...`). Other skills may not be installed, may be renamed, or may be overridden by a user's own skill of the same name; any named reference silently breaks in all three cases.
+
+State the intent directly and trust the agent's skill discovery to pick up whatever skill matches:
+
+| Do | Don't |
+|----|-------|
+| "If you're on `main`, create a feature branch first." | "Use the `create-branch` skill to create the branch." |
+| "If there are uncommitted changes, commit them first." | "Run the `sentry-skills:commit` skill before proceeding." |
+| "For deeper guidance on X, see `references/x.md`." | "See the `other-skill` skill for X." |
+
 ## Avoid Duplication
 
 Information should live in either SKILL.md or reference files, not both. Prefer reference files for detailed content and SKILL.md for the core procedural workflow.
