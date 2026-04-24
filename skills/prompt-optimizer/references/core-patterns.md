@@ -18,7 +18,7 @@ Good section names are concrete and stable:
 - `<role>`
 - `<goal>`
 - `<context>`
-- `<tools>`
+- `<tool_policy>`
 - `<workflow>`
 - `<constraints>`
 - `<output_format>`
@@ -72,7 +72,20 @@ Do not cargo-cult this ordering into short prompts that do not need it.
 
 ## Portable agent prompt skeleton
 
-Use this as a starting point and adapt it:
+Use this as a starting point and adapt it.
+
+Tool schemas are disclosed to the model by the provider-native tools parameter
+(Anthropic `tools`, OpenAI `tools`, Gemini `tools`). On Anthropic this is
+explicit — the API constructs a special system prompt that injects the tool
+definitions from the `tools` parameter alongside the user-authored system
+prompt. Well-tuned harnesses (Codex CLI, pi-agent-core) pass tools natively
+and keep the prompt text free of schema restatements.
+
+The prompt text should carry tool *policy* — when to call tools, when to avoid
+them, what evidence to gather before acting — not a restated list of tool
+names or argument schemas. Naming a specific tool in a policy rule ("prefer
+`Read` over a `Bash` cat") is fine; re-enumerating the tool inventory or its
+schemas is not.
 
 ```text
 <role>
@@ -91,11 +104,11 @@ Available files or documents:
 Known constraints:
 </context>
 
-<tools>
-Available tools:
-When to use them:
-When to avoid them:
-</tools>
+<tool_policy>
+When to use tools:
+When to avoid tools:
+Evidence to gather before acting:
+</tool_policy>
 
 <workflow>
 1. Clarify only if required.
