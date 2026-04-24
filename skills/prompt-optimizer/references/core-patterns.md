@@ -88,7 +88,7 @@ When prompts are long, separate policy from evidence explicitly:
 - instructions in one block
 - retrieved documents in another
 - examples in another
-- tool rules and schemas in their own labeled sections
+- tool policy (when/why/whether) in its own labeled section; tool schemas stay in the provider-native tools parameter
 
 For long-context prompts, place long evidence before the final query and keep the actual ask in a terminal section.
 Do not cargo-cult this ordering into short prompts that do not need it.
