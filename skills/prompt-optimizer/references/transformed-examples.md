@@ -127,3 +127,42 @@ Why it is better:
 - removes chain-of-thought demand
 - replaces absolute slogans with operational rules
 - turns style goals into specific output behavior
+
+## Example 4: Directive placement — state marker vs. rules section
+
+### Before
+
+```text
+<turn-state>resumed</turn-state>
+This turn continues from a prior checkpoint. Post a brief continuation
+notice (e.g., "Connected — continuing.") and then the resumed answer
+as a separate message.
+```
+
+The directive is buried inside a descriptive state marker. In the field,
+this variant scored 0.5 on the relevant LLM-judged eval — the model read
+the block as situational data and combined both messages into one.
+
+### After
+
+```text
+<turn-state>resumed</turn-state>
+
+<behavior>
+When `<turn-state>` is `resumed`, post a brief continuation notice
+("Connected — continuing.") first, then send the resumed answer as a
+separate message.
+</behavior>
+```
+
+Same rule, stronger placement. The state marker stays descriptive; the
+directive moves to the canonical rules section and references the state
+by name. In the same eval, this variant passed at ≥0.75 with no other
+change.
+
+Why it is better:
+
+- keeps descriptive markers descriptive — facts, not policy
+- places the directive where the model reads directives
+- makes the state-conditional nature explicit instead of implicit
+- preserves a single authoritative owner for the rule

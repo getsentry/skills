@@ -27,6 +27,29 @@ Do not add markup around every sentence. Markers are useful when they carve the 
 
 If the target stack or model family responds better to plain markdown, use headings and bullets instead of XML-style tags. The structure matters more than the syntax.
 
+### Where rules live
+
+Markers signal to the model what kind of content a block carries. Descriptive
+or state markers (`<context>`, `<state>`, `<turn-state>`, `<environment>`,
+`<artifact-state>`) read as facts about the situation — data, not policy.
+Canonical rules markers (`<behavior>`, `<constraints>`, `<tool_policy>`,
+`<workflow>`) read as directives the model should follow.
+
+A directive buried in a descriptive block can underperform the same directive
+placed in a rules block, especially for state-conditional rules. Observed in
+the field: a resume-notice instruction placed inside `<turn-state>resumed</turn-state>`
+scored 0.5 on the relevant eval; the identical sentence moved into
+`<behavior>` passed at ≥0.75 with no other change.
+
+Rules of thumb:
+
+- keep descriptive markers descriptive — put facts about the situation there,
+  not directives
+- directives live in a canonical rules section
+- for state-conditional rules, phrase them in the rules section and reference
+  the state by name: "When `<turn-state>` is `resumed`, post a brief
+  continuation notice, then answer."
+
 ## Layer the prompt correctly
 
 Keep these layers separate:
@@ -171,6 +194,7 @@ Use markdown headings instead of tags if that fits the target stack better.
 - Keep progress-update style explicit if the user should see it.
 - Use the shortest wording that preserves the intended behavioral constraint.
 - Remove persona, motivation, or reminder text that does not change measured behavior.
+- Place directives in canonical rules sections (`<behavior>`, `<constraints>`, `<tool_policy>`, `<workflow>`), not buried inside descriptive markers like `<context>`, `<state>`, or `<turn-state>`.
 
 ## Examples
 
