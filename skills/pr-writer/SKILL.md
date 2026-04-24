@@ -11,14 +11,15 @@ Create pull requests following Sentry's engineering practices.
 
 ## Prerequisites
 
-Before creating a PR, ensure all changes are committed.
+Before creating a PR, ensure all changes are committed **to a feature branch**, not to the default branch.
 
 ```bash
-# Check for uncommitted changes
+# Check current branch and for uncommitted changes
+git branch --show-current
 git status --porcelain
 ```
 
-If the output shows any uncommitted changes (modified, added, or untracked files that should be included), commit them before proceeding.
+If on `main` or `master`, create a feature branch and move any uncommitted changes onto it before committing — a PR cannot be opened from the default branch against itself. If there are uncommitted changes, commit them on the feature branch before proceeding.
 
 ## Process
 
