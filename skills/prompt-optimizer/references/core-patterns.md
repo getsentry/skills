@@ -70,6 +70,34 @@ When prompts are long, separate policy from evidence explicitly:
 For long-context prompts, place long evidence before the final query and keep the actual ask in a terminal section.
 Do not cargo-cult this ordering into short prompts that do not need it.
 
+### Layered prompts with multiple owners
+
+The layers above assume a single author owns the whole system prompt. Many
+runtimes concatenate the system prompt from multiple layers with different
+owners at request time:
+
+- a **platform layer** owned by the product or framework team (harness rules,
+  tool-use policy, output contract, safety boundaries)
+- a **deployer or persona layer** authored by the downstream user or customer
+  (voice, tone, identity files such as `SOUL.md`, `CLAUDE.md`, `AGENTS.md`)
+
+When this is the case, treat the deployer layer as **voice-only**:
+
+- every platform behavior rule — evidence gathering, tool-use policy, narration
+  rules, output contract, escalation boundaries — must live in the
+  platform-owned layer and must still fire if the deployer layer is empty,
+  five lines of voice, or customized in unexpected ways
+- do not delete a platform bullet on the assumption that a persona file
+  "probably covers it"; deployers ship sparse persona files in practice
+- if a rule is load-bearing, it belongs in the platform layer by default;
+  the deployer layer gets voice and domain framing, not policy
+
+Hermes Agent, OpenClaw, and similar SOUL.md-style frameworks use this split
+explicitly: platform behavior is code-level, SOUL.md carries identity and
+tone, and the platform falls back to a built-in default identity if SOUL.md
+is absent or sparse. Mirror that invariant whenever a prompt is assembled
+from more than one authorship layer.
+
 ## Portable agent prompt skeleton
 
 Use this as a starting point and adapt it.

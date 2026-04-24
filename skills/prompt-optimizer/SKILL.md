@@ -58,6 +58,7 @@ Read `references/core-patterns.md`.
 1. Separate durable behavior from task-local context:
 - stable policy and behavioral defaults belong in `system` or `developer`
 - variable inputs, retrieved context, and task instances belong in templated user-facing sections
+- when the system prompt is assembled at runtime from a platform layer and a deployer-authored persona layer (e.g., `SOUL.md`, `CLAUDE.md`, `AGENTS.md`), see "Layered prompts with multiple owners" in `references/core-patterns.md` — platform behavior rules must not depend on what the deployer layer contains
 
 2. Keep one authoritative instruction per behavior:
 - if a rule appears in more than one layer, choose one owner for it
