@@ -2,6 +2,17 @@
 
 Use this file when creating a new prompt or restructuring a weak one.
 
+## Contents
+
+- When markers help
+- Where rules live
+- Layer the prompt correctly
+- Layered prompts with multiple owners
+- Portable agent prompt skeleton
+- High-value prompt moves
+- Examples
+- Symptom to fix mapping
+
 ## When markers help
 
 Use markers when the prompt mixes different content types:

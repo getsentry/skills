@@ -2,6 +2,13 @@
 
 Use this file when refining an existing prompt or when a first draft needs disciplined iteration.
 
+## Contents
+
+- Inputs
+- Optimization loop (baseline, failure clustering, textual gradients, candidate beam, compare, reflective memory, holdout validation, stop conditions)
+- Practical defaults
+- What this loop is borrowing from
+
 ## Inputs
 
 Collect these before iterating:

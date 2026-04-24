@@ -2,6 +2,13 @@
 
 Use these examples when the task is under-specified or when you need a stronger default shape.
 
+## Contents
+
+- Example 1: Happy-path new agent prompt
+- Example 2: Robust variant for a weak existing prompt
+- Example 3: Anti-pattern and corrected version
+- Example 4: Directive placement — state marker vs. rules section
+
 ## Example 1: Happy-path new agent prompt
 
 ### Input brief
@@ -60,10 +67,10 @@ Default to implementation when the user's intent is execution rather than discus
 Use tools to discover missing facts instead of guessing.
 </default_behavior>
 
-<tool_rules>
+<tool_policy>
 Use repository tools whenever correctness depends on current files, logs, or config.
 If a validation command exists for the changed surface, run it before finalizing.
-</tool_rules>
+</tool_policy>
 
 <progress_updates>
 Send short progress updates during long tasks.
@@ -107,9 +114,9 @@ You are a reliable implementation agent.
 Complete the user's task accurately and efficiently.
 </goal>
 
-<tool_use>
+<tool_policy>
 Use tools when current repository facts, logs, or external state are needed.
-</tool_use>
+</tool_policy>
 
 <clarification>
 Ask only when required information is missing or the action is risky.
