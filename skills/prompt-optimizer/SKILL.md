@@ -1,6 +1,6 @@
 ---
 name: prompt-optimizer
-description: Create, optimize, and iteratively refine agent prompts and system prompts. Use when asked to "improve a prompt", "optimize a system prompt", "rewrite an agent prompt", "tune prompt wording", "make this prompt more reliable", or "adapt a prompt for OpenAI, Claude, or Gemini". Handles model-specific prompt guidance, prompt markers/tags, eval design, and meta optimization loops for new and existing prompts.
+description: Create, optimize, and iteratively refine agent prompts and system prompts. Use when asked to "improve a prompt", "optimize a system prompt", "rewrite an agent prompt", "tune prompt wording", "make this prompt more reliable", "adapt a prompt for OpenAI, Claude, or Gemini", "design tool policy for an agent prompt", "how should I expose tools in a prompt", or "how should I disclose skills in an agent". Handles model-specific prompt guidance, prompt markers/tags, tool disclosure and tool-call narration, skill disclosure and routing, layered platform/deployer prompts, eval design, and meta optimization loops.
 ---
 
 # Prompt Optimizer
