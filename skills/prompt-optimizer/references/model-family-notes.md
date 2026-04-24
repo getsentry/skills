@@ -12,6 +12,7 @@ Use this file to adapt prompts to model behavior instead of assuming all model f
 - Use delimiters such as markdown headings, XML tags, or section titles when the prompt mixes multiple content blocks.
 - Try zero-shot first. Add few-shot examples only when the output contract or edge cases need them.
 - Be explicit about constraints, success criteria, and completion conditions.
+- Tool schemas are disclosed via the Responses API `tools` parameter. Keep tool policy (when/why/whether to call) in the prompt; do not restate tool names or argument schemas.
 
 ### GPT-style non-reasoning models
 
@@ -29,6 +30,7 @@ Use this file to adapt prompts to model behavior instead of assuming all model f
 - For long context, place long documents before the question and put the actual query near the end.
 - When grounding in long documents, asking for relevant quotes first can improve downstream analysis.
 - If tool use or progress-update behavior matters, specify it explicitly rather than assuming the model will infer it.
+- When you call the Messages API with `tools`, the API injects the tool definitions into a special system prompt automatically. Keep your user-authored system prompt focused on policy; put tool detail in each tool's `description` field rather than re-listing schemas in prose.
 
 ## Gemini
 
@@ -39,6 +41,7 @@ Use this file to adapt prompts to model behavior instead of assuming all model f
 - Use system instructions when the target runtime supports them.
 - Thinking is dynamic by default on modern Gemini thinking models; tune it only when latency or deeper reasoning warrants it.
 - Gemini long-context workflows can benefit from many-shot in-context learning when you have a large bank of representative examples.
+- Tool schemas are disclosed via the Gemini API `tools` (function declarations) parameter. Keep the prompt focused on tool policy; do not re-list function names or parameter schemas.
 
 ## Cross-family adapter rules
 
