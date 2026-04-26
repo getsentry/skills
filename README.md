@@ -111,6 +111,8 @@ sentry-skills/
 The canonical skill source for the `sentry-skills` plugin lives at repo-root `skills/`.
 `.agents/skills` mirrors that tree for local agent tooling, and the root plugin manifest loads repo-root `skills/` and `agents/`.
 
+New skills and materially changed skills should include a root-level `SPEC.md` alongside `SKILL.md`.
+
 ### Creating New Skills
 
 Skills follow the [Agent Skills specification](https://agentskills.io/specification). Each skill requires a `SKILL.md` file with YAML frontmatter.
@@ -123,7 +125,8 @@ Create a new directory under `skills/`:
 
 ```
 skills/my-skill/
-└── SKILL.md
+├── SKILL.md
+└── SPEC.md
 ```
 
 **SKILL.md format:**
@@ -149,6 +152,10 @@ Concrete examples showing expected input/output.
 - Specific rules to follow
 - Edge cases to handle
 ```
+
+**SPEC.md format:**
+
+Use `SPEC.md` as the maintenance contract for the skill. It should describe intent, scope, trigger context, source/evidence model, reference architecture, evaluation expectations, known limitations, and maintenance notes. Keep runtime instructions in `SKILL.md`; keep source inventories in `SOURCES.md`; keep durable examples in `references/evidence/`.
 
 #### Naming Conventions
 

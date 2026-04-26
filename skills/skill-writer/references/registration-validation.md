@@ -5,7 +5,7 @@ Apply registration and quality checks before completion.
 ## Registration checklist
 
 1. Inspect the workspace and identify the active skill layout before editing files.
-2. Create/update `<skill-root>/SKILL.md` and any bundled `references/`, `scripts/`, or `assets/` beneath that root.
+2. Create/update `<skill-root>/SKILL.md`, `<skill-root>/SPEC.md` when required by change scope, and any bundled `references/`, `scripts/`, or `assets/` beneath that root.
 3. Default to `.agents/skills/<name>/` when there is no stronger prior art.
 4. If the workspace clearly uses a different canonical layout, follow that layout instead of forcing `.agents/skills/`.
 5. Common established alternatives include:
@@ -37,11 +37,11 @@ If you must run the validator from another working directory, convert both paths
 - transformed examples exist in references (happy-path, secure/robust, anti-pattern+fix)
 - synthesis depth gates are satisfied
 - selected example profile requirements are satisfied and reported
+- `SPEC.md` exists or was updated when the change creates a skill or materially changes intent, scope, evidence model, evaluation, or maintenance expectations
 
 3. Confirm for integration/documentation skills:
-- `references/api-surface.md` exists
-- `references/common-use-cases.md` exists with sufficient depth
-- `references/troubleshooting-workarounds.md` exists with sufficient depth
+- focused references cover API surface, common use cases, known issues/workarounds, and version variance
+- reference file names fit the skill's domain rather than a fixed template
 - `SKILL.md` and `references/*.md` avoid host-specific absolute filesystem paths
 
 4. Confirm portability for skills that are expected to be portable by default:
@@ -54,7 +54,8 @@ If you must run the validator from another working directory, convert both paths
 - qualitative depth rubric status for API/workaround/use-case/gap handling (recommended for integration/documentation and skill-authoring)
 - deeper eval or quantitative summary only if user requested benchmark mode or risk warrants it
 
-6. Reject shallow handoffs that omit required artifacts.
+6. Review validator warnings for long reference files and split files when warnings indicate mixed concerns or poor navigation.
+7. Reject shallow handoffs that omit required artifacts.
 
 ## Required output
 

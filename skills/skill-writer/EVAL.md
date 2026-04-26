@@ -21,10 +21,8 @@ Mandatory source retrieval:
 - In-repo usage scan for key APIs (for example Agent, agentLoop, streamProxy, convertToLlm, transformContext, steer, followUp, continue)
 
 Required depth artifacts:
-- `references/api-surface.md`
-- `references/common-use-cases.md` (at least 6 concrete downstream use cases)
-- `references/troubleshooting-workarounds.md` (at least 8 failure modes with fixes/workarounds)
-- `references/integration-patterns.md` (happy path, robust variant, anti-pattern + correction)
+- focused references covering API surface, at least 6 concrete downstream use cases, and at least 8 failure modes with fixes/workarounds
+- a focused integration-patterns or examples reference with happy path, robust variant, and anti-pattern + correction
 
 Depth gates (hard fail if missing):
 - Coverage matrix includes: API surface, options/config, runtime lifecycle, event semantics, queue semantics, failure modes, version variance, downstream usage patterns.

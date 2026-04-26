@@ -4,6 +4,8 @@ Use this path when improving a skill based on outcomes and examples.
 
 ## Example intake
 
+Read `references/iteration-evidence.md` when examples should be persisted across future skill revisions.
+
 Capture example records with:
 
 - label (`positive` or `negative`)
@@ -26,6 +28,9 @@ Capture example records with:
 3. Update transformed examples when guidance changes.
 4. Record deltas in `SOURCES.md` changelog.
 5. Expand input collection when failures indicate coverage gaps.
+6. Store durable positive/negative examples in `references/evidence/` instead of overloading `SKILL.md`, `SOURCES.md`, or a generic reference file.
+7. Keep holdout examples separate from working examples until validation is complete.
+8. Update `SPEC.md` when iteration changes the skill's intended scope, evidence model, evaluation gates, or known limitations.
 
 ## Required output
 

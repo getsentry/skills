@@ -3,6 +3,7 @@
 ## Skill Structure
 ```
 skills/<skill-name>/SKILL.md
+skills/<skill-name>/SPEC.md
 ```
 
 If you use Claude marketplace sparse checkouts for this repo, include `skills` and `agents` alongside `.claude-plugin` because the root plugin manifest loads repo-root `skills/` and `agents/`.
@@ -16,9 +17,10 @@ ALWAYS use `/skill-writer` — it handles requirements, writing, registration, a
 
 ### Registration Checklist
 1. Create `skills/<skill-name>/SKILL.md`
-2. Add to `README.md` Available Skills table (alphabetical by canonical skill name; exclude aliases/symlinks)
-3. Add to `.claude/settings.json`: `Skill(sentry-skills:<skill-name>)`
-4. Add to allowlist in `skills/claude-settings-audit/SKILL.md`
+2. Create `skills/<skill-name>/SPEC.md`
+3. Add to `README.md` Available Skills table (alphabetical by canonical skill name; exclude aliases/symlinks)
+4. Add to `.claude/settings.json`: `Skill(sentry-skills:<skill-name>)`
+5. Add to allowlist in `skills/claude-settings-audit/SKILL.md`
 
 ## Key Conventions
 - Frontmatter `---` must be the **first line** of SKILL.md — no comments before it
@@ -27,6 +29,7 @@ ALWAYS use `/skill-writer` — it handles requirements, writing, registration, a
 - Attribution comments go **after** the closing `---`
 - Python scripts: always use `uv run <script>`, never `python` or `python3`
 - Keep SKILL.md under 500 lines; move reference material to `references/`
+- Keep runtime instructions in `SKILL.md`; put intent, source/evidence model, evaluation, limitations, and maintenance rules in `SPEC.md`
 
 ## Commit Attribution
 AI commits MUST include:

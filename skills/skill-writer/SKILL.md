@@ -14,15 +14,19 @@ Load only the path(s) required for the task:
 |------|------|
 | Set skill class and required dimensions | `references/mode-selection.md` |
 | Apply writing constraints for depth vs concision | `references/design-principles.md` |
+| Decide what belongs in SKILL.md vs reference files | `references/reference-architecture.md` |
+| Create or update a skill maintenance specification | `references/spec-template.md` |
 | Select structure pattern for this skill | `references/skill-patterns.md` |
 | Select workflow orchestration pattern for process-heavy skills | `references/workflow-patterns.md` |
 | Select output format pattern for deterministic quality | `references/output-patterns.md` |
 | Choose workflow path and required outputs | `references/mode-selection.md` |
+| Find high-signal source material, including history | `references/source-discovery.md` |
 | Load representative synthesis examples by skill type | `references/examples/*.md` |
 | Synthesize external/local sources with depth gates | `references/synthesis-path.md` |
 | Author or update SKILL.md and supporting files | `references/authoring-path.md` |
 | Optimize skill description and trigger precision | `references/description-optimization.md` |
 | Iterate using positive/negative/fix examples | `references/iteration-path.md` |
+| Store improvement evidence for future iterations | `references/iteration-evidence.md` |
 | Evaluate behavior and compare baseline vs with-skill (opt-in quantitative) | `references/evaluation-path.md` |
 | Register and validate skill changes | `references/registration-validation.md` |
 
@@ -50,20 +54,22 @@ Load only the path(s) required for the task:
 Read `references/synthesis-path.md`.
 
 1. Collect and score relevant sources with provenance.
-2. Apply trust and safety rules when ingesting external content.
-3. Produce source-backed decisions and coverage/gap status.
-4. Load one or more profiles from `references/examples/*.md` when the skill is hybrid.
-5. Enforce baseline source pack for skill-authoring workflows.
-6. Enforce depth gates before moving to authoring.
+2. Read `references/source-discovery.md` when source material is thin, stale, or ambiguous.
+3. Apply trust and safety rules when ingesting external content.
+4. Produce source-backed decisions and coverage/gap status.
+5. Load one or more profiles from `references/examples/*.md` when the skill is hybrid.
+6. Enforce baseline source pack for skill-authoring workflows.
+7. Enforce depth gates before moving to authoring.
 
 ## Step 3: Run iteration first when improving from outcomes/examples
 
 Read `references/iteration-path.md` first when selected path includes `iteration` (for example operation `iterate`).
 
 1. Capture and anonymize examples with provenance.
-2. Re-evaluate skill behavior against working and holdout slices.
-3. Propose improvements from positive/negative/fix evidence.
-4. Carry concrete behavior deltas into authoring.
+2. Read `references/iteration-evidence.md` when examples should persist beyond the current turn.
+3. Re-evaluate skill behavior against working and holdout slices.
+4. Propose improvements from positive/negative/fix evidence.
+5. Carry concrete behavior deltas into authoring.
 
 Skip this step when selected path does not include `iteration`.
 
@@ -72,10 +78,12 @@ Skip this step when selected path does not include `iteration`.
 Read `references/authoring-path.md`.
 
 1. Write or update `SKILL.md` in imperative voice with trigger-rich description.
-2. Create focused reference files and scripts only when justified.
-3. Follow `references/skill-patterns.md`, `references/workflow-patterns.md`, and
+2. Read `references/reference-architecture.md` before adding bulk instructions or new reference files.
+3. Create or update `SPEC.md` using `references/spec-template.md` when creating a new skill or materially changing an existing skill's intent, sources, evaluation, or maintenance model.
+4. Create focused reference files and scripts only when justified.
+5. Follow `references/skill-patterns.md`, `references/workflow-patterns.md`, and
    `references/output-patterns.md` for structure and output determinism.
-4. For authoring/generator skills, include transformed examples in references:
+6. For authoring/generator skills, include transformed examples in references:
    - happy-path
    - secure/robust variant
    - anti-pattern + corrected version
