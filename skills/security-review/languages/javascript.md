@@ -122,9 +122,12 @@ res.render('template', { name: userInput });  // EJS, Pug, Handlebars
 ### Flag These (Express-Specific)
 
 ```javascript
-// SQL Injection
-db.query(`SELECT * FROM users WHERE id = ${userId}`);  // FLAG
-connection.query('SELECT * FROM users WHERE name = "' + name + '"');  // FLAG
+// SQL Injection - DO NOT USE
+// db.query(`SELECT * FROM users WHERE id = ${userId}`);  // FLAG
+// connection.query('SELECT * FROM users WHERE name = "' + name + '"');  // FLAG
+// Use parameterized queries instead:
+db.query('SELECT * FROM users WHERE id = ?', [userId]);  // CORRECT
+connection.query('SELECT * FROM users WHERE name = ?', [name]);  // CORRECT
 
 // NoSQL Injection
 db.collection('users').find({ $where: userInput });  // FLAG: Code execution

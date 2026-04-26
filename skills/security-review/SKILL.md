@@ -202,8 +202,10 @@ child_process.exec(user)   # Node.js
 innerHTML = userInput              # DOM XSS
 dangerouslySetInnerHTML={user}     # React XSS
 v-html="userInput"                 # Vue XSS
-f"SELECT * FROM x WHERE {user}"    # SQL injection
-`SELECT * FROM x WHERE ${user}`    # SQL injection
+# f"SELECT * FROM x WHERE {user}"    # SQL injection - DO NOT USE
+cursor.execute("SELECT * FROM x WHERE col = %s", (user,))  # CORRECT
+# `SELECT * FROM x WHERE ${user}`    # SQL injection - DO NOT USE
+db.query('SELECT * FROM x WHERE col = ?', [user]);  # CORRECT
 os.system(f"cmd {user_input}")     # Command injection
 ```
 

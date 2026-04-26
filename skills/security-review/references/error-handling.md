@@ -319,11 +319,14 @@ process.on('unhandledRejection', (reason, promise) => {
 ### Verbose Database Errors
 
 ```python
-# VULNERABLE: Database errors exposed
+# VULNERABLE: Database errors exposed + SQL injection
 @app.route('/api/search')
 def search():
     try:
-        results = db.execute(f"SELECT * FROM items WHERE name = '{query}'")
+        # VULNERABLE: SQL injection - DO NOT USE
+        # results = db.execute(f"SELECT * FROM items WHERE name = '{query}'")
+        # Use parameterized query instead:
+        results = db.execute(text("SELECT * FROM items WHERE name = :name"), {"name": query})
         return jsonify(results)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
