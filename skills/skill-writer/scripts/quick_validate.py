@@ -25,6 +25,7 @@ import yaml
 MAX_NAME_LENGTH = 64
 MAX_DESCRIPTION_LENGTH = 1024
 MAX_SKILL_LINES = 500
+REFERENCE_LINE_WARNING = 150
 
 SKILL_CLASSES = {
     "auto",
@@ -43,11 +44,17 @@ INTEGRATION_REQUIRED_DIMENSIONS = [
     ("Version/migration variance", ("version", "migration", "deprecation", "variance")),
 ]
 
-INTEGRATION_REQUIRED_REFERENCES = {
-    "references/api-surface.md": None,
-    "references/common-use-cases.md": 6,
-    "references/troubleshooting-workarounds.md": 8,
-}
+SPEC_REQUIRED_HEADINGS = (
+    "Intent",
+    "Scope",
+    "Users And Trigger Context",
+    "Runtime Contract",
+    "Source And Evidence Model",
+    "Reference Architecture",
+    "Evaluation",
+    "Known Limitations",
+    "Maintenance Notes",
+)
 
 PARTIAL_STATUS_TOKENS = ("partial", "missing", "incomplete", "todo", "unknown")
 ACTION_TOKENS = (
@@ -156,20 +163,6 @@ def parse_open_gap_lines(sources_markdown: str) -> list[str]:
     return [ln.strip() for ln in raw_lines if ln.strip()]
 
 
-def count_list_items(markdown: str) -> int:
-    count = 0
-    in_fenced_code = False
-    for line in markdown.splitlines():
-        if re.match(r"^\s*(```|~~~)", line):
-            in_fenced_code = not in_fenced_code
-            continue
-        if in_fenced_code:
-            continue
-        if re.match(r"^\s*(?:-|\d+\.)\s+", line):
-            count += 1
-    return count
-
-
 def find_machine_specific_paths(text: str) -> list[str]:
     matches: list[str] = []
     for pattern in MACHINE_SPECIFIC_PATH_PATTERNS:
@@ -207,6 +200,53 @@ def validate_portable_paths(
         severity.append(
             "Machine-specific absolute filesystem paths detected. Use portable placeholders like "
             "`<repo-root>/...` or `<skill-dir>/...`. Offenders: " + "; ".join(portability_hits)
+        )
+
+
+def validate_reference_lengths(skill_path: Path, warnings: list[str]) -> None:
+    refs_dir = skill_path / "references"
+    if not refs_dir.exists():
+        return
+
+    long_refs: list[str] = []
+    for ref_path in sorted(refs_dir.rglob("*.md")):
+        line_count = len(ref_path.read_text().splitlines())
+        if line_count > REFERENCE_LINE_WARNING:
+            long_refs.append(f"{ref_path.relative_to(skill_path)} ({line_count} lines)")
+
+    if long_refs:
+        warnings.append(
+            "Long reference file(s) detected. Consider splitting by lookup need or adding navigation: "
+            + "; ".join(long_refs)
+        )
+
+
+def validate_spec_md(
+    skill_path: Path,
+    strict_depth: bool,
+    errors: list[str],
+    warnings: list[str],
+) -> None:
+    spec_md = skill_path / "SPEC.md"
+    if not spec_md.exists():
+        return
+
+    severity = errors if strict_depth else warnings
+    spec_content = spec_md.read_text()
+    missing_headings = [
+        heading
+        for heading in SPEC_REQUIRED_HEADINGS
+        if not re.search(rf"^##\s+{re.escape(heading)}\s*$", spec_content, re.MULTILINE)
+    ]
+    if missing_headings:
+        severity.append("SPEC.md is missing required heading(s): " + ", ".join(missing_headings))
+
+    spec_hits = find_machine_specific_paths(spec_content)
+    if spec_hits:
+        severity.append(
+            "SPEC.md contains machine-specific absolute filesystem paths. "
+            "Use portable placeholders like `<repo-root>/...` or `<skill-dir>/...`. "
+            "Offenders: " + ", ".join(spec_hits[:3])
         )
 
 
@@ -251,18 +291,6 @@ def validate_integration_depth(
             if not actionable:
                 severity.append(
                     "Coverage matrix has partial/missing dimensions but `## Open gaps` lacks actionable next retrieval steps"
-                )
-
-    for rel_path, min_items in INTEGRATION_REQUIRED_REFERENCES.items():
-        ref_path = skill_path / rel_path
-        if not ref_path.exists():
-            severity.append(f"Missing required reference for integration/documentation skill: {rel_path}")
-            continue
-        if min_items is not None:
-            item_count = count_list_items(ref_path.read_text())
-            if item_count < min_items:
-                severity.append(
-                    f"{rel_path} has {item_count} list items; expected at least {min_items} for sufficient depth"
                 )
 
 
@@ -426,6 +454,8 @@ def validate_skill(
     if resolved_skill_class == "integration-documentation":
         validate_integration_depth(skill_path, strict_depth, errors, warnings)
     validate_portable_paths(skill_path, content, strict_depth, errors, warnings)
+    validate_reference_lengths(skill_path, warnings)
+    validate_spec_md(skill_path, strict_depth, errors, warnings)
 
     return len(errors) == 0, errors, warnings, resolved_skill_class
 

@@ -172,9 +172,9 @@ Fix GitHub issue $ARGUMENTS following our coding standards.
 
 ### Extraneous Files
 
-**Problem:** The skill directory includes README.md, CHANGELOG.md, INSTALLATION_GUIDE.md, or other documentation files.
+**Problem:** The skill directory includes README.md, CHANGELOG.md, INSTALLATION_GUIDE.md, or other documentation files that do not help agents run, evaluate, or maintain the skill.
 
-**Fix:** A skill should only contain files an agent needs to do the job: SKILL.md, references, scripts, assets, and LICENSE. Remove user-facing docs, development history, and setup guides.
+**Fix:** A skill should only contain files an agent needs to run, evaluate, or maintain the skill: SKILL.md, SPEC.md, SOURCES.md, EVAL.md, references, scripts, assets, and LICENSE. Remove user-facing docs, duplicated development history, and setup guides.
 
 ### Scripts Without Documentation
 

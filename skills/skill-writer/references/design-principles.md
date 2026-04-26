@@ -137,6 +137,12 @@ Information should live in either SKILL.md or reference files, not both. Prefer 
 
 Similarly, don't repeat conventions already in project agent docs such as `AGENTS.md` or `CLAUDE.md`. Reference them instead of copying the entire format spec.
 
+## Avoid Catch-All References
+
+Reference files should be small enough that their filename predicts their contents. Avoid putting source notes, examples, troubleshooting, and evaluation data into one generic reference file. Split by the agent's lookup need so the skill can load exactly the context required for the current task.
+
+Use `references/evidence/` for persistent iteration findings, not `SKILL.md` and not a generic notes file.
+
 ## Avoid Time-Sensitive Information
 
 Don't include information that will become outdated:
