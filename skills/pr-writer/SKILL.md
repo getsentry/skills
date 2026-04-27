@@ -57,17 +57,55 @@ Understand the scope and purpose of all changes before writing the description.
 
 ### Step 3: Write the PR Description
 
-Use this structure for PR descriptions (ignoring any repository PR templates):
+Use this structure for PR descriptions, ignoring any repository PR templates:
 
 ```markdown
-<brief description of what the PR does>
-
-<why these changes are being made - the motivation>
-
-<alternative approaches considered, if any>
-
-<any additional context reviewers need>
+<1-3 sentence summary of the change and why it matters. Keep this short.>
 ```
+
+When there is a known issue, ticket, or related PR, add references at the end. Do not invent one.
+
+When the PR has distinct changes reviewers should scan, add 0-3 bold emphasis blocks after the opening summary:
+
+```markdown
+**<Important Change>**
+
+<1-2 sentences explaining the important implementation, behavior, or review-relevant change.>
+```
+
+When direct comparison is the clearest explanation, add a before/after block under the relevant paragraph or emphasis block:
+
+````markdown
+Before, <old shape or behavior in one sentence>:
+
+```<format-or-pseudocode>
+...
+```
+
+After, <new shape or behavior in one sentence>:
+
+```<format-or-pseudocode>
+...
+```
+````
+
+Treat the bold sections as optional emphasis blocks, not mandatory headings. Use them when the PR has one or more distinct changes that reviewers should scan quickly. Omit them for simple PRs where the opening summary is enough.
+
+Use before/after examples only when that is the clearest way to explain the changeset. They are usually useful for changed contracts or output shapes, such as JSON responses, schemas, config, CLI output, event payloads, permissions, or input formats. Omit them when prose is clearer.
+
+Prefer:
+- A concise opening summary, usually 1-3 sentences
+- 0-3 bold emphasis blocks for the parts that matter most
+- Before/after examples only for changes that benefit from direct comparison, with separate fenced blocks for the old and new forms
+- Known issue references at the end, when available
+
+Avoid:
+- Essays, exhaustive file-by-file walkthroughs, or copied commit logs
+- Generic headings like "Summary" or "Changes"
+- A bold block for every touched file
+- Inline before/after snippets that are hard to compare
+- Placeholder issue references when no issue is known
+- Repeating details that are obvious from the diff
 
 **Do NOT include:**
 - "Test plan" sections
@@ -76,10 +114,10 @@ Use this structure for PR descriptions (ignoring any repository PR templates):
 - Customer data — customer/org names, user emails, support ticket contents, or PII. Describe the technical symptom, not who hit it, and if available, reference the internal ticket (e.g. `Fixes SENTRY-1234`). PRs are typically public on open-source repos.
 
 **Do include:**
-- Clear explanation of what and why
-- Links to relevant issues or tickets
+- Clear explanation of what changed and why it matters
+- Links to relevant issues or tickets, when known
 - Context that isn't obvious from the code
-- Notes on specific areas that need careful review
+- Specific review notes when a part of the diff needs extra attention
 
 ### Step 4: Create the PR
 
@@ -97,6 +135,15 @@ EOF
 
 ## PR Description Examples
 
+### Simple PR
+
+```markdown
+Collapse the AI Customizations section by default in the sessions sidebar.
+
+The section now starts hidden so it does not consume space before users need
+it. Users who expand it keep the same persisted preference behavior as before.
+```
+
 ### Feature PR
 
 ```markdown
@@ -106,38 +153,73 @@ When an alert is updated or resolved, we now post a reply to the original
 Slack thread instead of creating a new message. This keeps related
 notifications grouped and reduces channel noise.
 
-Previously considered posting edits to the original message, but threading
-better preserves the timeline of events and works when the original message
-is older than Slack's edit window.
+**Notification Threading**
+
+Resolved and updated alerts now reply to the original Slack message instead
+of creating a new channel message.
 
 Refs SENTRY-1234
 ```
 
-### Bug Fix PR
+### Schema Change PR
 
-```markdown
-Handle null response in user API endpoint
+````markdown
+Switch run logs to chunk-level JSONL records
 
-The user endpoint could return null for soft-deleted accounts, causing
-dashboard crashes when accessing user properties. This adds a null check
-and returns a proper 404 response.
+Run logs now write one versioned record per analyzed chunk instead of one
+large skill-level record. This lets `warden runs follow` show findings as
+chunks complete while preserving durable run reconstruction at finalization.
 
-Found while investigating SENTRY-5678.
+**JSONL Shape**
 
-Fixes SENTRY-5678
+Before, each line represented a full skill result:
+
+```jsonc
+{
+  "run": {...},
+  "skill": "security-review",
+  "summary": "Found 2 issues",
+  "findings": [...],
+  "files": [...]
+}
 ```
+
+After, each line represents one chunk result:
+
+```jsonc
+{
+  "schemaVersion": 1,
+  "run": {...},
+  "skill": "security-review",
+  "chunk": {
+    "file": "src/api/auth.ts",
+    "index": 1,
+    "total": 2,
+    "lineRange": "42-45"
+  },
+  "status": "ok",
+  "findings": [...]
+}
+```
+
+Refs WARDEN-123
+````
 
 ### Refactor PR
 
-```markdown
+````markdown
 Extract validation logic to shared module
 
 Moves duplicate validation code from the alerts, issues, and projects
 endpoints into a shared validator class. No behavior change.
 
-This prepares for adding new validation rules in SENTRY-9999 without
-duplicating logic across endpoints.
-```
+**Shared Validator**
+
+The shared class keeps the existing endpoint behavior but gives future
+validation rules one place to live.
+
+Refs SENTRY-9999
+````
 
 ## Issue References
 
