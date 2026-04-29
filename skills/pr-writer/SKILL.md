@@ -55,7 +55,9 @@ git diff BASE...HEAD
 
 Understand the scope and purpose of all changes before writing the description.
 
-### Step 3: Write the PR Description
+### Step 3: Write or Update the PR Description
+
+Use this same structure whether you are opening a new PR or updating an existing PR body. When updating, rewrite the final PR body so it still matches this structure instead of appending ad hoc notes or preserving repository template sections.
 
 Use this structure for PR descriptions, ignoring any repository PR templates:
 
@@ -118,6 +120,8 @@ Avoid:
 - Links to relevant issues or tickets, when known
 - Context that isn't obvious from the code
 - Specific review notes when a part of the diff needs extra attention
+
+If the existing PR body has stale context, repo-template scaffolding, or a delta-only update note, remove or rewrite it so the final body reads as one coherent description of the current PR.
 
 ### Step 4: Create the PR
 
@@ -241,12 +245,12 @@ Reference issues in the PR body:
 
 ## Editing Existing PRs
 
-If you need to update a PR after creation, use `gh api` instead of `gh pr edit`:
+If you need to update a PR after creation, first rewrite the title and/or body using the same rules from Step 3, then use `gh api` instead of `gh pr edit`:
 
 ```bash
 # Update PR description
 gh api -X PATCH repos/{owner}/{repo}/pulls/PR_NUMBER -f body="$(cat <<'EOF'
-Updated description here
+<updated description body here>
 EOF
 )"
 
@@ -256,7 +260,10 @@ gh api -X PATCH repos/{owner}/{repo}/pulls/PR_NUMBER -f title='new: Title here'
 # Update both
 gh api -X PATCH repos/{owner}/{repo}/pulls/PR_NUMBER \
   -f title='new: Title' \
-  -f body='New description'
+  -f body="$(cat <<'EOF'
+<updated description body here>
+EOF
+)"
 ```
 
 Note: `gh pr edit` is currently broken due to GitHub's Projects (classic) deprecation.
