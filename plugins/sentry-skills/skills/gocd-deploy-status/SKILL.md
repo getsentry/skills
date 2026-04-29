@@ -64,9 +64,37 @@ When `failures` returns `log_status: "archived"`, the run is older than ~30 days
 
 ## Authentication
 
-The skill fetches the GoCD token from GCP Secret Manager (`gocd-access-token` in `dicd-team-devinfra-cd`) and mints an IAP identity token via service account impersonation. To use a personal read-only token instead, set `GOCD_ACCESS_TOKEN` -- it takes precedence over the Secret Manager fetch.
+Two tokens are needed: a GoCD bearer token and a Google IAP identity token. The IAP token is minted automatically via service account impersonation (no setup needed beyond `gcloud auth login` + `role-deploy-user@sentry.io` membership). For the GoCD token there are two paths:
 
-See [references/gocd_skill_auth.md](references/gocd_skill_auth.md) for the full auth flow.
+1. **Default**: fetched from GCP Secret Manager (`gocd-access-token` in `dicd-team-devinfra-cd`). Admin-scoped; anyone with project access can read it. Works out of the box, no setup.
+2. **Personal read-only token (preferred)**: mint your own from GoCD's UI. Smaller blast radius (read-only enforced server-side) and produces per-user audit trails on the GoCD side.
+
+### First-time setup with a personal read-only token
+
+1. Open https://deploy.getsentry.net in your browser. Click your avatar (top right) → "Personal Access Tokens".
+2. Click "Generate Token". Give it a name like `claude-code-readonly`. Copy the value -- GoCD only shows it once.
+3. Make `GOCD_ACCESS_TOKEN` available in the shell where Claude Code runs. Pick whichever fits your workflow:
+
+   **Shell rc file (simplest, persistent):**
+   ```bash
+   echo 'export GOCD_ACCESS_TOKEN=<your-token>' >> ~/.zshrc
+   source ~/.zshrc
+   ```
+
+   **Project-local `.env` with `direnv`:**
+   ```bash
+   echo 'export GOCD_ACCESS_TOKEN=<your-token>' >> .envrc
+   direnv allow
+   ```
+
+   **Inline for one-off use:**
+   ```bash
+   GOCD_ACCESS_TOKEN=<your-token> uv run ${CLAUDE_SKILL_ROOT}/scripts/gocd.py status getsentry-backend
+   ```
+
+When `GOCD_ACCESS_TOKEN` is set, the skill skips Secret Manager entirely. Tokens don't auto-expire; rotate manually via the same GoCD UI when needed.
+
+See [references/gocd_skill_auth.md](references/gocd_skill_auth.md) for the full auth flow including how IAP impersonation works.
 
 ## Errors
 
