@@ -25,6 +25,7 @@ Run all commands with `uv run ${CLAUDE_SKILL_ROOT}/scripts/gocd.py <cmd>`:
 | `job-log <pipeline> <pctr> <stage> <sctr> <job> [--tail N] [--full]` | Console log; smart-deduped by default |
 | `find-deploy <sha> <pipeline-or-group> [--count N]` | Find runs containing a commit SHA |
 | `failures <pipeline-or-group> [--count N]` | Recent failed runs with failed-job log excerpt |
+| `paused [group]` | List currently-paused pipelines; scope to a group or scan all |
 
 The `status`, `find-deploy`, and `failures` commands resolve `<name>` as either a pipeline or a group; group output wraps results from each pipeline in the group.
 
@@ -48,9 +49,11 @@ The `status`, `find-deploy`, and `failures` commands resolve `<name>` as either 
 
 `failures <group>` -- one call returns recent failed runs across the group, each with the failed stage, failed jobs, and last 50 lines of the first failed job's console log (deduped). For the full log on a specific job, follow up with `job-log ... --full`.
 
-**"Why is this pipeline paused?"**
+**"What's paused right now?"**
 
-Sentry's deploy scripts auto-pause pipelines when canary fails (see `getsentry/gocd/templates/bash/backend/rollback-canary-and-pause.sh`). When `status` shows `paused: true`, check `paused_cause` and run `failures <pipeline>` -- the most recent failed run usually has the answer.
+`paused [group]` -- scope to a group (e.g. `paused getsentry-backend`) or omit to scan everything. Returns each paused pipeline with `paused_by` and `paused_cause`. Sentry's deploy scripts auto-pause pipelines when canary fails (see `getsentry/gocd/templates/bash/backend/rollback-canary-and-pause.sh`), so a paused pipeline often means something broke -- follow up with `failures <pipeline>` to see why.
+
+When `failures` returns `log_status: "archived"`, the run is older than ~30 days and its logs were moved to GCS; for those, fall back to the GoCD web UI.
 
 **"What's deploying right now?"**
 

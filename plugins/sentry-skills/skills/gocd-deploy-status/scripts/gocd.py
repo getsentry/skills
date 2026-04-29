@@ -14,6 +14,7 @@ Commands: pipelines, status, history, stage, job-log
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import json
 import os
 import re
@@ -105,12 +106,25 @@ def api_get_text(session: requests.Session, path: str) -> str:
     return resp.text
 
 
-def try_get_text(session: requests.Session, path: str) -> str | None:
-    """Like api_get_text but returns None on any failure (used for best-effort log fetches)."""
+def try_get_text(session: requests.Session, path: str) -> tuple[str | None, int | None]:
+    """Best-effort text fetch. Returns (text, http_status). text is None on any failure;
+    http_status is None on connection errors, otherwise the response code."""
     try:
         resp = session.get(f"{GOCD_HOST}{path}")
-        return resp.text if resp.ok else None
+        return (resp.text, resp.status_code) if resp.ok else (None, resp.status_code)
     except requests.RequestException:
+        return None, None
+
+
+def try_get_json(session: requests.Session, path: str, version: int = 1) -> dict | None:
+    """Best-effort JSON fetch. Returns None on any failure."""
+    try:
+        resp = session.get(
+            f"{GOCD_HOST}{path}",
+            headers={"Accept": f"application/vnd.go.cd.v{version}+json"},
+        )
+        return resp.json() if resp.ok else None
+    except (requests.RequestException, ValueError):
         return None
 
 
@@ -363,6 +377,45 @@ def cmd_find_deploy(session: requests.Session, args: argparse.Namespace) -> None
     }, indent=2))
 
 
+def cmd_paused(session: requests.Session, args: argparse.Namespace) -> None:
+    """List currently-paused pipelines, optionally scoped to a single group."""
+    groups = fetch_pipeline_groups(session)
+    if args.group:
+        if args.group not in groups:
+            print(json.dumps({
+                "error": f"Group not found: {args.group}",
+                "hint": "Run `pipelines` to list available groups.",
+            }, indent=2))
+            sys.exit(1)
+        targets = [(args.group, p) for p in groups[args.group]]
+    else:
+        targets = [(g, p) for g, ps in groups.items() for p in ps]
+
+    def _check(item: tuple[str, str]) -> dict | None:
+        group, pipeline = item
+        status = try_get_json(session, f"/go/api/pipelines/{pipeline}/status")
+        if not status or not status.get("paused"):
+            return None
+        return {
+            "group": group,
+            "pipeline": pipeline,
+            "paused_cause": status.get("paused_cause"),
+            "paused_by": status.get("paused_by"),
+        }
+
+    paused = []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as ex:
+        for result in ex.map(_check, targets):
+            if result:
+                paused.append(result)
+
+    print(json.dumps({
+        "scope": args.group or "all",
+        "checked": len(targets),
+        "paused": paused,
+    }, indent=2))
+
+
 def cmd_failures(session: requests.Session, args: argparse.Namespace) -> None:
     """Find recent failed runs in a pipeline or group, with first failed job's log tail."""
     pipelines = resolve_pipelines(session, args.pipeline)
@@ -378,16 +431,20 @@ def cmd_failures(session: requests.Session, args: argparse.Namespace) -> None:
                     j.get("name") for j in stage.get("jobs", []) if j.get("result") == "Failed"
                 ]
                 log_excerpt = None
+                log_status = "no_failed_jobs" if not failed_jobs else "fetch_failed"
                 if failed_jobs:
                     log_path = (
                         f"/go/files/{p}/{run.get('counter')}"
                         f"/{stage.get('name')}/{stage.get('counter')}"
                         f"/{failed_jobs[0]}/cruise-output/console.log"
                     )
-                    raw = try_get_text(session, log_path)
+                    raw, http_status = try_get_text(session, log_path)
                     if raw is not None:
                         deduped, _ = smart_dedup(raw.splitlines())
                         log_excerpt = "\n".join(deduped[-50:])
+                        log_status = "ok"
+                    elif http_status == 404:
+                        log_status = "archived"
                 failures.append({
                     "pipeline": p,
                     "counter": run.get("counter"),
@@ -396,6 +453,7 @@ def cmd_failures(session: requests.Session, args: argparse.Namespace) -> None:
                     "stage_counter": stage.get("counter"),
                     "failed_jobs": failed_jobs,
                     "log_excerpt": log_excerpt,
+                    "log_status": log_status,
                 })
     print(json.dumps({
         "pipeline_or_group": args.pipeline,
@@ -441,6 +499,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("pipeline")
     p.add_argument("--count", type=int, default=10, help="Runs per pipeline to scan (default 10)")
 
+    p = sub.add_parser("paused", help="List currently-paused pipelines")
+    p.add_argument("group", nargs="?", help="Optional group to scope to; default scans all")
+
     return parser
 
 
@@ -455,6 +516,7 @@ def main() -> None:
         "job-log": cmd_job_log,
         "find-deploy": cmd_find_deploy,
         "failures": cmd_failures,
+        "paused": cmd_paused,
     }[args.command](session, args)
 
 
