@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -102,6 +103,49 @@ def api_get_text(session: requests.Session, path: str) -> str:
         print(json.dumps({"error": f"HTTP {resp.status_code}", "message": resp.text[:500]}, indent=2))
         sys.exit(1)
     return resp.text
+
+
+def try_get_text(session: requests.Session, path: str) -> str | None:
+    """Like api_get_text but returns None on any failure (used for best-effort log fetches)."""
+    try:
+        resp = session.get(f"{GOCD_HOST}{path}")
+        return resp.text if resp.ok else None
+    except requests.RequestException:
+        return None
+
+
+_DEDUP_DIGIT_RE = re.compile(r"\d+")
+
+
+def smart_dedup(lines: list[str], min_run: int = 4) -> tuple[list[str], dict]:
+    """Collapse runs of >=min_run consecutive lines that differ only in digit fields.
+
+    Replaces digit sequences with `#` to detect "same line, different counter/timestamp/host"
+    patterns common in deploy logs (e.g. `Pod 1/100 ready`, `[12:34:01] migrating ...`).
+    """
+    if len(lines) < min_run:
+        return lines, {"groups_collapsed": 0, "lines_saved": 0}
+
+    out: list[str] = []
+    groups = 0
+    saved = 0
+    i = 0
+    while i < len(lines):
+        norm = _DEDUP_DIGIT_RE.sub("#", lines[i])
+        j = i + 1
+        while j < len(lines) and _DEDUP_DIGIT_RE.sub("#", lines[j]) == norm:
+            j += 1
+        run = j - i
+        if run >= min_run:
+            out.append(lines[i])
+            out.append(f"... [{run - 2} similar lines collapsed] ...")
+            out.append(lines[j - 1])
+            groups += 1
+            saved += run - 3
+        else:
+            out.extend(lines[i:j])
+        i = j
+    return out, {"groups_collapsed": groups, "lines_saved": saved}
 
 
 def fmt_timestamp(ms: int | None) -> str | None:
@@ -201,9 +245,13 @@ def cmd_status(session: requests.Session, args: argparse.Namespace) -> None:
         print(json.dumps({"group": args.pipeline, "pipelines": results}, indent=2))
 
 
+GOCD_PAGE_SIZE_MIN = 10
+
+
 def cmd_history(session: requests.Session, args: argparse.Namespace) -> None:
-    data = api_get(session, f"/go/api/pipelines/{args.pipeline}/history?page_size={args.count}")
-    runs = [fmt_pipeline_run(r) for r in data.get("pipelines", [])]
+    page_size = max(GOCD_PAGE_SIZE_MIN, args.count)
+    data = api_get(session, f"/go/api/pipelines/{args.pipeline}/history?page_size={page_size}")
+    runs = [fmt_pipeline_run(r) for r in data.get("pipelines", [])][:args.count]
     print(json.dumps({"pipeline": args.pipeline, "total": len(runs), "runs": runs}, indent=2))
 
 
@@ -244,11 +292,22 @@ def cmd_job_log(session: requests.Session, args: argparse.Namespace) -> None:
         f"/{args.stage}/{args.stage_counter}"
         f"/{args.job}/cruise-output/console.log"
     )
-    lines = api_get_text(session, path).splitlines()
-    total = len(lines)
-    truncated = bool(args.tail) and total > args.tail
-    if truncated:
-        lines = lines[-args.tail:]
+    raw = api_get_text(session, path).splitlines()
+    total = len(raw)
+
+    if args.full:
+        out_lines = raw
+        dedup_summary: dict | None = None
+        truncated = False
+    else:
+        deduped, dedup_summary = smart_dedup(raw)
+        if args.tail and len(deduped) > args.tail:
+            out_lines = deduped[-args.tail:]
+            truncated = True
+        else:
+            out_lines = deduped
+            truncated = False
+
     print(json.dumps({
         "pipeline": args.pipeline,
         "pipeline_counter": args.pipeline_counter,
@@ -256,9 +315,92 @@ def cmd_job_log(session: requests.Session, args: argparse.Namespace) -> None:
         "stage_counter": args.stage_counter,
         "job": args.job,
         "total_lines": total,
-        "showing_lines": len(lines),
+        "showing_lines": len(out_lines),
         "truncated": truncated,
-        "log": "\n".join(lines),
+        "dedup": dedup_summary,
+        "log": "\n".join(out_lines),
+    }, indent=2))
+
+
+def _scan_run_for_sha(run: dict, sha_lower: str) -> tuple[str | None, str | None]:
+    """Find a (revision, material_name) pair where revision matches the given SHA."""
+    for rev in run.get("build_cause", {}).get("material_revisions", []):
+        for mod in rev.get("modifications", []):
+            revision = (mod.get("revision") or "").lower()
+            if revision and (revision.startswith(sha_lower) or sha_lower in revision):
+                return mod.get("revision"), rev.get("material", {}).get("name")
+    return None, None
+
+
+def cmd_find_deploy(session: requests.Session, args: argparse.Namespace) -> None:
+    """Search recent pipeline runs for ones that include a given commit SHA."""
+    sha_lower = args.sha.lower()
+    pipelines = resolve_pipelines(session, args.pipeline)
+    page_size = max(GOCD_PAGE_SIZE_MIN, args.count)
+    matches = []
+    for p in pipelines:
+        data = api_get(session, f"/go/api/pipelines/{p}/history?page_size={page_size}")
+        for run in data.get("pipelines", [])[:args.count]:
+            rev, mat = _scan_run_for_sha(run, sha_lower)
+            if rev is None:
+                continue
+            matches.append({
+                "pipeline": p,
+                "counter": run.get("counter"),
+                "matched_revision": rev,
+                "material": mat,
+                "scheduled": fmt_timestamp(run.get("scheduled_date")),
+                "stages": [
+                    {"name": s.get("name"), "status": s.get("result") or s.get("status")}
+                    for s in run.get("stages", [])
+                ],
+            })
+    print(json.dumps({
+        "sha": args.sha,
+        "matches": matches,
+        "searched_pipelines": pipelines,
+        "search_window": args.count,
+    }, indent=2))
+
+
+def cmd_failures(session: requests.Session, args: argparse.Namespace) -> None:
+    """Find recent failed runs in a pipeline or group, with first failed job's log tail."""
+    pipelines = resolve_pipelines(session, args.pipeline)
+    page_size = max(GOCD_PAGE_SIZE_MIN, args.count)
+    failures = []
+    for p in pipelines:
+        data = api_get(session, f"/go/api/pipelines/{p}/history?page_size={page_size}")
+        for run in data.get("pipelines", [])[:args.count]:
+            for stage in run.get("stages", []):
+                if stage.get("result") != "Failed":
+                    continue
+                failed_jobs = [
+                    j.get("name") for j in stage.get("jobs", []) if j.get("result") == "Failed"
+                ]
+                log_excerpt = None
+                if failed_jobs:
+                    log_path = (
+                        f"/go/files/{p}/{run.get('counter')}"
+                        f"/{stage.get('name')}/{stage.get('counter')}"
+                        f"/{failed_jobs[0]}/cruise-output/console.log"
+                    )
+                    raw = try_get_text(session, log_path)
+                    if raw is not None:
+                        deduped, _ = smart_dedup(raw.splitlines())
+                        log_excerpt = "\n".join(deduped[-50:])
+                failures.append({
+                    "pipeline": p,
+                    "counter": run.get("counter"),
+                    "scheduled": fmt_timestamp(run.get("scheduled_date")),
+                    "stage": stage.get("name"),
+                    "stage_counter": stage.get("counter"),
+                    "failed_jobs": failed_jobs,
+                    "log_excerpt": log_excerpt,
+                })
+    print(json.dumps({
+        "pipeline_or_group": args.pipeline,
+        "failures": failures,
+        "search_window": args.count,
     }, indent=2))
 
 
@@ -281,13 +423,23 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("stage")
     p.add_argument("stage_counter")
 
-    p = sub.add_parser("job-log", help="Console log for a job")
+    p = sub.add_parser("job-log", help="Console log for a job (smart-deduped by default)")
     p.add_argument("pipeline")
     p.add_argument("pipeline_counter")
     p.add_argument("stage")
     p.add_argument("stage_counter")
     p.add_argument("job")
-    p.add_argument("--tail", type=int, default=200)
+    p.add_argument("--tail", type=int, default=200, help="Lines after dedup to keep (default 200)")
+    p.add_argument("--full", action="store_true", help="Return entire raw log, no dedup or tail")
+
+    p = sub.add_parser("find-deploy", help="Find pipeline runs containing a commit SHA")
+    p.add_argument("sha", help="Full or partial commit SHA")
+    p.add_argument("pipeline", help="Pipeline name or group to search")
+    p.add_argument("--count", type=int, default=20, help="Runs per pipeline to scan (default 20)")
+
+    p = sub.add_parser("failures", help="Recent failed runs in a pipeline or group")
+    p.add_argument("pipeline")
+    p.add_argument("--count", type=int, default=10, help="Runs per pipeline to scan (default 10)")
 
     return parser
 
@@ -301,6 +453,8 @@ def main() -> None:
         "history": cmd_history,
         "stage": cmd_stage,
         "job-log": cmd_job_log,
+        "find-deploy": cmd_find_deploy,
+        "failures": cmd_failures,
     }[args.command](session, args)
 
 

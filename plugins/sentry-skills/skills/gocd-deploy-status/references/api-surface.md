@@ -63,11 +63,13 @@ A pipeline is actively running when `locked: true` and `schedulable: false`.
 ### Pipeline Groups
 
 ```
-GET /go/api/config/pipeline_groups
+GET /go/api/admin/pipeline_groups
 Accept: application/vnd.go.cd.v1+json
 ```
 
-Returns array of `{name, pipelines: [{name, ...}]}`.
+Returns `{_embedded: {groups: [{name, pipelines: [{name, ...}], ...}]}}`.
+
+Note: `page_size` on `/go/api/pipelines/{name}/history` has a server-side minimum of 10 -- requests below that return HTTP 404. Clamp the request and slice client-side.
 
 ### Stage Instance
 
