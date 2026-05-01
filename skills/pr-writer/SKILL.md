@@ -1,6 +1,6 @@
 ---
 name: pr-writer
-description: ALWAYS use this skill when creating or updating pull requests — never create or edit a PR directly without it. Follows Sentry conventions for PR titles, descriptions, and issue references. Trigger on any create PR, open PR, submit PR, make PR, update PR title, update PR description, edit PR, push and create PR, prepare changes for review task, or request for a PR writer.
+description: Create and update pull requests following Sentry conventions. Use when opening a PR or refreshing an existing PR after material changes.
 ---
 
 # PR Writer
@@ -55,9 +55,73 @@ git diff BASE...HEAD
 
 Understand the scope and purpose of all changes before writing the description.
 
-### Step 3: Write or Update the PR Description
+### Step 3: Check Existing PR
+
+If the current branch already has an open PR, inspect the current title and body before rewriting either one:
+
+```bash
+gh pr view PR_NUMBER --json number,title,body,url,baseRefName,headRefName
+```
+
+Treat the current PR title and body as inputs, not source of truth. Compare them against the current diff, not the diff from when the PR was first opened.
+
+When refreshing a PR:
+- Keep the current title only if it still matches the dominant change.
+- Rewrite vague or stale titles.
+- Rewrite the body as a fresh description of the current diff, not an append-only update log.
+
+If the branch already has an open PR, refresh it after material follow-up changes even if the user did not explicitly ask for a PR edit.
+
+Refresh when follow-up commits change reviewer expectations, such as a scope change, a new implementation approach from review feedback, or new context the current title/body no longer explains. Skip trivial edits like typos or rename-only diffs.
+
+### Step 4: Write or Update the PR Title
+
+Write the title before the body, or re-evaluate it before finalizing the body.
+
+**Title format** follows commit conventions:
+- `feat(scope): Add Slack thread replies for alert notifications`
+- `fix(scope): Preserve replay segment cursor across pagination`
+- `ref(scope): Extract shared project validation helper`
+
+Prefer:
+- The dominant change, not the latest commit
+- Specific nouns and verbs
+- The narrowest accurate type and scope
+- One clear change axis a reviewer can scan in a PR list
+
+Avoid:
+- Vague words like `update`, `cleanup`, `misc`, `fix stuff`, or `address feedback`
+- Titles that describe the process instead of the change
+- Titles that no longer match the current branch after follow-up commits
+- Trailing periods
+
+Use this test on updates: if a reviewer read only the title, would they still form the right expectation about the current diff? If not, rewrite it.
+
+### Step 5: Write or Update the PR Description
 
 Use this same structure whether you are opening a new PR or updating an existing PR body. When updating, rewrite the final PR body so it still matches this structure instead of appending ad hoc notes or preserving repository template sections.
+
+Write reviewer-facing prose, not a narrated diff.
+
+The opening summary should usually:
+- Name the primary change
+- Explain the practical effect or behavior change
+- Give the why only when it is not already obvious from the change itself
+
+Prefer:
+- Concrete nouns and verbs
+- The changed behavior before implementation detail
+- Short declarative sentences
+- Details that help a reviewer understand impact, risk, or why the code is shaped this way
+
+Avoid:
+- Throat-clearing like `This PR`, `basically`, `simply`, `just`, `some`, `various`, or `in order to`
+- Empty claims like `improves things`, `cleans things up`, or `makes this better` without saying how
+- File-by-file narration
+- Repeating the diff without adding meaning
+- Long setup or project history before the actual change
+
+When a sentence only restates what the diff already makes obvious, delete it.
 
 Use this structure for PR descriptions, ignoring any repository PR templates:
 
@@ -123,7 +187,9 @@ Avoid:
 
 If the existing PR body has stale context, repo-template scaffolding, or a delta-only update note, remove or rewrite it so the final body reads as one coherent description of the current PR.
 
-### Step 4: Create the PR
+### Step 6: Create or Update the PR
+
+For a new PR, create a draft with the rewritten title and body:
 
 ```bash
 gh pr create --draft --title "<type>(<scope>): <description>" --body "$(cat <<'EOF'
@@ -132,10 +198,16 @@ EOF
 )"
 ```
 
-**Title format** follows commit conventions:
-- `feat(scope): Add new feature`
-- `fix(scope): Fix the bug`
-- `ref: Refactor something`
+For an existing PR, patch the title and body after you have re-evaluated both. If the current title still fits, keep it intentionally rather than skipping title review.
+
+```bash
+gh api -X PATCH repos/{owner}/{repo}/pulls/PR_NUMBER \
+  -f title='new: Title' \
+  -f body="$(cat <<'EOF'
+<updated description body here>
+EOF
+)"
+```
 
 ## PR Description Examples
 
@@ -242,29 +314,8 @@ Reference issues in the PR body:
 - **Keep PRs reviewable** - Smaller PRs get faster, better reviews
 - **Explain the why** - Code shows what; description explains why
 - **Mark WIP early** - Use draft PRs for early feedback
-
-## Editing Existing PRs
-
-If you need to update a PR after creation, first rewrite the title and/or body using the same rules from Step 3, then use `gh api` instead of `gh pr edit`:
-
-```bash
-# Update PR description
-gh api -X PATCH repos/{owner}/{repo}/pulls/PR_NUMBER -f body="$(cat <<'EOF'
-<updated description body here>
-EOF
-)"
-
-# Update PR title
-gh api -X PATCH repos/{owner}/{repo}/pulls/PR_NUMBER -f title='new: Title here'
-
-# Update both
-gh api -X PATCH repos/{owner}/{repo}/pulls/PR_NUMBER \
-  -f title='new: Title' \
-  -f body="$(cat <<'EOF'
-<updated description body here>
-EOF
-)"
-```
+- **Rewrite, don't append** - Updated PRs should read like a fresh description of the current diff
+- **Re-evaluate the title on updates** - Do not assume the existing title still fits after scope changes
 
 Note: `gh pr edit` is currently broken due to GitHub's Projects (classic) deprecation.
 
