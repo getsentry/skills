@@ -49,6 +49,7 @@ Out of scope:
   - `SKILL.md` frontmatter is first line and `name` matches the directory.
   - `description` contains realistic trigger language.
   - `SKILL.md` remains an orchestration/index layer for complex skills.
+  - Runtime guidance should prefer dense structures such as tables, checklists, templates, and examples over explanatory prose.
   - Material skill changes explicitly name the selected execution shape.
   - Advanced mechanics are justified and include portability notes.
   - Supporting references are focused and loaded conditionally.
@@ -136,6 +137,7 @@ Data that must not be stored:
 - The validator checks structure and selected depth gates; it cannot prove that a generated skill is semantically complete.
 - The validator does not yet deeply verify every advanced-shape contract.
 - The validator intentionally does not hardcode or exhaustively validate provider-specific optional frontmatter fields.
+- The validator does not yet strongly enforce prose density; that still relies mostly on authoring guidance and review.
 - Deeper evals are opt-in unless risk or user request justifies the extra cost.
 - Source discovery can still miss private operational knowledge if it is not present in local files, accessible issue/PR history, or supplied context.
 - Provider-specific skill extensions may drift; `skill-writer` treats them as compatibility guidance unless a skill is intentionally provider-specific.

@@ -45,6 +45,7 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 12. Reference files remain split by lookup need rather than topic buckets, even as the set of supported shapes expands.
 13. Subfolders inside `references/` are acceptable when they create clearer lookup leaves, but every bundled reference should still be directly discoverable from `SKILL.md`.
 14. The validator should enforce durable structural guarantees and required fields, but should not hardcode provider-specific optional frontmatter keys.
+15. `skill-writer` should default to dense structures such as tables, checklists, templates, and I/O examples, and should cut explanatory prose unless it prevents a concrete mistake.
 
 ## Coverage matrix
 
@@ -87,3 +88,4 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 - 2026-05-01: Reworked `skill-writer` around explicit execution-shape routing, added shape-specific example profiles, refreshed Claude Code provider mechanics from current official docs, and added eval/source guidance for routing, delegation, hooks, and evaluator loops.
 - 2026-05-01: Replaced generic pattern bucket references with routed leaf files under `references/artifact-layouts/`, `references/workflow-mechanics/`, and `references/claude-code/`; made `SKILL.md` enumerate every bundled reference file with a direct open-when reason.
 - 2026-05-01: Removed the validator's hardcoded optional frontmatter allowlist so provider-specific field drift does not create noisy false warnings.
+- 2026-05-01: Reduced prose-heavy guidance in `skill-writer`, rewrote the main runtime refs into denser tables/checklists, and made compact runtime guidance an explicit contract.

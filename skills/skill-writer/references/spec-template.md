@@ -1,38 +1,40 @@
 # SPEC.md Template
 
-Use this guide to create or update a root-level `SPEC.md` for a skill.
+Use this guide to create or update a root-level `SPEC.md`.
 
-`SPEC.md` is a maintenance specification, not runtime instructions. It explains why the skill exists, what evidence shaped it, what data improves it, how it should be evaluated, and where it should not be used.
+## Use `SPEC.md` For
 
-Use `../SPEC.md` as the canonical filled example for `skill-writer` itself.
+- intent
+- scope
+- trigger context
+- evidence model
+- evaluation expectations
+- limitations
+- maintenance rules
 
-## When To Create Or Update
+Do not put runtime instructions or full provenance tables here.
 
-Create `SPEC.md` when creating a new skill in a repository that accepts maintenance artifacts.
+## Update `SPEC.md` When
 
-Update `SPEC.md` when changing:
+- intent or scope changes
+- trigger strategy changes
+- evidence sources or storage policy changes
+- reference architecture changes
+- evaluation gates change
+- privacy, security, or data-handling assumptions change
 
-- skill intent, scope, or out-of-scope behavior
-- trigger strategy or expected users
-- source inventory or synthesis assumptions
-- reference architecture or evidence storage
-- evaluation approach, acceptance gates, or known limitations
-- privacy, security, or data-handling assumptions
-
-For a tiny wording-only fix, update `SOURCES.md` changelog if present; skip `SPEC.md` unless the change affects the contract above.
+For tiny wording-only fixes, update `SOURCES.md` changelog instead.
 
 ## Relationship To Other Files
 
 | File | Purpose |
 |------|---------|
-| `SKILL.md` | Runtime activation and execution instructions loaded by agents. |
-| `SPEC.md` | Maintenance contract for humans and agents improving the skill. |
-| `SOURCES.md` | Source inventory, decisions, coverage matrix, gaps, and changelog. |
-| `EVAL.md` | Repeatable evaluation prompts or runbooks. |
-| `references/` | Runtime-loadable domain/process details. |
-| `references/evidence/` | Persistent examples and observed behavior used for iteration. |
-
-Keep `SPEC.md` concise. Link to `SOURCES.md`, `EVAL.md`, and focused references instead of duplicating them.
+| `SKILL.md` | runtime activation and execution |
+| `SPEC.md` | maintenance contract |
+| `SOURCES.md` | source inventory, decisions, gaps, changelog |
+| `EVAL.md` | reusable eval prompts or runbooks |
+| `references/` | runtime-loadable depth |
+| `references/evidence/` | persistent iteration examples |
 
 ## Template
 
@@ -41,16 +43,14 @@ Keep `SPEC.md` concise. Link to `SOURCES.md`, `EVAL.md`, and focused references 
 
 ## Intent
 
-Describe the skill's purpose in one or two short paragraphs.
+<1-2 short paragraphs>
 
 ## Scope
 
 In scope:
-
 - ...
 
 Out of scope:
-
 - ...
 
 ## Users And Trigger Context
@@ -69,11 +69,9 @@ Out of scope:
 ## Source And Evidence Model
 
 Authoritative sources:
-
 - ...
 
 Useful improvement sources:
-
 - positive examples:
 - negative examples:
 - commit logs/changelogs:
@@ -81,10 +79,9 @@ Useful improvement sources:
 - eval results:
 
 Data that must not be stored:
-
 - secrets
 - customer data
-- private URLs or identifiers that are not needed for reproduction
+- private URLs or identifiers not needed for reproduction
 
 ## Reference Architecture
 
@@ -115,9 +112,7 @@ Data that must not be stored:
 
 ## Design Rules
 
-1. Describe intent and maintenance contract; do not add runtime instructions that belong in `SKILL.md`.
-2. Summarize source categories and link to `SOURCES.md`; do not duplicate full source tables.
-3. Describe evidence classes and storage policy; keep raw examples in `references/evidence/`.
-4. Include out-of-scope behavior and known limitations so future edits do not expand the skill accidentally.
-5. Include evaluation expectations that explain what "good" means, then link to `EVAL.md` for runnable prompts.
-6. Keep private or sensitive evidence redacted; store only what is needed to reproduce and improve behavior.
+1. Keep `SPEC.md` concise.
+2. Link to `SOURCES.md` or refs instead of duplicating them.
+3. Keep raw examples in `references/evidence/`.
+4. Keep sensitive data redacted.

@@ -6,7 +6,7 @@ description: Create, synthesize, and iteratively improve agent skills following 
 # Skill Writer
 
 Use this as the single canonical workflow for skill creation and improvement.
-Primary success condition: maximize high-value input coverage before authoring so the resulting skill has minimal blind spots.
+Primary success condition: maximize high-value input coverage before authoring while minimizing wasted runtime tokens.
 
 Load only the path(s) required for the task. `SKILL.md` is the primary router: every bundled reference file should have a direct "open when..." reason here.
 
@@ -132,9 +132,11 @@ Read `references/authoring-path.md`.
 3. Create or update `SPEC.md` using `references/spec-template.md` when creating a new skill or materially changing an existing skill's intent, sources, evaluation, or maintenance model.
 4. Create focused reference files, subfolders, scripts, and assets only when each one has a clear "open when..." reason.
 5. If you add a bundled reference file, add a direct routing entry for it in this `SKILL.md`.
-6. Follow only the specific artifact-layout, workflow-mechanic, Claude-specific, and output-contract references selected for this skill.
-7. For advanced execution shapes, add the required routing, delegation, evaluation, or safety contracts before considering the skill complete.
-8. For authoring/generator skills, include transformed examples in references:
+6. Prefer checklists, tables, templates, and input/output examples over explanatory prose.
+7. Keep rationale short; cut or compress any section that does not help the agent choose, do, or verify something.
+8. Follow only the specific artifact-layout, workflow-mechanic, Claude-specific, and output-contract references selected for this skill.
+9. For advanced execution shapes, add the required routing, delegation, evaluation, or safety contracts before considering the skill complete.
+10. For authoring/generator skills, include transformed examples in references:
    - happy-path
    - secure/robust variant
    - anti-pattern + corrected version
