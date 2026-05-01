@@ -38,6 +38,7 @@ If you must run the validator from another working directory, convert both paths
 - synthesis depth gates are satisfied
 - selected example profile requirements are satisfied and reported
 - `SPEC.md` exists or was updated when the change creates a skill or materially changes intent, scope, evidence model, evaluation, or maintenance expectations
+- every bundled reference file is directly discoverable from `SKILL.md`
 
 3. Confirm for integration/documentation skills:
 - focused references cover API surface, common use cases, known issues/workarounds, and version variance
@@ -49,10 +50,10 @@ If you must run the validator from another working directory, convert both paths
 - provider-specific path variables (for example `${CLAUDE_SKILL_ROOT}`) either follow established repository prior art or are explicitly scoped, rather than being introduced ad hoc
 - provider-specific behavior, if any, is labeled as compatibility guidance rather than the primary workflow
 
-5. Confirm evaluation outputs as applicable:
-- lightweight qualitative summary (recommended default)
-- qualitative depth rubric status for API/workaround/use-case/gap handling (recommended for integration/documentation and skill-authoring)
-- deeper eval or quantitative summary only if user requested benchmark mode or risk warrants it
+5. If evaluation was run, include:
+- lightweight qualitative summary
+- concise depth rubric status for integration/documentation and skill-authoring skills
+- deeper eval or quantitative summary only if user requested it or risk warranted it
 
 6. Review validator warnings for long reference files and split files when warnings indicate mixed concerns or poor navigation.
 7. Reject shallow handoffs that omit required artifacts.
@@ -62,5 +63,5 @@ If you must run the validator from another working directory, convert both paths
 - Registration changes summary
 - Selected skill root and why it was chosen
 - Validator output
-- Evaluation summary status
+- Evaluation summary, if run
 - Any residual risks or open gaps

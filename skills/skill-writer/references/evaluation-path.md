@@ -1,15 +1,21 @@
 # Evaluation Path
 
-Use this path to verify that skill behavior improves outcomes.
+Load this only when the user asks for evaluation, the change is high-risk, or you need to verify a non-obvious architectural choice.
 
 ## Default approach (lightweight, guidance-only)
 
-Use this by default when a full eval pass is not requested:
+If you do run evaluation, start here:
 
 1. Define representative prompts for the target skill task.
 2. Compare observed behavior before/after edits in concise notes.
-3. Mark outcomes as improved, unchanged, or regressed.
-4. Record unresolved weaknesses and next steps.
+3. For material skill changes, judge the architectural choice as well as the prose:
+   - class selection: pass/fail
+   - execution shape selection: pass/fail
+   - reference routing clarity: pass/fail
+   - advanced mechanics justification: pass/fail
+   - portability/fallback notes: pass/fail
+4. Mark outcomes as improved, unchanged, or regressed.
+5. Record unresolved weaknesses and next steps.
 
 For `integration-documentation` and `skill-authoring` skills, include a concise depth rubric:
 
@@ -28,10 +34,17 @@ Use this only when:
 
 Suggested workflow:
 
-1. Build a prompt set with positives, implicit triggers, and negatives.
+1. Build a prompt set with positives, implicit triggers, negatives, and wrong-shape temptations.
 2. Capture deterministic run traces (for example `codex exec --json`).
 3. Apply machine-checkable rubric/schema checks (for example `--output-schema` where applicable).
 4. Compare baseline vs updated behavior and report deltas.
+
+For advanced shapes, add targeted checks:
+
+1. routers: should-route and should-not-route prompts
+2. evaluator loops: stop-condition and acceptance checks
+3. subagent-fork skills: task-oriented prompt vs passive-guidance negative
+4. hook-backed skills: fallback behavior and security-note presence
 
 ## Optional quantitative benchmark
 
@@ -53,8 +66,8 @@ Use those prompts when you need a repeatable depth check against `skill-writer`.
 
 Keep evaluation instructions tool-agnostic so they work in both Codex and Claude environments.
 
-## Required output
+## Required Output
 
-- Qualitative evaluation summary (recommended default)
+- Qualitative evaluation summary
 - Deeper eval or quantitative summary (optional, if run)
 - Final acceptance decision and residual risks
