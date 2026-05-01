@@ -27,7 +27,7 @@ Load only the path(s) required for the task. `SKILL.md` is the primary router: e
 | store persistent working and holdout examples for future revisions | `references/iteration-evidence.md` |
 | choose a response template, schema, or output contract | `references/output-contracts.md` |
 | troubleshoot overloaded layouts, hidden refs, or other structure failures | `references/structure-troubleshooting.md` |
-| evaluate whether the new skill structure and behavior are actually better | `references/evaluation-path.md` |
+| verify a risky, disputed, or explicitly requested change | `references/evaluation-path.md` |
 | register the skill and run final validation checks | `references/registration-validation.md` |
 
 ## Artifact Layout References
@@ -76,40 +76,25 @@ Load only the path(s) required for the task. `SKILL.md` is the primary router: e
 
 ## Step 1: Resolve target, path, and shape
 
-1. Resolve target skill root and intended operation (`create`, `update`, `synthesize`, `iterate`).
-2. Inspect workspace prior art before choosing where the skill belongs:
-   - existing skill directories and neighboring skills
-   - repository docs such as `AGENTS.md`, `README.md`, and `CONTRIBUTING.md`
-   - plugin manifests or other layout-defining files when present
-3. Choose the target skill root from observed conventions:
-   - default to `.agents/skills/<name>/`
-   - if the workspace clearly uses another established layout, follow that layout instead
-   - common established alternatives include `skills/<name>/` when the workspace uses a canonical root skill tree, `.claude/skills/<name>/`, `plugins/<plugin>/skills/<name>/`, or another repo-managed skill root with clear prior art
-4. If multiple plausible locations exist and the canonical one is still unclear after inspection, ask the user where the skill should go before editing files.
-5. Distinguish skill-internal paths from repo registration paths:
-   - inside a skill, reference bundled files relative to that skill root (for example `references/foo.md`, `scripts/check.py`)
-   - for repository registration edits, use the repository's actual canonical files/locations after inspecting the workspace
-6. Read `references/mode-selection.md` and `references/execution-shapes.md`.
-7. Classify the skill on two axes:
-   - skill class (`workflow-process`, `integration-documentation`, `security-review`, `skill-authoring`, `generic`)
-   - execution shape (`inline-guidance`, `reference-backed-expert`, `script-backed-workflow`, `argument-driven`, `router`, `parallelization`, `orchestrator-workers`, `evaluator-optimizer`, `subagent-fork`, `hook-backed`, `asset-template`, or `hybrid`)
-8. Default to the simplest adequate execution shape. If selecting a more complex shape, record why simpler shapes were rejected.
-9. After choosing the shape, load only the specific artifact-layout, workflow-mechanic, and Claude-specific leaf files that match that shape. Do not bulk-load whole subtrees.
-10. If the selected shape or artifact plan uses Claude Code-only mechanics, record portability implications before authoring.
-11. Ask one direct question if class, shape, target location, or depth requirements are ambiguous; otherwise state explicit assumptions.
+1. Resolve the intended operation (`create`, `update`, `synthesize`, `iterate`) and inspect workspace prior art before choosing where files belong.
+2. Choose the target skill root from observed conventions. If the canonical location is still unclear after inspection, ask one direct question before editing files.
+3. Read `references/mode-selection.md` to choose the minimum required workflow paths.
+4. Read `references/execution-shapes.md` to choose the primary execution shape.
+5. Default to the simplest adequate shape. If selecting a more complex shape, record why simpler shapes were rejected.
+6. Load only the exact artifact-layout, workflow-mechanic, and provider-specific leaf files required by that shape.
+7. Record portability implications before using provider-specific mechanics.
 
 ## Step 2: Run synthesis when needed
 
 Read `references/synthesis-path.md`.
 
-1. Collect and score relevant sources with provenance.
-2. Read `references/source-discovery.md` when source material is thin, stale, or ambiguous.
-3. Apply trust and safety rules when ingesting external content.
+1. Use this path for new skills, material changes, and research-first planning.
+2. Collect and score relevant sources with provenance.
+3. Read `references/source-discovery.md` when source material is thin, stale, or ambiguous.
 4. Produce source-backed decisions and coverage/gap status, including the class and execution-shape choice.
-5. Load one or more profiles from `references/examples/*.md` when the skill is hybrid or when the selected shape is nontrivial.
-6. If the skill uses provider-specific mechanics, include current official provider docs in the source pack and capture usage constraints.
-7. Enforce baseline source pack for skill-authoring workflows.
-8. Enforce depth gates before moving to authoring.
+5. Load example profiles only when they add concrete depth for the selected class or shape.
+6. If the skill uses provider-specific mechanics, include current official provider docs and capture usage constraints.
+7. Do not move to authoring until depth gates pass.
 
 ## Step 3: Run iteration first when improving from outcomes/examples
 
@@ -128,14 +113,14 @@ Skip this step when selected path does not include `iteration`.
 Read `references/authoring-path.md`.
 
 1. Write or update `SKILL.md` in imperative voice with trigger-rich description.
-2. Read `references/reference-architecture.md` before adding bulk instructions or new reference files.
-3. Create or update `SPEC.md` using `references/spec-template.md` when creating a new skill or materially changing an existing skill's intent, sources, evaluation, or maintenance model.
-4. Create focused reference files, subfolders, scripts, and assets only when each one has a clear "open when..." reason.
-5. If you add a bundled reference file, add a direct routing entry for it in this `SKILL.md`.
-6. Prefer checklists, tables, templates, and input/output examples over explanatory prose.
-7. Keep rationale short; cut or compress any section that does not help the agent choose, do, or verify something.
+2. Keep `SKILL.md` as the runtime router, not an encyclopedia.
+3. Read `references/reference-architecture.md` before adding bulk instructions or new reference files.
+4. Create or update `SPEC.md` using `references/spec-template.md` when creating a new skill or materially changing its contract.
+5. Create focused reference files, subfolders, scripts, and assets only when each one has a clear "open when..." reason.
+6. If you add a bundled reference file, add a direct routing entry for it in this `SKILL.md`.
+7. Prefer checklists, tables, templates, and input/output examples over explanatory prose.
 8. Follow only the specific artifact-layout, workflow-mechanic, Claude-specific, and output-contract references selected for this skill.
-9. For advanced execution shapes, add the required routing, delegation, evaluation, or safety contracts before considering the skill complete.
+9. For advanced execution shapes, add the required routing, delegation, or safety contracts before considering the skill complete.
 10. For authoring/generator skills, include transformed examples in references:
    - happy-path
    - secure/robust variant
@@ -149,15 +134,12 @@ Read `references/description-optimization.md`.
 2. Reduce false positives and false negatives with targeted description edits.
 3. Keep trigger language generic across providers unless the skill is intentionally provider-specific.
 
-## Step 6: Evaluate outcomes
+## Step 6: Evaluate only when needed
 
-Read `references/evaluation-path.md`.
-
-1. Run a lightweight qualitative check by default (recommended).
-2. For integration/documentation and skill-authoring skills, include the concise depth rubric from `references/evaluation-path.md`.
-3. For material skill changes, verify that the selected execution shape was appropriate, that any advanced mechanics were justified, and that every bundled reference remains directly routable from `SKILL.md`.
-4. Run deeper eval playbook and quantitative baseline-vs-with-skill only when requested or risk warrants it.
-5. Record outcomes and unresolved risks.
+1. Read `references/evaluation-path.md` only when the user asks for evaluation, the change is high-risk, or the architecture choice is non-obvious.
+2. If you run evaluation, start with the lightweight qualitative check.
+3. Run deeper evals only when requested or risk warrants it.
+4. Record outcomes and unresolved risks when evaluation is run.
 
 ## Step 7: Register and validate
 

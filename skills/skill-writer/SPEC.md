@@ -40,6 +40,7 @@ Out of scope:
   - Inspect local repository conventions before deciding where files belong.
   - Classify the skill and select the minimum required workflow paths.
   - Select a primary execution shape and default to the simplest adequate option.
+  - Treat evaluation as conditional rather than a default path.
 - Required outputs:
   - Summary.
   - Changes Made.
@@ -66,7 +67,7 @@ Out of scope:
   - `references/reference-architecture.md`
   - `references/spec-template.md`
   - `references/description-optimization.md`
-  - `references/evaluation-path.md`
+  - `references/evaluation-path.md` when the user asks for evaluation, the change is high-risk, or the architecture choice is non-obvious
   - `references/registration-validation.md`
   - `references/artifact-layouts/*.md`
   - `references/workflow-mechanics/*.md`
@@ -120,7 +121,7 @@ Data that must not be stored:
   - Inspect changed references for focused scope, direct discoverability, and absence of host-specific paths.
   - Verify that the selected execution shape is explicit and that advanced mechanics, if any, are justified.
 - Deeper evaluation:
-  - Use `EVAL.md` when a change affects synthesis depth gates, artifact requirements, or generated skill quality.
+  - Use `references/evaluation-path.md` and `EVAL.md` only when the user requests it, the change is high-risk, or the architectural choice needs verification.
   - Compare behavior before and after changes with representative positive and negative prompts.
   - Include shape-selection prompts when the change affects routing, delegation, hooks, or evaluator loops.
 - Holdout examples:

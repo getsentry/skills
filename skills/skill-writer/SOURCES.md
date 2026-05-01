@@ -46,6 +46,8 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 13. Subfolders inside `references/` are acceptable when they create clearer lookup leaves, but every bundled reference should still be directly discoverable from `SKILL.md`.
 14. The validator should enforce durable structural guarantees and required fields, but should not hardcode provider-specific optional frontmatter keys.
 15. `skill-writer` should default to dense structures such as tables, checklists, templates, and I/O examples, and should cut explanatory prose unless it prevents a concrete mistake.
+16. `SKILL.md` should stay a thin router; repeated policy belongs in routed references rather than always-loaded step prose.
+17. Evaluation is conditional and should not be part of the default authoring path unless the user asks for it or the change is genuinely risky.
 
 ## Coverage matrix
 
@@ -89,3 +91,4 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 - 2026-05-01: Replaced generic pattern bucket references with routed leaf files under `references/artifact-layouts/`, `references/workflow-mechanics/`, and `references/claude-code/`; made `SKILL.md` enumerate every bundled reference file with a direct open-when reason.
 - 2026-05-01: Removed the validator's hardcoded optional frontmatter allowlist so provider-specific field drift does not create noisy false warnings.
 - 2026-05-01: Reduced prose-heavy guidance in `skill-writer`, rewrote the main runtime refs into denser tables/checklists, and made compact runtime guidance an explicit contract.
+- 2026-05-01: Thinned `SKILL.md` back toward a true router, removed duplicated execution-shape detail from `mode-selection.md`, and made evaluation conditional instead of a default workflow path.

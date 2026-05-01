@@ -2,15 +2,17 @@
 
 Choose the minimal set of paths needed for the request.
 Regardless of path, prioritize input quality and coverage depth before finalizing outputs.
+Do not add evaluation unless the user asks for it, the change is high-risk, or the architecture choice is genuinely uncertain.
 
 ## Path mapping
 
 | Request shape | Required paths |
 |---------------|----------------|
-| New skill from scratch | synthesis + authoring + description optimization + evaluation + registration/validation |
-| Update existing skill wording/structure | authoring + description optimization + evaluation + registration/validation |
-| Improve skill from outcomes/examples | iteration + authoring + description optimization + evaluation + registration/validation |
+| New skill from scratch | synthesis + authoring + description optimization + registration/validation |
+| Update existing skill wording/structure | authoring + description optimization + registration/validation |
+| Improve skill from outcomes/examples | iteration + authoring + description optimization + registration/validation |
 | Research-first skill planning | synthesis only, then authoring if requested |
+| Risky, disputed, or explicitly reviewed change | add `evaluation` to the selected path |
 
 ## Skill class selection
 
@@ -32,28 +34,13 @@ Choose the skill's primary execution shape separately from the skill class.
 Class answers "what domain/problem is this skill for?"
 Shape answers "how should this skill run?"
 
-Use `references/execution-shapes.md` for the full decision guide and the next leaf reference to load.
-After selecting the shape, load only the specific file(s) you need from `references/artifact-layouts/`, `references/workflow-mechanics/`, or `references/claude-code/`.
+Use `references/execution-shapes.md` for the full decision table and the next leaf reference to load.
 
-Common shapes:
+Record:
 
-| Shape | Use when |
-|-------|----------|
-| `inline-guidance` | one coherent set of rules is enough |
-| `reference-backed-expert` | most complexity is optional deep knowledge |
-| `script-backed-workflow` | the skill needs repeatable automation or validation |
-| `argument-driven` | the skill is usually invoked with explicit inputs |
-| `router` | distinct categories need different downstream paths |
-| `parallelization` | known subtasks can run independently |
-| `orchestrator-workers` | subtasks are dynamic and must be discovered at runtime |
-| `evaluator-optimizer` | quality improves via critique-and-revise loops |
-| `subagent-fork` | the work needs isolated context, tools, or model settings |
-| `hook-backed` | deterministic enforcement at lifecycle/tool boundaries is required |
-| `asset-template` | the main value is reusable templates or assets |
-| `hybrid` | more than one shape is required; declare a primary shape |
-
-Default to the simplest adequate shape.
-If the selected shape is `router`, `orchestrator-workers`, `evaluator-optimizer`, `subagent-fork`, or `hook-backed`, record why a simpler inline or script-backed shape was not enough.
+1. primary execution shape
+2. simpler-shape rejection when the chosen shape is advanced
+3. exact leaf references opened because of that choice
 
 ## Required outputs by path
 
@@ -65,12 +52,13 @@ If the selected shape is `router`, `orchestrator-workers`, `evaluator-optimizer`
 - `authoring`: updated `SKILL.md` and required supporting files.
 - `description optimization`: should/should-not trigger sets and final description.
 - `iteration`: example intake summary and behavior deltas.
-- `evaluation`: qualitative summary (mandatory) and optional quantitative benchmark.
+- `evaluation`: qualitative summary and any deeper checks run.
 - `registration/validation`: registration edits and validator results.
 
 ## Hard stop rules
 
 Do not claim completion when any required path output is missing.
+Evaluation output is required only when `evaluation` was selected.
 
 For authoring/generator skills, missing transformed example artifacts is a hard failure.
 Missing selected-profile requirements is also a hard failure.

@@ -1,23 +1,8 @@
 # Execution Shapes
 
 Use this guide to choose the runtime shape of a skill before you decide its files.
-
-Skill class and execution shape are different decisions:
-
-- skill class defines domain coverage requirements
-- execution shape defines how the skill runs and what artifacts it needs
-
 Default rule: choose the simplest adequate shape, then add complexity only when it clearly improves outcomes.
-
 Once you pick a shape, load only the concrete leaf references it needs.
-
-## Contents
-
-- Defaulting to the simplest shape
-- Shape decision table
-- Secondary workflow mechanics
-- Hybrid shapes
-- Advanced-shape hard stops
 
 ## Defaulting To The Simplest Shape
 
@@ -63,25 +48,12 @@ These are not usually primary execution shapes, but they often refine one:
 
 ## Hybrid Shapes
 
-Hybrid skills are acceptable when one primary shape is insufficient.
-
-Rules:
+Use a hybrid only when one primary shape is insufficient.
 
 1. Declare one primary shape.
 2. Add only the minimum secondary shapes needed.
 3. Keep each secondary shape scoped to one concrete need.
-4. Record why the hybrid is better than a single simpler shape.
-
-Good hybrids:
-
-- `reference-backed-expert` + `script-backed-workflow`
-- `router` + `reference-backed-expert`
-- `script-backed-workflow` + `asset-template`
-
-Risky hybrids:
-
-- `router` + `orchestrator-workers` + `evaluator-optimizer` + `hook-backed`
-- any hybrid where no one can explain what the base path is
+4. Avoid stacking multiple advanced shapes without a clear base path.
 
 ## Advanced-Shape Hard Stops
 

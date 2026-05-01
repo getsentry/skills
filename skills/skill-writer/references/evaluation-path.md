@@ -1,10 +1,10 @@
 # Evaluation Path
 
-Use this path to verify that skill behavior improves outcomes.
+Load this only when the user asks for evaluation, the change is high-risk, or you need to verify a non-obvious architectural choice.
 
 ## Default approach (lightweight, guidance-only)
 
-Use this by default when a full eval pass is not requested:
+If you do run evaluation, start here:
 
 1. Define representative prompts for the target skill task.
 2. Compare observed behavior before/after edits in concise notes.
@@ -66,8 +66,8 @@ Use those prompts when you need a repeatable depth check against `skill-writer`.
 
 Keep evaluation instructions tool-agnostic so they work in both Codex and Claude environments.
 
-## Required output
+## Required Output
 
-- Qualitative evaluation summary (recommended default)
+- Qualitative evaluation summary
 - Deeper eval or quantitative summary (optional, if run)
 - Final acceptance decision and residual risks
