@@ -2,6 +2,22 @@
 
 Principles for writing effective agent skills. A skill is a set of instructions injected into an agent's context window — every line competes for space with the user's actual task.
 
+## Contents
+
+- Conciseness
+- Degrees of Freedom
+- Progressive Disclosure
+- Description as Trigger
+- Imperative Voice
+- Consistent Terminology
+- Independence
+- Avoid Duplication
+- Avoid Catch-All References
+- Avoid Time-Sensitive Information
+- Avoid Machine-Specific Paths
+- Default To Portable Skills
+- Long Reference Files
+
 ## Conciseness
 
 The context window is shared between the skill instructions and the agent's working memory. Only include what the agent doesn't already know.
@@ -140,6 +156,8 @@ Similarly, don't repeat conventions already in project agent docs such as `AGENT
 ## Avoid Catch-All References
 
 Reference files should be small enough that their filename predicts their contents. Avoid putting source notes, examples, troubleshooting, and evaluation data into one generic reference file. Split by the agent's lookup need so the skill can load exactly the context required for the current task.
+
+If subfolders make the routing clearer, use them. The main `SKILL.md` router should still name each bundled reference file directly with a short "open when..." reason.
 
 Use `references/evidence/` for persistent iteration findings, not `SKILL.md` and not a generic notes file.
 

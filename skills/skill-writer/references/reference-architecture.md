@@ -21,6 +21,7 @@ Good reference files answer a concrete lookup need: "I need to decide X", "I nee
 `SKILL.md` is the router. It should tell the agent what path to take, when to load a reference, what outputs are required, and what gates must pass before completion.
 
 Reference files are lookup modules. They should be opened only when the current task needs that module's decision logic, procedure, facts, examples, or diagnostic matrix.
+Subfolders are acceptable when they create clearer lookup leaves, for example `references/workflow-mechanics/routing-workflows.md` or `references/examples/router-skill.md`.
 
 `SPEC.md` is the maintenance contract. It describes intent, scope, source/evidence model, evaluation expectations, known limitations, and update rules for future skill authors.
 
@@ -29,7 +30,7 @@ Reference files are lookup modules. They should be opened only when the current 
 Before creating a reference file, write the sentence that would make an agent open it:
 
 - "I need to classify the requested skill, so read `references/mode-selection.md`."
-- "I need to choose the right output contract, so read `references/output-patterns.md`."
+- "I need to choose the right output contract, so read `references/output-contracts.md`."
 - "I need to diagnose why the generated skill failed validation, so read `references/validation-failures.md`."
 - "I need examples of before/after prompt transformations, so read `references/transformed-examples.md`."
 
@@ -112,6 +113,8 @@ Name references for the action or question they answer:
 - `references/streaming-integration-patterns.md`
 - `references/transformed-examples.md`
 - `references/evaluation-rubric.md`
+- `references/workflow-mechanics/routing-workflows.md`
+- `references/claude-code/hook-backed-skills.md`
 
 Avoid bucket names that do not explain why the agent should open them:
 
@@ -128,7 +131,7 @@ For very large source-derived material, split by task or lookup path instead of 
 
 Before finalizing, verify:
 
-1. Every reference has an "open when..." reason in `SKILL.md`, `SPEC.md`, or the adjacent workflow reference.
+1. Every runtime reference has a direct "open when..." reason in `SKILL.md`.
 2. Every reference mostly matches one type from the reference type table.
 3. The agent can decide whether to open each reference from its filename and one-line description.
 4. No required instruction is hidden only inside a reference that may not be loaded.

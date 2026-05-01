@@ -5,6 +5,7 @@
 `skill-writer` is the canonical workflow for creating, updating, synthesizing, and iteratively improving agent skills in this repository.
 
 Its primary purpose is to prevent shallow skill authoring by forcing high-value source coverage, explicit provenance, focused runtime instructions, and validation before completion.
+It is also a meta-router: before authoring, it must choose the simplest adequate execution shape for the target skill and only then decide which artifacts are needed.
 
 ## Scope
 
@@ -15,6 +16,8 @@ In scope:
 - Research-first synthesis for proposed skills.
 - Iteration from positive examples, negative examples, review feedback, eval results, and observed agent behavior.
 - Registration and validation for this repository's canonical `skills/<skill-name>/` layout and other discovered layouts.
+- Choosing between execution shapes such as inline guidance, reference-backed expert, script-backed workflow, router, evaluator loop, subagent-fork, hook-backed, asset-template, or hybrids.
+- Assessing when provider-specific mechanics are justified and documenting portability constraints.
 
 Out of scope:
 
@@ -36,6 +39,7 @@ Out of scope:
   - Resolve the target skill root and operation.
   - Inspect local repository conventions before deciding where files belong.
   - Classify the skill and select the minimum required workflow paths.
+  - Select a primary execution shape and default to the simplest adequate option.
 - Required outputs:
   - Summary.
   - Changes Made.
@@ -45,6 +49,8 @@ Out of scope:
   - `SKILL.md` frontmatter is first line and `name` matches the directory.
   - `description` contains realistic trigger language.
   - `SKILL.md` remains an orchestration/index layer for complex skills.
+  - Material skill changes explicitly name the selected execution shape.
+  - Advanced mechanics are justified and include portability notes.
   - Supporting references are focused and loaded conditionally.
   - Source provenance and decisions live in `SOURCES.md`.
   - Durable positive/negative examples live in `references/evidence/`.
@@ -52,6 +58,7 @@ Out of scope:
   - Validation runs before completion.
 - Expected bundled files loaded at runtime:
   - `references/mode-selection.md`
+  - `references/execution-shapes.md`
   - `references/synthesis-path.md`
   - `references/iteration-path.md`
   - `references/authoring-path.md`
@@ -60,15 +67,21 @@ Out of scope:
   - `references/description-optimization.md`
   - `references/evaluation-path.md`
   - `references/registration-validation.md`
+  - `references/artifact-layouts/*.md`
+  - `references/workflow-mechanics/*.md`
+  - `references/claude-code/*.md`
+  - `references/examples/*.md`
   - `scripts/quick_validate.py`
 
 ## Source And Evidence Model
 
 Authoritative sources:
 
-- Local `skill-writer` runtime files: `SKILL.md`, `references/*.md`, `scripts/quick_validate.py`.
+- Local `skill-writer` runtime files: `SKILL.md`, `references/**/*.md`, `scripts/quick_validate.py`.
 - Repository policy: `AGENTS.md`, `README.md`, `CONTRIBUTING.md`, plugin manifests, and registration settings.
 - Agent Skills specification and official skill authoring guidance.
+- Current official provider docs for any provider-specific mechanics being recommended.
+- Official orchestration guidance for routing, delegation, evaluation loops, and reasoning-model planning patterns.
 
 Useful improvement sources:
 
@@ -89,10 +102,12 @@ Data that must not be stored:
 ## Reference Architecture
 
 - `SKILL.md` contains the top-level workflow, path-loading table, branch points, universal constraints, and output contract.
+- `SKILL.md` acts as a meta-router for the authoring process: class selection, shape selection, and path selection happen before writing.
 - `SPEC.md` contains this maintenance specification.
 - `SOURCES.md` contains source inventory, decisions, coverage matrix, open gaps, and changelog.
 - `EVAL.md` contains reusable evaluation prompts and deeper eval runbooks.
-- `references/` contains focused workflow guidance, patterns, templates, rubrics, and class-specific authoring requirements.
+- `references/` contains focused workflow guidance, routed leaf references, templates, rubrics, and class-specific authoring requirements.
+- `references/` may use subfolders when they create clearer leaf routing, but every bundled reference should still be directly routed from `SKILL.md`.
 - `references/evidence/` contains durable positive/negative examples when future iterations need them.
 - `scripts/` contains validation automation.
 - `assets/` is unused unless a future skill-authoring workflow needs static templates or media.
@@ -102,9 +117,11 @@ Data that must not be stored:
 - Lightweight validation:
   - Run `uv run skills/skill-writer/scripts/quick_validate.py skills/skill-writer --skill-class skill-authoring --strict-depth`.
   - Inspect changed references for focused scope, direct discoverability, and absence of host-specific paths.
+  - Verify that the selected execution shape is explicit and that advanced mechanics, if any, are justified.
 - Deeper evaluation:
   - Use `EVAL.md` when a change affects synthesis depth gates, artifact requirements, or generated skill quality.
   - Compare behavior before and after changes with representative positive and negative prompts.
+  - Include shape-selection prompts when the change affects routing, delegation, hooks, or evaluator loops.
 - Holdout examples:
   - Keep durable holdout examples in `references/evidence/holdout-set.md` when repeated regressions appear.
   - Do not tune directly against holdout examples until they are intentionally moved to the working set.
@@ -117,6 +134,8 @@ Data that must not be stored:
 ## Known Limitations
 
 - The validator checks structure and selected depth gates; it cannot prove that a generated skill is semantically complete.
+- The validator does not yet deeply verify every advanced-shape contract.
+- The validator intentionally does not hardcode or exhaustively validate provider-specific optional frontmatter fields.
 - Deeper evals are opt-in unless risk or user request justifies the extra cost.
 - Source discovery can still miss private operational knowledge if it is not present in local files, accessible issue/PR history, or supplied context.
 - Provider-specific skill extensions may drift; `skill-writer` treats them as compatibility guidance unless a skill is intentionally provider-specific.
@@ -124,6 +143,8 @@ Data that must not be stored:
 ## Maintenance Notes
 
 - Update `SKILL.md` when the required runtime workflow, branch conditions, or output contract changes.
+- Update `references/execution-shapes.md` when new skill mechanics or orchestration patterns become important.
+- Update the relevant file under `references/artifact-layouts/`, `references/workflow-mechanics/`, or `references/claude-code/` when a specific routed leaf changes.
 - Update `SPEC.md` when intent, scope, user/trigger context, evidence model, evaluation gates, limitations, or maintenance rules change.
 - Update `SOURCES.md` when source inventory, decisions, coverage, gaps, or changelog entries change.
 - Update `EVAL.md` when reusable evaluation prompts or runbooks change.

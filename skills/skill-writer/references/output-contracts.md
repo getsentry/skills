@@ -1,12 +1,20 @@
-# Output Patterns
+# Output Contracts
 
-Patterns for producing consistent, high-quality output from skills.
+Use this guide when the skill needs a predictable answer shape, template, schema, or reporting format.
 
-## Template Pattern
+## Choose The Contract Shape
 
-Provide templates when the skill must produce a specific format. Match strictness to requirements.
+| Need | Use this contract |
+|------|-------------------|
+| exact headings or sections must appear | strict template |
+| default structure is helpful but adaptation is allowed | flexible template |
+| style is hard to describe but easy to imitate | input/output examples |
+| output shape depends on task type | decision table |
+| scripts or downstream tools parse the output | structured data schema |
 
-**Strict (for API responses, reports, data formats):**
+## Strict Template
+
+Use when wrong structure is costly.
 
 ```markdown
 ## Report structure
@@ -27,7 +35,9 @@ ALWAYS use this exact template:
 2. Specific actionable recommendation
 ```
 
-**Flexible (when adaptation is useful):**
+## Flexible Template
+
+Use when consistency helps but the content still needs adaptation.
 
 ```markdown
 ## Report structure
@@ -46,9 +56,9 @@ Use this as a sensible default, but adapt based on context:
 [Tailor to the specific context]
 ```
 
-## Examples Pattern
+## Input/Output Examples
 
-When output quality depends on style or format, provide input/output pairs:
+Use when examples communicate tone, density, or formatting more clearly than prose.
 
 ````markdown
 ## Commit message format
@@ -72,15 +82,11 @@ fix(reports): correct date formatting in timezone conversion
 
 Use UTC timestamps consistently across report generation
 ```
-
-Follow this style: type(scope): brief description, then detailed explanation.
 ````
 
-Examples help agents understand desired style and detail level more clearly than descriptions alone.
+## Decision Table
 
-## Decision Table Pattern
-
-Use tables when the output format depends on input characteristics:
+Use when different input classes should produce different response formats.
 
 ```markdown
 ## Output format selection
@@ -92,9 +98,9 @@ Use tables when the output format depends on input characteristics:
 | Full repository | Executive summary + details | Summary table + expandable sections |
 ```
 
-## Structured Data Pattern
+## Structured Data Schema
 
-When scripts or downstream tools consume the output, specify the exact schema:
+Use when another script, tool, or validator consumes the output.
 
 ````markdown
 ## Output format

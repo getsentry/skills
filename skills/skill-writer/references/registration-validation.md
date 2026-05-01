@@ -38,6 +38,7 @@ If you must run the validator from another working directory, convert both paths
 - synthesis depth gates are satisfied
 - selected example profile requirements are satisfied and reported
 - `SPEC.md` exists or was updated when the change creates a skill or materially changes intent, scope, evidence model, evaluation, or maintenance expectations
+- every bundled reference file is directly discoverable from `SKILL.md`
 
 3. Confirm for integration/documentation skills:
 - focused references cover API surface, common use cases, known issues/workarounds, and version variance

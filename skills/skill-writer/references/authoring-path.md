@@ -8,7 +8,7 @@ Use this path to create or update the skill files.
 2. `name` must match directory.
 3. `description` must contain realistic trigger phrases.
 4. Keep body imperative and concise.
-5. Use SKILL.md as index/orchestration for complex workflows.
+5. Use SKILL.md as the runtime decision layer for complex skills.
 6. Apply `references/reference-architecture.md` before adding long sections or new bundled files.
 7. Keep bundled-file references relative to the skill root: use `references/...`, `scripts/...`, and `assets/...` for files that ship with the skill.
 8. Keep paths portable: do not hardcode host-specific absolute filesystem paths (for example `<home>/...` or `<drive>:\Users\...`) in `SKILL.md` or `references/`.
@@ -25,15 +25,18 @@ Use this path to create or update the skill files.
 ## Supporting files
 
 Create only files needed to execute the workflow:
-
 - `SPEC.md` for skill intent, scope, source/evidence model, evaluation expectations, limitations, and maintenance rules
 - `references/` for domain/process depth
 - `references/evidence/` for persistent positive/negative examples and iteration findings
 - `scripts/` when repeated automation is needed
 - `assets/` for reusable static output artifacts
 
-For workflow/process-heavy skills, also load and apply `references/workflow-patterns.md`
-to structure sequencing, conditional branches, and validation loops.
+Subfolders inside `references/` are acceptable when they make the lookup path clearer. Do not create extra nesting unless the subtree name helps the agent find the right leaf quickly.
+
+For shape-specific details, load the exact file you need from:
+- `references/artifact-layouts/`
+- `references/workflow-mechanics/`
+- `references/claude-code/`
 
 Use focused reference files instead of catch-all documents. Split by lookup need, such as API surface, examples, troubleshooting, source discovery, or evaluation rubric. Do not create a single large reference file that mixes workflow orchestration, source notes, examples, and eval results.
 
@@ -58,6 +61,65 @@ Default minimum depth unless user overrides:
 1. At least 6 concrete downstream use cases across the chosen reference files.
 2. At least 8 issue/fix or failure/workaround entries across the chosen reference files.
 
+## Shape-specific artifact requirements
+
+### `router`
+
+Require:
+1. explicit route-selection criteria
+2. default route or clarification fallback
+3. per-route downstream contract
+4. misroute recovery guidance
+
+### `script-backed-workflow`
+Require:
+1. documented script interfaces
+2. non-interactive execution
+3. structured output where practical
+4. fallback instructions if a script fails
+
+### `parallelization` or `orchestrator-workers`
+Require:
+1. unit-of-work definition
+2. worker output schema
+3. synthesis or aggregation rule
+4. stop condition or expansion cap
+
+### `evaluator-optimizer`
+Require:
+1. rubric or evaluation criteria
+2. loop stop rule
+3. acceptance condition
+4. evidence or diff logging expectations when iteration matters
+
+### `subagent-fork`
+Require:
+1. an actionable task in the skill body
+2. expected summary/output returned to the main thread
+3. reason isolation is helpful
+4. portability note because the mechanic is Claude Code-specific
+
+### `hook-backed`
+Require:
+1. hook event and matcher scope
+2. side-effect and security boundaries
+3. fallback behavior when hooks are unavailable
+4. explicit safety note for shell execution and paths
+
+### `asset-template`
+
+Require:
+1. asset/template routing guidance
+2. placeholder/adaptation instructions
+3. validation or checklist for filled-in output when needed
+
+### `argument-driven`
+
+Require:
+1. expected arguments and empty-input behavior
+2. manual-only invocation when side effects are substantial
+3. named arguments only when they improve clarity
+
 ## Example artifact requirements
 
 For authoring/generator skills, references must include transformed examples that are directly usable:
@@ -68,6 +130,7 @@ For authoring/generator skills, references must include transformed examples tha
 
 Do not accept abstract-only guidance.
 Case-study style references are preferred over generic tips.
+Every new bundled reference file must be routed directly from `SKILL.md` with a one-line "open when..." reason.
 
 When improving an existing skill from observed outcomes, store durable examples using `references/iteration-evidence.md`.
 

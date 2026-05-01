@@ -70,6 +70,12 @@ ACTION_TOKENS = (
     "map",
 )
 
+SKILL_WRITER_ROUTING_EXCEPTIONS = {
+    "references/evidence/findings-log.md",
+    "references/evidence/holdout-set.md",
+    "references/evidence/working-set.md",
+}
+
 MACHINE_SPECIFIC_PATH_PATTERNS = (
     re.compile(r"/Users/[^/\s`\"'<>)](?:[^\s`\"'<>)]*)"),
     re.compile(r"/home/[^/\s`\"'<>)](?:[^\s`\"'<>)]*)"),
@@ -221,6 +227,38 @@ def validate_reference_lengths(skill_path: Path, warnings: list[str]) -> None:
         )
 
 
+def validate_skill_writer_reference_routing(
+    skill_path: Path,
+    skill_content: str,
+    strict_depth: bool,
+    errors: list[str],
+    warnings: list[str],
+) -> None:
+    if skill_path.name != "skill-writer":
+        return
+
+    refs_dir = skill_path / "references"
+    if not refs_dir.exists():
+        return
+
+    all_refs: list[str] = []
+    for ref_path in sorted(refs_dir.rglob("*.md")):
+        rel_path = ref_path.relative_to(skill_path).as_posix()
+        if rel_path in SKILL_WRITER_ROUTING_EXCEPTIONS:
+            continue
+        all_refs.append(rel_path)
+
+    missing = [rel_path for rel_path in all_refs if rel_path not in skill_content]
+    if not missing:
+        return
+
+    severity = errors if strict_depth else warnings
+    severity.append(
+        "skill-writer references should be directly discoverable from SKILL.md. "
+        "Missing routing entries for: " + ", ".join(missing)
+    )
+
+
 def validate_spec_md(
     skill_path: Path,
     strict_depth: bool,
@@ -331,29 +369,10 @@ def validate_skill(
         errors.append(f"Invalid YAML in frontmatter: {exc}")
         return False, errors, warnings, "generic"
 
-    # Validate allowed fields.
-    allowed_fields = {
-        "name",
-        "description",
-        "license",
-        "compatibility",
-        "metadata",
-        "allowed-tools",
-        # Claude Code extensions.
-        "argument-hint",
-        "disable-model-invocation",
-        "user-invocable",
-        "model",
-        "context",
-        "agent",
-        "hooks",
-    }
-    unexpected = set(frontmatter.keys()) - allowed_fields
-    if unexpected:
-        warnings.append(
-            f"Unexpected frontmatter field(s): {', '.join(sorted(unexpected))}. "
-            f"These may be ignored by some tools."
-        )
+    # Validate frontmatter keys without hardcoding provider-specific optional fields.
+    invalid_keys = [key for key in frontmatter.keys() if not isinstance(key, str) or not key.strip()]
+    if invalid_keys:
+        errors.append("Frontmatter keys must be non-empty strings")
 
     # Validate name.
     if "name" not in frontmatter:
@@ -444,6 +463,8 @@ def validate_skill(
             "SKILL.md may contain hardcoded paths. "
             "Use skill-local references/... paths and run scripts via <skill-dir>/scripts/..."
         )
+
+    validate_skill_writer_reference_routing(skill_path, content, strict_depth, errors, warnings)
 
     resolved_skill_class = (
         selected_skill_class
