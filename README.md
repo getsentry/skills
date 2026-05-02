@@ -79,9 +79,13 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 ### Local Development
 
 ```bash
+# SSH
 git clone git@github.com:getsentry/skills.git ~/sentry-skills
+# or HTTPS
+git clone https://github.com/getsentry/skills.git ~/sentry-skills
+
 claude plugin marketplace add ~/sentry-skills
-claude plugin install sentry-skills
+claude plugin install sentry-skills@sentry-skills
 ```
 
 If you use `claude plugin marketplace add --sparse` for this repo, include `skills` and `agents` alongside `.claude-plugin` because the root plugin manifest loads repo-root `skills/` and `agents/`.
