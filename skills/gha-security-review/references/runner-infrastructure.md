@@ -66,7 +66,8 @@ nmap -sn 10.0.0.0/24
 
 # Access internal services
 curl http://internal-api.corp.example.com/admin
-curl http://169.254.169.254/latest/meta-data/  # Cloud metadata
+# nosemgrep: skill-cloud-metadata-access
+curl http://169.254.169.254/latest/meta-data/  # Cloud metadata (example of attack vector)
 ```
 
 ---
