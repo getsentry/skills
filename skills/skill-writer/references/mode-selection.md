@@ -65,3 +65,4 @@ Missing selected-profile requirements is also a hard failure.
 Missing required class dimensions is a hard failure.
 Missing an explicit execution-shape choice for a material skill change is a hard failure.
 Using advanced mechanics without justification or portability notes is a hard failure.
+Hard-coding project-specific identifiers in a globally registered skill is a hard failure; see `references/design-principles.md` Scope-Aware Encapsulation.
