@@ -1,9 +1,6 @@
 # Core Patterns
 
-Use this file when creating a new prompt or restructuring a weak one.
-
 ## When markers help
-
 Use markers when the prompt mixes different content types:
 
 - instructions
@@ -29,26 +26,16 @@ If the target stack or model family responds better to plain markdown, use headi
 
 ### Where rules live
 
-Markers signal to the model what kind of content a block carries. Descriptive
-or state markers (`<context>`, `<state>`, `<turn-state>`, `<environment>`,
-`<artifact-state>`) read as facts about the situation — data, not policy.
-Canonical rules markers (`<behavior>`, `<constraints>`, `<tool_policy>`,
-`<workflow>`) read as directives the model should follow.
+| Block type | Examples | Content |
+|------------|----------|---------|
+| descriptive | `<context>`, `<state>`, `<environment>` | facts, inputs, current state |
+| rules | `<behavior>`, `<constraints>`, `<tool_policy>`, `<workflow>` | directives |
 
-A directive buried in a descriptive block can underperform the same directive
-placed in a rules block, especially for state-conditional rules. Observed in
-the field: a resume-notice instruction placed inside `<turn-state>resumed</turn-state>`
-scored 0.5 on the relevant eval; the identical sentence moved into
-`<behavior>` passed at ≥0.75 with no other change.
+Rules:
 
-Rules of thumb:
-
-- keep descriptive markers descriptive — put facts about the situation there,
-  not directives
-- directives live in a canonical rules section
-- for state-conditional rules, phrase them in the rules section and reference
-  the state by name: "When `<turn-state>` is `resumed`, post a brief
-  continuation notice, then answer."
+- Keep descriptive markers descriptive.
+- Put directives in canonical rules sections.
+- For state-conditional rules, write the directive in a rules section and reference the state by name.
 
 ## Layer the prompt correctly
 
@@ -95,93 +82,45 @@ Do not cargo-cult this ordering into short prompts that do not need it.
 
 ### Layered prompts with multiple owners
 
-The layers above assume a single author owns the whole system prompt. Many
-runtimes concatenate the system prompt from multiple layers with different
-owners at request time:
+When a runtime concatenates prompt layers from different owners:
 
-- a **platform layer** owned by the product or framework team (harness rules,
-  tool-use policy, output contract, safety boundaries)
-- a **deployer or persona layer** authored by the downstream user or customer
-  (voice, tone, identity files such as `SOUL.md`, `CLAUDE.md`, `AGENTS.md`)
+| Layer | Owns | Must not own |
+|-------|------|--------------|
+| platform | tool policy, output contract, safety, escalation, workflow | voice-only identity |
+| deployer/persona | voice, tone, domain framing, sparse identity files | load-bearing behavior |
+| user payload | task facts, variables, current request | durable policy |
 
-When this is the case, treat the deployer layer as **voice-only**:
+Rules:
 
-- every platform behavior rule — evidence gathering, tool-use policy, narration
-  rules, output contract, escalation boundaries — must live in the
-  platform-owned layer and must still fire if the deployer layer is empty,
-  five lines of voice, or customized in unexpected ways
-- do not delete a platform bullet on the assumption that a persona file
-  "probably covers it"; deployers ship sparse persona files in practice
-- if a rule is load-bearing, it belongs in the platform layer by default;
-  the deployer layer gets voice and domain framing, not policy
+- Platform behavior must work when `AGENTS.md`, `CLAUDE.md`, or persona files are empty or customized.
+- Do not delete platform rules because a deployer layer "probably covers it".
+- Put load-bearing rules in the highest stable owner.
 
-Hermes Agent, OpenClaw, and similar SOUL.md-style frameworks use this split
-explicitly: platform behavior is code-level, SOUL.md carries identity and
-tone, and the platform falls back to a built-in default identity if SOUL.md
-is absent or sparse. Mirror that invariant whenever a prompt is assembled
-from more than one authorship layer.
+## External file inventories
 
-## Portable agent prompt skeleton
-
-Use this as a starting point and adapt it.
-
-Tool schemas are disclosed to the model by the provider-native tools parameter
-(Anthropic `tools`, OpenAI `tools`, Gemini `tools`). On Anthropic this is
-explicit — the API constructs a special system prompt that injects the tool
-definitions from the `tools` parameter alongside the user-authored system
-prompt. Well-tuned harnesses (Codex CLI, pi-agent-core) pass tools natively
-and keep the prompt text free of schema restatements.
-
-The prompt text should carry tool *policy* — when to call tools, when to avoid
-them, what evidence to gather before acting — not a restated list of tool
-names or argument schemas. Naming a specific tool in a policy rule ("prefer
-`Read` over a `Bash` cat") is fine; re-enumerating the tool inventory or its
-schemas is not.
+Use path inventories when prompts depend on repo docs, specs, or policies.
 
 ```text
-<role>
-You are [agent role].
-</role>
-
-<goal>
-Primary objective:
-Secondary objective:
-Non-goals:
-</goal>
-
-<context>
-Available inputs:
-Available files or documents:
-Known constraints:
-</context>
-
-<tool_policy>
-When to use tools:
-When to avoid tools:
-Evidence to gather before acting:
-</tool_policy>
-
-<workflow>
-1. Clarify only if required.
-2. Gather missing facts with tools instead of guessing.
-3. Execute the task.
-4. Validate the result.
-5. Report outcome and remaining risks.
-</workflow>
-
-<constraints>
-Hard constraints:
-Soft preferences:
-Escalation boundaries:
-</constraints>
-
-<output_format>
-Progress updates:
-Final response sections:
-</output_format>
+<external_files>
+- `AGENTS.md` - repo agent rules; loaded
+- `docs/api.md` - API contract; reference before endpoint changes
+- `SECURITY.md` - security policy; reference for disclosure or auth changes
+</external_files>
 ```
 
-Use markdown headings instead of tags if that fits the target stack better.
+Rules:
+
+- Enumerate exact repo-relative paths.
+- Mark each file as `loaded`, `referenced`, or `out of scope`.
+- Paste only excerpts needed for the prompt or eval case.
+- Prefer `docs/api.md` over "read the docs".
+- Keep stable docs outside the prompt when the runtime can retrieve files.
+
+## Tool policy placement
+
+- Tool schemas belong in provider-native tools.
+- Prompt text carries tool policy: when, why, whether, evidence, and stop conditions.
+- Naming a tool in policy is fine; re-enumerating schemas is not.
 
 ## High-value prompt moves
 
@@ -190,29 +129,12 @@ Use markdown headings instead of tags if that fits the target stack better.
 - State when it should use tools and what evidence it should gather before acting.
 - State what counts as completion.
 - State what counts as refusal, escalation, or defer.
+- Enumerate external files by path when specs, docs, or policies matter.
 - Separate hard constraints from preferences.
 - Keep progress-update style explicit if the user should see it.
 - Use the shortest wording that preserves the intended behavioral constraint.
 - Remove persona, motivation, or reminder text that does not change measured behavior.
 - Place directives in canonical rules sections (`<behavior>`, `<constraints>`, `<tool_policy>`, `<workflow>`), not buried inside descriptive markers like `<context>`, `<state>`, or `<turn-state>`.
-
-## Examples
-
-Examples help most when they teach one of these:
-
-- output format
-- edge-case handling
-- tool-use triggers
-- the difference between "ask first" and "act now"
-
-Examples hurt when they:
-
-- contradict the instructions
-- overfit the model to one narrow phrasing
-- use inconsistent structure
-- show anti-patterns without a corrected version
-- restate rules that are already clear in the instructions
-- remain in the prompt after they stop improving evals
 
 ## Symptom to fix mapping
 

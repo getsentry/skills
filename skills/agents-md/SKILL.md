@@ -1,118 +1,95 @@
 ---
 name: agents-md
-description: This skill should be used when the user asks to "create AGENTS.md", "update AGENTS.md", "maintain agent docs", "set up CLAUDE.md", or needs to keep agent instructions concise. Enforces research-backed best practices for minimal, high-signal agent documentation.
+description: Creates and maintains concise AGENTS.md and CLAUDE.md project instruction files. Use when asked to create AGENTS.md, update AGENTS.md, maintain agent docs, set up CLAUDE.md, document repository agent conventions, or keep coding-agent instructions minimal and reference-backed.
 ---
 
 # Maintaining AGENTS.md
 
-AGENTS.md is the canonical agent-facing documentation. Keep it minimal—agents are capable and don't need hand-holding. Target under 60 lines; never exceed 100. Instruction-following quality degrades as document length increases.
+Goal: concise, actionable agent instructions. Target under 60 lines; never exceed 100.
+
+## Workflow
+
+1. Inspect before writing:
+   - package manager: lock files and manifests
+   - commands: `package.json`, `Makefile`, task runners, CI workflows
+   - docs/specs/policies: `README.md`, `CONTRIBUTING.md`, `docs/`, `specs/`, `policies/`, `SECURITY.md`, `.github/`
+   - conventions: current code patterns, test layout, generated files, legacy areas to avoid
+2. Choose scope:
+   - root `AGENTS.md`: repo-wide defaults
+   - nested `AGENTS.md`: only when a subtree has different commands or rules
+   - closest instruction file wins; keep narrower files shorter than root files
+3. Write the smallest useful file.
+4. Verify exact paths and commands exist.
 
 ## File Setup
 
-1. Create `AGENTS.md` at project root
-2. Create symlink: `ln -s AGENTS.md CLAUDE.md`
+- Create `AGENTS.md` at the repository root.
+- If a Claude-compatible entrypoint is required, symlink `CLAUDE.md` to `AGENTS.md`.
+- Do not maintain divergent `AGENTS.md` and `CLAUDE.md` copies.
 
-## Before Writing
+## Default Sections
 
-Analyze the project to understand what belongs in the file:
+Use only sections that add non-obvious value.
 
-1. **Package manager** — Check for lock files (`pnpm-lock.yaml`, `yarn.lock`, `package-lock.json`, `uv.lock`, `poetry.lock`)
-2. **Linter/formatter configs** — Look for `.eslintrc`, `biome.json`, `ruff.toml`, `.prettierrc`, etc. (don't duplicate these in AGENTS.md)
-3. **CI/build commands** — Check `Makefile`, `package.json` scripts, CI configs for canonical commands
-4. **Monorepo indicators** — Check for `pnpm-workspace.yaml`, `nx.json`, Cargo workspace, or subdirectory `package.json` files
-5. **Existing conventions** — Check for existing CONTRIBUTING.md, docs/, or README patterns
-
-## Writing Rules
-
-- **Headers + bullets** — No paragraphs
-- **Code blocks** — For commands and templates
-- **Reference, don't embed** — Point to existing docs: "See `CONTRIBUTING.md` for setup" or "Follow patterns in `src/api/routes/`"
-- **No filler** — No intros, conclusions, or pleasantries
-- **Trust capabilities** — Omit obvious context
-- **Prefer file-scoped commands** — Per-file test/lint/typecheck commands over project-wide builds
-- **Don't duplicate linters** — Code style lives in linter configs, not AGENTS.md
-
-## Required Sections
-
-### Package Manager
-Which tool and key commands only:
-```markdown
-## Package Manager
-Use **pnpm**: `pnpm install`, `pnpm dev`, `pnpm test`
-```
-
-### File-Scoped Commands
-Per-file commands are faster and cheaper than full project builds. Always include when available:
-```markdown
-## File-Scoped Commands
-| Task | Command |
-|------|---------|
-| Typecheck | `pnpm tsc --noEmit path/to/file.ts` |
-| Lint | `pnpm eslint path/to/file.ts` |
-| Test | `pnpm jest path/to/file.test.ts` |
-```
-
-### Commit Attribution
-Always include this section. Agents should use their own identity:
-```markdown
-## Commit Attribution
-AI commits MUST include:
-```
-Co-Authored-By: (the agent's name and attribution byline)
-```
-Example: `Co-Authored-By: Claude Sonnet 4 <noreply@example.com>`
-```
-
-### Key Conventions
-Project-specific patterns agents must follow. Keep brief.
-
-## Optional Sections
-
-Add only if truly needed:
-- API route patterns (show template, not explanation)
-- CLI commands (table format)
-- File naming conventions
-- Project structure hints (point to critical files, flag legacy code to avoid)
-- Monorepo overrides (subdirectory `AGENTS.md` files override root)
-
-## Anti-Patterns
-
-Omit these:
-- "Welcome to..." or "This document explains..."
-- "You should..." or "Remember to..."
-- Linter/formatter rules already in config files (`.eslintrc`, `biome.json`, `ruff.toml`)
-- Listing installed skills or plugins (agents discover these automatically)
-- Full project-wide build commands when file-scoped alternatives exist
-- Obvious instructions ("run tests", "write clean code")
-- Explanations of why (just say what)
-- Long prose paragraphs
-
-## Example Structure
-
-```markdown
+````markdown
 # Agent Instructions
 
 ## Package Manager
-Use **pnpm**: `pnpm install`, `pnpm dev`
+- Use **pnpm**: `pnpm install`
+
+## Commands
+| Task | Command |
+|------|---------|
+| Test file | `pnpm vitest run path/to/file.test.ts` |
+| Lint file | `pnpm eslint path/to/file.ts` |
+
+## External References
+| Need | File |
+|------|------|
+| Setup | `CONTRIBUTING.md` |
+| Architecture | `docs/architecture.md` |
+| Security policy | `SECURITY.md` |
+
+## Key Conventions
+- Generated files: update with `pnpm generate`; do not edit by hand.
 
 ## Commit Attribution
 AI commits MUST include:
 ```
 Co-Authored-By: (the agent's name and attribution byline)
 ```
+````
 
-## File-Scoped Commands
-| Task | Command |
-|------|---------|
-| Typecheck | `pnpm tsc --noEmit path/to/file.ts` |
-| Lint | `pnpm eslint path/to/file.ts` |
-| Test | `pnpm jest path/to/file.test.ts` |
+## Writing Rules
 
-## API Routes
-[Template code block]
+- Use headings, bullets, and tables; avoid paragraphs.
+- Use repo-relative paths; avoid vague references like "see docs".
+- Reference existing docs/specs/policies instead of copying them.
+- List exact external files for setup, architecture, API specs, security, release, and policy docs when they exist.
+- Prefer file-scoped test/lint/typecheck commands; include full builds only when no narrower command exists.
+- Put commands in tables when there is more than one.
+- Keep one rule per bullet.
+- Keep rationale out unless it prevents a likely mistake.
+- Do not restate linter, formatter, or typechecker config.
+- Do not list installed skills or plugins.
+- Do not include generic quality slogans.
 
-## CLI
-| Command | Description |
-|---------|-------------|
-| `pnpm cli sync` | Sync data |
+## External Reference Rules
+
+Good:
+
+```markdown
+## External References
+| Need | File |
+|------|------|
+| API contract | `docs/api.md` |
+| Release process | `docs/releasing.md` |
 ```
+
+## Anti-Patterns
+
+- welcome text, intros, conclusions, or pleasantries
+- long prose explaining why instructions matter
+- duplicated content from `README.md`, `CONTRIBUTING.md`, or policy docs
+- project-wide commands when file-scoped commands are available
+- nested `AGENTS.md` files that repeat root instructions

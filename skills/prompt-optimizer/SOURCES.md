@@ -17,9 +17,11 @@ Why: this skill is a repeatable prompt-optimization workflow with explicit preco
 | `README.md` | repo convention | canonical | 2026-04-18 | high | Skill template, naming, registration conventions | repository-local policy | Canonical public skill inventory |
 | `CONTRIBUTING.md` | repo convention | canonical | 2026-04-18 | high | Local testing and registration checklist | repository-local policy | Confirms registration steps |
 | `AGENTS.md` | repo convention | canonical | 2026-04-18 | high | Mandatory use of `skill-writer`, registration checklist, portability conventions | repository-local policy | Highest-priority local instruction source |
+| `https://agents.md/` | official format guide | canonical | 2026-05-04 | high | AGENTS.md purpose, common sections, nested files, closest-file precedence | public format guidance | Supports exact external file references in repo agent prompts |
+| `https://developers.openai.com/codex/guides/agents-md` | official product docs | canonical | 2026-05-04 | high | Codex AGENTS.md discovery, scope, merge order, size cap, verification | OpenAI-specific behavior | Used for agent prompt and repo instruction layering guidance |
+| `https://platform.openai.com/docs/guides/prompt-optimizer/` | official docs | canonical | 2026-05-04 | high | Dataset-backed prompt optimization, annotations, graders, manual review | verify product surface before dashboard-specific instructions | Confirms eval-first and manual-review loop |
+| `https://platform.openai.com/docs/guides/prompting` | official docs | canonical | 2026-05-04 | high | Prompt objects, versioning, variables, linked evals, prompt roles | product-specific features may evolve | Supports reusable prompt packages and eval reruns |
 | `https://developers.openai.com/api/docs/guides/reasoning-best-practices` | official docs | canonical | 2026-04-18 | high | Reasoning-model prompting differences, simplicity, delimiters, no explicit CoT | verify product syntax if exact API behavior matters | Used for OpenAI family notes |
-| `https://developers.openai.com/api/docs/guides/prompt-optimizer` | official docs | canonical | 2026-04-18 | high | Evals, graders, annotations, critique-driven prompt iteration | verify current product surface if depending on dashboard workflow | Supports eval-first workflow |
-| `https://developers.openai.com/api/docs/guides/prompting` | official docs | canonical | 2026-04-18 | high | Prompt versioning, reuse, prompt objects, eval linkage | product-specific features may evolve | Supports reusable prompt packaging |
 | `https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview` | official docs | canonical | 2026-04-18 | high | Success-criteria-first prompting and reminder that not every failure is a prompt problem | product syntax may evolve | Supports precondition checks |
 | `https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices` | official docs | canonical | 2026-04-18 | high | XML tags, role prompting, examples, long-context ordering, output control | provider-specific behavior | Used for Claude family notes and marker guidance |
 | `https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-tools` | official docs | canonical | 2026-04-18 | medium | Prompt improver inputs: prompt, failure feedback, ideal examples | console workflow may change | Reinforces critique-plus-example loop |
@@ -68,6 +70,14 @@ Why: this skill is a repeatable prompt-optimization workflow with explicit preco
    Status: adopted
    Why: Gemini and Anthropic both document that long-context prompts perform better when evidence comes before the final query.
 
+9. Inventory stable external context by exact path.
+   Status: adopted
+   Why: AGENTS.md and Codex guidance favor explicit project instruction sources, and path inventories prevent prompts from copying stale docs or using vague "read the docs" pointers.
+
+10. Add `External Context` to the returned prompt package.
+    Status: adopted
+    Why: another engineer should see which specs, docs, policies, and examples were loaded, referenced, or left out of scope.
+
 ## Coverage matrix
 
 | Dimension | Coverage status | Evidence |
@@ -78,6 +88,7 @@ Why: this skill is a repeatable prompt-optimization workflow with explicit preco
 | Model-family variance | complete | OpenAI, Anthropic, Gemini docs |
 | Prompt compaction and deduplication | complete | OpenAI reasoning best practices, Anthropic skill best practices, Gemini long-context guidance |
 | Context ordering and query placement | complete | Anthropic prompting docs, Gemini long-context guidance |
+| External file inventories | complete | AGENTS.md format guidance, OpenAI Codex AGENTS.md docs, user concern |
 | Safety and escalation boundaries | complete | provider docs plus repo workflow conventions |
 | Output and acceptance checks | complete | OpenAI prompting and optimizer docs, skill-writer output patterns |
 | Transformed example artifacts | complete | `references/transformed-examples.md` |
@@ -108,6 +119,7 @@ Why: this skill is a repeatable prompt-optimization workflow with explicit preco
 1. Add provider notes for additional families only when the repository has a real downstream need.
 2. If this skill starts getting heavy use, add an optional script or eval template for capturing prompt scores across rounds.
 3. Re-check provider docs when major model-family updates land, especially around tool use and reasoning defaults.
+4. Add durable before/after examples for external context inventories if future prompt changes regress into vague file references.
 
 ## Stopping rationale
 
@@ -123,3 +135,4 @@ Further retrieval is currently low-yield for this first version. The source pack
 - 2026-04-18: Created the initial `prompt-optimizer` skill, references, and provenance record.
 - 2026-04-18: Added an explicit prompt learnings pass covering compaction, deduplication, and context ordering.
 - 2026-04-18: Folded the prompt learnings back into the core shaping and iteration guidance to keep the workflow compact.
+- 2026-05-04: Added exact external context inventories, `External Context` output, concise runtime workflow, and `SPEC.md`.
