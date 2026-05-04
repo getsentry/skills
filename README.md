@@ -41,7 +41,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 
 | Skill | Description |
 |-------|-------------|
-| [agents-md](skills/agents-md/SKILL.md) | This skill should be used when the user asks to "create AGENTS.md", "update AGENTS.md", "maintain agent docs", "set up CLAUDE.md", or needs to keep agent instructions concise. |
+| [agents-md](skills/agents-md/SKILL.md) | Create and maintain concise, reference-backed AGENTS.md and CLAUDE.md files. |
 | [blog-writing-guide](skills/blog-writing-guide/SKILL.md) | Write, review, and improve blog posts for the Sentry engineering blog following Sentry's specific writing standards, voice, and quality bar. |
 | [brand-guidelines](skills/brand-guidelines/SKILL.md) | Write copy following Sentry brand guidelines. |
 | [claude-settings-audit](skills/claude-settings-audit/SKILL.md) | Analyze a repository to generate recommended Claude Code settings.json permissions. |
@@ -58,7 +58,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [iterate-pr](skills/iterate-pr/SKILL.md) | Iterate on a PR until CI passes. |
 | [presentation-creator](skills/presentation-creator/SKILL.md) | Create data-driven presentation slides using React, Vite, and Recharts with Sentry branding. |
 | [pr-writer](skills/pr-writer/SKILL.md) | Canonical workflow to create and update pull requests following Sentry conventions. |
-| [prompt-optimizer](skills/prompt-optimizer/SKILL.md) | Create, optimize, and iteratively refine agent prompts and system prompts. |
+| [prompt-optimizer](skills/prompt-optimizer/SKILL.md) | Optimize prompts with evals, model-family adapters, and exact external context references. |
 | [replay-ux-research](skills/replay-ux-research/SKILL.md) | Analyze Sentry session replays to surface UX patterns, pain points, and user journeys for a given product area. |
 | [security-review](skills/security-review/SKILL.md) | Security code review for vulnerabilities. |
 | [skill-scanner](skills/skill-scanner/SKILL.md) | Scan agent skills for security issues. |
