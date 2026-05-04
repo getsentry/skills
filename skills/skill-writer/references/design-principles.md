@@ -67,6 +67,22 @@ Use this guide to keep skill instructions dense, scannable, and worth their toke
 - Reuse established repo-specific path variables only when the repo already standardizes on them.
 - Label provider-specific mechanics explicitly and add portability notes when they matter.
 
+## Scope-Aware Encapsulation
+
+A skill's body must not exceed its registration scope. Where the skill is registered determines what its content may reference. Distinct from `Independence And Portability`: that section governs provider portability (paths, runtime deps); this one governs body content matching registration scope.
+
+| Registration | Scope | Body may reference |
+|--------------|-------|---------------------|
+| Global (`~/.claude/skills/`, `~/.claude/agents/`) | cross-project | generic patterns, public APIs, structural placeholder names |
+| Project (`<project>/.claude/skills/`, `<project>/.claude/agents/`) | one codebase | project files, hooks, domain terms, internal helpers |
+
+A global skill that bakes in identifiers from one project ships them to every consumer of the skill, where the references resolve to nothing.
+
+- Resolve registration scope before authoring; ask the user once if ambiguous.
+- For global skills, abstract project-grounded patterns to structural placeholder names (`ExampleComponent`, `useDataHook`) before writing them into the body. Do not substitute one domain for another.
+- Source synthesis may consult a project's files for the canonical pattern; the resulting body must not.
+- Project skills may anchor freely on real codebase symbols; that's the value.
+
 ## Long Files
 
 - Keep `SKILL.md` short enough to scan as a router.

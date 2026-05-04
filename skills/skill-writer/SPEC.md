@@ -57,6 +57,7 @@ Out of scope:
   - Source provenance and decisions live in `SOURCES.md`.
   - Durable positive/negative examples live in `references/evidence/`.
   - `SPEC.md` records the maintenance contract for new or materially changed skills.
+  - Globally registered skills do not bake in project-specific identifiers (file paths, hook names, domain nouns).
   - Validation runs before completion.
 - Expected bundled files loaded at runtime:
   - `references/mode-selection.md`
