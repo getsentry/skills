@@ -19,7 +19,7 @@ my-skill/
     └── troubleshooting.md
 ```
 
-Subfolders are acceptable when they make the lookup path clearer, for example `references/api/` or `references/examples/`.
+Keep reference files as direct children of `references/`. For related variant-specific leaves, use a shared filename prefix and list each file directly from `SKILL.md`.
 
 ## Required contract
 
@@ -27,6 +27,7 @@ Subfolders are acceptable when they make the lookup path clearer, for example `r
 2. Reference filenames predict their contents.
 3. No reference mixes routing, troubleshooting, examples, and source notes without a clear reason.
 4. Large references include navigation or are split further.
+5. Runtime references stay flat unless there is a non-runtime evidence or asset reason to use a subfolder.
 
 ## Avoid this layout when
 

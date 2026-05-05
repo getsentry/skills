@@ -14,9 +14,9 @@ In scope:
 - New skill creation from local, external, or mixed sources.
 - Existing skill updates that affect runtime behavior, structure, trigger precision, references, or validation.
 - Research-first synthesis for proposed skills.
-- Iteration from positive examples, negative examples, review feedback, eval results, and observed agent behavior.
+- Iteration from positive examples, negative examples, review feedback, validation results, and observed agent behavior.
 - Registration and validation for this repository's canonical `skills/<skill-name>/` layout and other discovered layouts.
-- Choosing between execution shapes such as inline guidance, reference-backed expert, script-backed workflow, router, evaluator loop, subagent-fork, hook-backed, asset-template, or hybrids.
+- Choosing between execution shapes such as inline guidance, reference-backed expert, script-backed workflow, router, subagent-fork, hook-backed, asset-template, or hybrids.
 - Assessing when provider-specific mechanics are justified and documenting portability constraints.
 
 Out of scope:
@@ -40,7 +40,7 @@ Out of scope:
   - Inspect local repository conventions before deciding where files belong.
   - Classify the skill and select the minimum required workflow paths.
   - Select a primary execution shape and default to the simplest adequate option.
-  - Treat evaluation as conditional rather than a default path.
+  - Keep validation lightweight and structural unless project conventions require more.
 - Required outputs:
   - Summary.
   - Changes Made.
@@ -53,11 +53,12 @@ Out of scope:
   - Runtime guidance should prefer dense structures such as tables, checklists, templates, and examples over explanatory prose.
   - Material skill changes explicitly name the selected execution shape.
   - Advanced mechanics are justified and include portability notes.
-  - Supporting references are focused and loaded conditionally.
+  - Supporting runtime references are focused, flat under `references/`, listed in `SKILL.md`, and loaded conditionally.
   - Source provenance and decisions live in `SOURCES.md`.
   - Durable positive/negative examples live in `references/evidence/`.
   - `SPEC.md` records the maintenance contract for new or materially changed skills.
-  - Validation runs before completion.
+  - Lightweight structural validation runs before completion.
+  - A post-change precision pass runs after any skill artifact change.
 - Expected bundled files loaded at runtime:
   - `references/mode-selection.md`
   - `references/execution-shapes.md`
@@ -67,12 +68,9 @@ Out of scope:
   - `references/reference-architecture.md`
   - `references/spec-template.md`
   - `references/description-optimization.md`
-  - `references/evaluation-path.md` when the user asks for evaluation, the change is high-risk, or the architecture choice is non-obvious
   - `references/registration-validation.md`
-  - `references/artifact-layouts/*.md`
-  - `references/workflow-mechanics/*.md`
-  - `references/claude-code/*.md`
-  - `references/examples/*.md`
+  - `references/source-adaptation.md`
+  - flat `references/*.md` files listed in `SKILL.md`
   - `scripts/quick_validate.py`
 
 ## Source And Evidence Model
@@ -83,15 +81,15 @@ Authoritative sources:
 - Repository policy: `AGENTS.md`, `README.md`, `CONTRIBUTING.md`, plugin manifests, and registration settings.
 - Agent Skills specification and official skill authoring guidance.
 - Current official provider docs for any provider-specific mechanics being recommended.
-- Official orchestration guidance for routing, delegation, evaluation loops, and reasoning-model planning patterns.
+- Official orchestration guidance for routing, delegation, and reasoning-model planning patterns.
 
 Useful improvement sources:
 
-- positive examples: successful generated skills, review-approved skill changes, and eval passes that demonstrate desired behavior
+- positive examples: successful generated skills, review-approved skill changes, and validation passes that demonstrate desired behavior
 - negative examples: shallow generated skills, overloaded `SKILL.md` files, catch-all references, missing provenance, failed validation, false triggers, or review feedback
 - commit logs/changelogs: repeated fixes, reversions, migrations, and changes that explain why a rule exists
-- issue or PR feedback: reviewer comments about missing coverage, confusing trigger language, poor file placement, or insufficient evaluation
-- eval results: fixed prompt sets in `EVAL.md`, qualitative depth checks, and optional baseline-vs-with-skill runs
+- issue or PR feedback: reviewer comments about missing coverage, confusing trigger language, poor file placement, or insufficient validation
+- validation results: structural checks, review findings, and observed behavior from real skill use
 
 Data that must not be stored:
 
@@ -107,23 +105,19 @@ Data that must not be stored:
 - `SKILL.md` acts as a meta-router for the authoring process: class selection, shape selection, and path selection happen before writing.
 - `SPEC.md` contains this maintenance specification.
 - `SOURCES.md` contains source inventory, decisions, coverage matrix, open gaps, and changelog.
-- `EVAL.md` contains reusable evaluation prompts and deeper eval runbooks.
-- `references/` contains focused workflow guidance, routed leaf references, templates, rubrics, and class-specific authoring requirements.
-- `references/` may use subfolders when they create clearer leaf routing, but every bundled reference should still be directly routed from `SKILL.md`.
+- `references/` contains focused flat workflow guidance, routed leaf references, templates, rubrics, and class-specific authoring requirements.
+- Runtime references should be direct children of `references/`; use filename prefixes for related leaves and list every bundled reference directly from `SKILL.md`.
 - `references/evidence/` contains durable positive/negative examples when future iterations need them.
 - `scripts/` contains validation automation.
 - `assets/` is unused unless a future skill-authoring workflow needs static templates or media.
 
-## Evaluation
+## Validation
 
 - Lightweight validation:
-  - Run `uv run skills/skill-writer/scripts/quick_validate.py skills/skill-writer --skill-class skill-authoring --strict-depth`.
+  - Run `uv run skills/skill-writer/scripts/quick_validate.py skills/skill-writer`.
   - Inspect changed references for focused scope, direct discoverability, and absence of host-specific paths.
   - Verify that the selected execution shape is explicit and that advanced mechanics, if any, are justified.
-- Deeper evaluation:
-  - Use `references/evaluation-path.md` and `EVAL.md` only when the user requests it, the change is high-risk, or the architectural choice needs verification.
-  - Compare behavior before and after changes with representative positive and negative prompts.
-  - Include shape-selection prompts when the change affects routing, delegation, hooks, or evaluator loops.
+  - Run the post-change precision pass and summarize what was replaced, narrowed, moved, deleted, or added with reason.
 - Holdout examples:
   - Keep durable holdout examples in `references/evidence/holdout-set.md` when repeated regressions appear.
   - Do not tune directly against holdout examples until they are intentionally moved to the working set.
@@ -131,15 +125,13 @@ Data that must not be stored:
   - Validator passes with no errors.
   - New or changed workflow rules are represented in the correct artifact.
   - `SOURCES.md` records source-backed decisions and any remaining gaps.
-  - `SPEC.md` is updated when intent, scope, evidence model, evaluation, or maintenance expectations change.
+  - `SPEC.md` is updated when intent, scope, evidence model, validation, or maintenance expectations change.
 
 ## Known Limitations
 
-- The validator checks structure and selected depth gates; it cannot prove that a generated skill is semantically complete.
-- The validator does not yet deeply verify every advanced-shape contract.
-- The validator intentionally does not hardcode or exhaustively validate provider-specific optional frontmatter fields.
-- The validator does not yet strongly enforce prose density; that still relies mostly on authoring guidance and review.
-- Deeper evals are opt-in unless risk or user request justifies the extra cost.
+- The validator checks only structural requirements and a high-threshold advisory size warning; it cannot prove that a generated skill is semantically complete.
+- The validator intentionally does not classify skills, parse source coverage, enforce SPEC headings, judge trigger quality, or exhaustively validate provider-specific optional frontmatter fields.
+- Prose density, source adaptation quality, advanced-shape contracts, and precision rely on authoring judgment and review.
 - Source discovery can still miss private operational knowledge if it is not present in local files, accessible issue/PR history, or supplied context.
 - Provider-specific skill extensions may drift; `skill-writer` treats them as compatibility guidance unless a skill is intentionally provider-specific.
 
@@ -147,8 +139,7 @@ Data that must not be stored:
 
 - Update `SKILL.md` when the required runtime workflow, branch conditions, or output contract changes.
 - Update `references/execution-shapes.md` when new skill mechanics or orchestration patterns become important.
-- Update the relevant file under `references/artifact-layouts/`, `references/workflow-mechanics/`, or `references/claude-code/` when a specific routed leaf changes.
-- Update `SPEC.md` when intent, scope, user/trigger context, evidence model, evaluation gates, limitations, or maintenance rules change.
+- Update the relevant flat file under `references/` when a specific routed leaf changes.
+- Update `SPEC.md` when intent, scope, user/trigger context, evidence model, validation expectations, limitations, or maintenance rules change.
 - Update `SOURCES.md` when source inventory, decisions, coverage, gaps, or changelog entries change.
-- Update `EVAL.md` when reusable evaluation prompts or runbooks change.
 - Update `references/evidence/` when preserving examples for future iteration or regression tracking.

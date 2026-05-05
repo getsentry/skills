@@ -1,6 +1,6 @@
 # Iteration Evidence
 
-Use this guide when improving a skill from positive examples, negative examples, review feedback, eval results, or observed agent behavior.
+Use this guide when improving a skill from positive examples, negative examples, review feedback, validation results, or observed agent behavior.
 
 ## Storage Layout
 
@@ -39,11 +39,11 @@ Use one record per example:
 - Label: positive | negative
 - Kind: true-positive | false-positive | false-negative | fix | regression | edge-case
 - Origin: human-verified | mixed | synthetic
-- Source: issue/PR/commit/log/user note/local eval pointer
+- Source: issue/PR/commit/log/user note/local validation pointer
 - Status: working | holdout | resolved | deferred
 - Expected behavior: concise statement
 - Observed behavior: concise statement
-- Skill delta: instruction, reference, description, or eval change
+- Skill delta: instruction, reference, description, or validation change
 - Anonymization: what was removed or generalized
 
 ### Content
@@ -76,7 +76,6 @@ Promote evidence into the skill artifacts only when it changes future behavior:
 - Put universal behavioral rules in `SKILL.md`.
 - Put domain-specific examples in a focused reference.
 - Put source provenance and decisions in `SOURCES.md`.
-- Put reusable eval prompts in `EVAL.md`.
 - Keep raw or semi-raw examples in `references/evidence/`.
 
 Do not turn `references/evidence/` into a changelog. The changelog belongs in `SOURCES.md`.

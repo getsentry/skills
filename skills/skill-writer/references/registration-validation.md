@@ -1,6 +1,6 @@
 # Registration and Validation
 
-Apply registration and quality checks before completion.
+Apply registration and lightweight validation before completion.
 
 ## Registration checklist
 
@@ -24,44 +24,40 @@ When a repository does maintain its own skill catalog, verify and update any req
 
 ## Validation checklist
 
+The validator is a structural check. It should fail only for invalid skill format or missing referenced files. The size warning requires author judgment, not a machine gate.
+
 1. Run:
 
 ```bash
-uv run scripts/quick_validate.py <path/to/skill-directory> --strict-depth
+uv run scripts/quick_validate.py <path/to/skill-directory>
 ```
 
 Use the skill-root-relative form above when running from the `skill-writer` directory.
 If you must run the validator from another working directory, convert both paths to the correct relative path from that directory instead of introducing absolute or host-specific paths into the skill docs.
 
-2. Confirm for authoring/generator skills:
+2. Confirm manually for authoring/generator skills:
 - transformed examples exist in references (happy-path, secure/robust, anti-pattern+fix)
-- synthesis depth gates are satisfied
+- synthesis coverage was considered and any gaps are explicit
 - selected example profile requirements are satisfied and reported
-- `SPEC.md` exists or was updated when the change creates a skill or materially changes intent, scope, evidence model, evaluation, or maintenance expectations
+- `SPEC.md` exists or was updated when the change creates a skill or materially changes intent, scope, evidence model, validation, or maintenance expectations
 - every bundled reference file is directly discoverable from `SKILL.md`
 
-3. Confirm for integration/documentation skills:
+3. Confirm manually for integration/documentation skills:
 - focused references cover API surface, common use cases, known issues/workarounds, and version variance
 - reference file names fit the skill's domain rather than a fixed template
 - `SKILL.md` and `references/*.md` avoid host-specific absolute filesystem paths
 
-4. Confirm portability for skills that are expected to be portable by default:
+4. Confirm manually for skills that are expected to be portable by default:
 - bundled file references use skill-root-relative paths such as `references/...`, `scripts/...`, or `assets/...`
 - provider-specific path variables (for example `${CLAUDE_SKILL_ROOT}`) either follow established repository prior art or are explicitly scoped, rather than being introduced ad hoc
 - provider-specific behavior, if any, is labeled as compatibility guidance rather than the primary workflow
 
-5. If evaluation was run, include:
-- lightweight qualitative summary
-- concise depth rubric status for integration/documentation and skill-authoring skills
-- deeper eval or quantitative summary only if user requested it or risk warranted it
-
-6. Review validator warnings for long reference files and split files when warnings indicate mixed concerns or poor navigation.
-7. Reject shallow handoffs that omit required artifacts.
+5. Review validator warnings for oversized `SKILL.md` files.
+6. Do not add validators for skill class, coverage quality, SPEC shape, trigger quality, or other qualitative guidance.
 
 ## Required output
 
 - Registration changes summary
 - Selected skill root and why it was chosen
 - Validator output
-- Evaluation summary, if run
 - Any residual risks or open gaps

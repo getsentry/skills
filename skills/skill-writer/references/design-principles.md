@@ -8,7 +8,21 @@ Use this guide to keep skill instructions dense, scannable, and worth their toke
 - Prefer tables, checklists, templates, and input/output examples over explanatory prose.
 - Keep rationale to one short sentence unless the agent is likely to make the wrong choice without it.
 
-## Add Vs Cut
+## Precision Before Addition
+
+Before adding instructions, choose one:
+
+| Action | Use when |
+|--------|----------|
+| replace | an existing rule is vague, stale, or pointing at the wrong behavior |
+| narrow | the current rule is mostly right but over-triggers or invites extra work |
+| move | the content belongs in `SOURCES.md`, `SPEC.md`, or a routed reference |
+| delete | the content repeats another rule or no longer changes behavior |
+| add | no existing rule can cover the new behavior without becoming less precise |
+
+Do not add a new section, reference, or checklist until replacement, narrowing, moving, and deletion have been considered.
+
+## Keep Vs Cut
 
 | Keep | Cut |
 |------|-----|
@@ -17,6 +31,7 @@ Use this guide to keep skill instructions dense, scannable, and worth their toke
 | exact commands, schemas, and templates | repeated restatements of the same rule |
 | branch logic and defaults | long essays where a table would work |
 | one strong example | multiple weak examples saying the same thing |
+| behavior-changing constraints | source notes that belong in `SOURCES.md` |
 
 ## Match Structure To Fragility
 
@@ -56,7 +71,8 @@ Use this guide to keep skill instructions dense, scannable, and worth their toke
 
 - Reference filenames should predict their contents.
 - Each reference should answer one lookup question.
-- Subfolders are acceptable only when they make the lookup path clearer.
+- Keep runtime references flat under `references/`.
+- For related variant-specific references, use sibling files with a shared prefix and explicit differentiator.
 - Every bundled reference should have a direct "open when..." entry in `SKILL.md`.
 - Do not create catch-all files for notes, context, or mixed patterns.
 

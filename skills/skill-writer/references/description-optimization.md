@@ -8,7 +8,7 @@ Use this path to improve skill triggering quality and reduce false matches.
 2. Build two query sets:
 - should-trigger queries
 - should-not-trigger queries
-3. Evaluate the current description against both sets.
+3. Check the current description against both sets.
 4. Edit description wording to improve precision/recall.
 5. Repeat until false positives and false negatives are reduced to acceptable levels.
 

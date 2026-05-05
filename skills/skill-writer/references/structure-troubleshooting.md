@@ -8,6 +8,12 @@ Problem: `SKILL.md` exceeds 500 lines and becomes a second encyclopedia.
 
 Fix: extract detailed material into focused `references/` files and keep `SKILL.md` as the router.
 
+## Additive Drift
+
+Problem: each update adds another rule, section, or reference without removing or tightening the old one.
+
+Fix: run the precision pass before editing and again after skill artifacts change. Replace, narrow, move, or delete existing guidance before adding new guidance.
+
 ## Missing Trigger Keywords
 
 Problem: the description is too vague to match user language.
@@ -40,9 +46,9 @@ Fix: add a table of contents or split by lookup need.
 
 ## Extraneous Files
 
-Problem: the skill directory accumulates user-facing docs or miscellaneous notes that do not help runtime, evaluation, or maintenance.
+Problem: the skill directory accumulates user-facing docs or miscellaneous notes that do not help runtime, validation, or maintenance.
 
-Fix: keep only `SKILL.md`, `SPEC.md`, `SOURCES.md`, `EVAL.md`, `references/`, `scripts/`, `assets/`, and `LICENSE` when needed.
+Fix: keep only `SKILL.md`, `SPEC.md`, `SOURCES.md`, `references/`, `scripts/`, `assets/`, and `LICENSE` when needed.
 
 ## Scripts Without Documentation
 
@@ -70,7 +76,7 @@ Fix: move legacy behavior into a clearly labeled deprecated section or remove it
 
 ## Advanced Mechanics Without Justification
 
-Problem: the skill uses routing, `context: fork`, hooks, or evaluator loops because they seem sophisticated.
+Problem: the skill uses routing, `context: fork`, or hooks because they seem sophisticated.
 
 Fix: name the shape, explain why simpler shapes were rejected, and add portability/safety notes.
 
