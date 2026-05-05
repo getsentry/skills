@@ -114,7 +114,7 @@ Data that must not be stored:
 ## Validation
 
 - Lightweight validation:
-  - Run `uv run skills/skill-writer/scripts/quick_validate.py skills/skill-writer --skill-class skill-authoring`.
+  - Run `uv run skills/skill-writer/scripts/quick_validate.py skills/skill-writer`.
   - Inspect changed references for focused scope, direct discoverability, and absence of host-specific paths.
   - Verify that the selected execution shape is explicit and that advanced mechanics, if any, are justified.
   - Run the post-change precision pass and summarize what was replaced, narrowed, moved, deleted, or added with reason.
@@ -129,10 +129,9 @@ Data that must not be stored:
 
 ## Known Limitations
 
-- The validator checks structure and emits advisory warnings; it cannot prove that a generated skill is semantically complete.
-- The validator does not yet deeply verify every advanced-shape contract.
-- The validator intentionally does not hardcode or exhaustively validate provider-specific optional frontmatter fields.
-- The validator intentionally does not strongly enforce prose density, source adaptation quality, or precision; those rely on authoring judgment and review.
+- The validator checks only structural requirements and limited advisory size/path warnings; it cannot prove that a generated skill is semantically complete.
+- The validator intentionally does not classify skills, parse source coverage, enforce SPEC headings, judge trigger quality, or exhaustively validate provider-specific optional frontmatter fields.
+- Prose density, source adaptation quality, advanced-shape contracts, and precision rely on authoring judgment and review.
 - Source discovery can still miss private operational knowledge if it is not present in local files, accessible issue/PR history, or supplied context.
 - Provider-specific skill extensions may drift; `skill-writer` treats them as compatibility guidance unless a skill is intentionally provider-specific.
 

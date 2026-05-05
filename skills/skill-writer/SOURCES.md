@@ -41,13 +41,14 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 8. Hooks are deterministic enforcement and need narrow scope plus security notes because command hooks run with full user permissions.
 9. Multi-agent guidance should distinguish manager/orchestrator, handoff, and isolated subagent execution instead of collapsing them into one pattern.
 10. Reasoning-model guidance is a design option, not a universal default: planner/doer splits are useful when complexity warrants them.
-11. Validation should check architectural choices qualitatively, not only file structure and prose depth.
+11. Architectural choices are reviewed qualitatively during authoring, not inferred by validator heuristics.
 12. Reference files remain split by lookup need rather than topic buckets, even as the set of supported shapes expands.
 13. Runtime references stay flat under `references/`; related leaves use filename prefixes, and every bundled reference is directly discoverable from `SKILL.md`.
-14. The validator should enforce durable structural guarantees and required fields, but should not hardcode provider-specific optional frontmatter keys.
+14. The validator should enforce durable structural guarantees and required fields, but should not hardcode skill classes, source-coverage schemas, SPEC headings, trigger-quality heuristics, or provider-specific optional frontmatter keys.
 15. `skill-writer` should default to dense structures such as tables, checklists, templates, and I/O examples, and should cut explanatory prose unless it prevents a concrete mistake.
 16. `SKILL.md` should stay a thin router; repeated policy belongs in routed references rather than always-loaded step prose.
 17. Validation stays lightweight and structural; qualitative precision remains an authoring judgment.
+18. Missing referenced bundled files are structural failures because they break runtime loading.
 
 ## Coverage matrix
 
@@ -94,3 +95,4 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 - 2026-05-01: Reduced prose-heavy guidance in `skill-writer`, rewrote the main runtime refs into denser tables/checklists, and made compact runtime guidance an explicit contract.
 - 2026-05-01: Thinned `SKILL.md` back toward a true router and removed duplicated execution-shape detail from `mode-selection.md`.
 - 2026-05-05: Flattened runtime reference files under `references/`, kept `SKILL.md` as the complete material index, removed unused runbooks, added source-adaptation guidance, and made precision passes part of every skill create/update flow while keeping validation lightweight.
+- 2026-05-05: Removed validator skill-class inference, integration coverage parsing, SPEC heading checks, SOURCES schema checks, and description-style heuristics.
