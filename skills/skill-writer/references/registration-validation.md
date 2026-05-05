@@ -1,6 +1,6 @@
 # Registration and Validation
 
-Apply registration and quality checks before completion.
+Apply registration and lightweight validation before completion.
 
 ## Registration checklist
 
@@ -24,10 +24,12 @@ When a repository does maintain its own skill catalog, verify and update any req
 
 ## Validation checklist
 
+The validator is a structural check. Treat depth, precision, routing, and portability comments as warnings that require author judgment, not hard machine gates.
+
 1. Run:
 
 ```bash
-uv run scripts/quick_validate.py <path/to/skill-directory> --strict-depth
+uv run scripts/quick_validate.py <path/to/skill-directory>
 ```
 
 Use the skill-root-relative form above when running from the `skill-writer` directory.
@@ -35,9 +37,9 @@ If you must run the validator from another working directory, convert both paths
 
 2. Confirm for authoring/generator skills:
 - transformed examples exist in references (happy-path, secure/robust, anti-pattern+fix)
-- synthesis depth gates are satisfied
+- synthesis coverage was considered and any gaps are explicit
 - selected example profile requirements are satisfied and reported
-- `SPEC.md` exists or was updated when the change creates a skill or materially changes intent, scope, evidence model, evaluation, or maintenance expectations
+- `SPEC.md` exists or was updated when the change creates a skill or materially changes intent, scope, evidence model, validation, or maintenance expectations
 - every bundled reference file is directly discoverable from `SKILL.md`
 
 3. Confirm for integration/documentation skills:
@@ -50,18 +52,12 @@ If you must run the validator from another working directory, convert both paths
 - provider-specific path variables (for example `${CLAUDE_SKILL_ROOT}`) either follow established repository prior art or are explicitly scoped, rather than being introduced ad hoc
 - provider-specific behavior, if any, is labeled as compatibility guidance rather than the primary workflow
 
-5. If evaluation was run, include:
-- lightweight qualitative summary
-- concise depth rubric status for integration/documentation and skill-authoring skills
-- deeper eval or quantitative summary only if user requested it or risk warranted it
-
-6. Review validator warnings for long reference files and split files when warnings indicate mixed concerns or poor navigation.
-7. Reject shallow handoffs that omit required artifacts.
+5. Review validator warnings for long reference files and split files when warnings indicate mixed concerns or poor navigation.
+6. Do not add stricter validation just to make qualitative guidance deterministic.
 
 ## Required output
 
 - Registration changes summary
 - Selected skill root and why it was chosen
 - Validator output
-- Evaluation summary, if run
 - Any residual risks or open gaps

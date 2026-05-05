@@ -5,11 +5,11 @@
 """
 Quick validation script for Agent Skills.
 
-Validates SKILL.md frontmatter, naming conventions, directory structure, and
-optional strict depth gates for integration/documentation skills.
+Validates SKILL.md frontmatter, naming conventions, and required file structure.
+Depth and quality checks are advisory warnings.
 
 Usage:
-    uv run quick_validate.py <skill_directory> [--skill-class <class>] [--strict-depth]
+    uv run quick_validate.py <skill_directory> [--skill-class <class>]
 
 Returns exit code 0 on success, 1 on failure. Outputs JSON with validation results.
 """
@@ -31,7 +31,6 @@ SKILL_CLASSES = {
     "auto",
     "workflow-process",
     "integration-documentation",
-    "security-review",
     "skill-authoring",
     "generic",
 }
@@ -51,7 +50,7 @@ SPEC_REQUIRED_HEADINGS = (
     "Runtime Contract",
     "Source And Evidence Model",
     "Reference Architecture",
-    "Evaluation",
+    "Validation",
     "Known Limitations",
     "Maintenance Notes",
 )
@@ -87,11 +86,10 @@ MACHINE_SPECIFIC_PATH_PATTERNS = (
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Validate agent skill structure and optional depth gates.",
+        description="Validate agent skill structure and report advisory quality warnings.",
     )
     parser.add_argument("skill_directory")
     parser.add_argument("--skill-class", choices=sorted(SKILL_CLASSES), default="auto")
-    parser.add_argument("--strict-depth", action="store_true")
     return parser.parse_args(argv)
 
 
@@ -104,10 +102,6 @@ def infer_skill_class(description: str, content: str) -> str:
         text, ("use when", "downstream", "consumer", "abstraction")
     ):
         return "integration-documentation"
-    if has_any_term(text, ("vulnerability", "owasp", "injection", "xss", "idor")) or (
-        has_any_term(text, ("security",)) and has_any_term(text, ("review", "audit", "scan"))
-    ):
-        return "security-review"
     if has_any_term(text, ("workflow", "ci", "branch", "checklist", "runbook", "triage")):
         return "workflow-process"
     return "generic"
@@ -182,11 +176,8 @@ def find_machine_specific_paths(text: str) -> list[str]:
 def validate_portable_paths(
     skill_path: Path,
     skill_content: str,
-    strict_depth: bool,
-    errors: list[str],
     warnings: list[str],
 ) -> None:
-    severity = errors if strict_depth else warnings
     portability_hits: list[str] = []
 
     skill_hits = find_machine_specific_paths(skill_content)
@@ -203,7 +194,7 @@ def validate_portable_paths(
                 )
 
     if portability_hits:
-        severity.append(
+        warnings.append(
             "Machine-specific absolute filesystem paths detected. Use portable placeholders like "
             "`<repo-root>/...` or `<skill-dir>/...`. Offenders: " + "; ".join(portability_hits)
         )
@@ -230,8 +221,6 @@ def validate_reference_lengths(skill_path: Path, warnings: list[str]) -> None:
 def validate_skill_writer_reference_routing(
     skill_path: Path,
     skill_content: str,
-    strict_depth: bool,
-    errors: list[str],
     warnings: list[str],
 ) -> None:
     if skill_path.name != "skill-writer":
@@ -252,8 +241,7 @@ def validate_skill_writer_reference_routing(
     if not missing:
         return
 
-    severity = errors if strict_depth else warnings
-    severity.append(
+    warnings.append(
         "skill-writer references should be directly discoverable from SKILL.md. "
         "Missing routing entries for: " + ", ".join(missing)
     )
@@ -261,15 +249,12 @@ def validate_skill_writer_reference_routing(
 
 def validate_spec_md(
     skill_path: Path,
-    strict_depth: bool,
-    errors: list[str],
     warnings: list[str],
 ) -> None:
     spec_md = skill_path / "SPEC.md"
     if not spec_md.exists():
         return
 
-    severity = errors if strict_depth else warnings
     spec_content = spec_md.read_text()
     missing_headings = [
         heading
@@ -277,11 +262,11 @@ def validate_spec_md(
         if not re.search(rf"^##\s+{re.escape(heading)}\s*$", spec_content, re.MULTILINE)
     ]
     if missing_headings:
-        severity.append("SPEC.md is missing required heading(s): " + ", ".join(missing_headings))
+        warnings.append("SPEC.md is missing expected heading(s): " + ", ".join(missing_headings))
 
     spec_hits = find_machine_specific_paths(spec_content)
     if spec_hits:
-        severity.append(
+        warnings.append(
             "SPEC.md contains machine-specific absolute filesystem paths. "
             "Use portable placeholders like `<repo-root>/...` or `<skill-dir>/...`. "
             "Offenders: " + ", ".join(spec_hits[:3])
@@ -290,30 +275,27 @@ def validate_spec_md(
 
 def validate_integration_depth(
     skill_path: Path,
-    strict_depth: bool,
-    errors: list[str],
     warnings: list[str],
 ) -> None:
     sources_md = skill_path / "SOURCES.md"
-    severity = errors if strict_depth else warnings
 
     if not sources_md.exists():
-        severity.append(
-            "Integration/documentation skill should include SOURCES.md with a coverage matrix and open gaps section"
+        warnings.append(
+            "Integration/documentation skill usually should include SOURCES.md with a coverage matrix and open gaps section"
         )
         return
 
     sources_content = sources_md.read_text()
     coverage_rows = parse_coverage_rows(sources_content)
     if not coverage_rows:
-        severity.append("SOURCES.md is missing a parseable `## Coverage matrix` table")
+        warnings.append("SOURCES.md is missing a parseable `## Coverage matrix` table")
     else:
         missing_dimensions: list[str] = []
         for label, tokens in INTEGRATION_REQUIRED_DIMENSIONS:
             if not any(any(token in dim for token in tokens) for dim, _status in coverage_rows):
                 missing_dimensions.append(label)
         if missing_dimensions:
-            severity.append(
+            warnings.append(
                 "Coverage matrix is missing required integration dimensions: " + ", ".join(missing_dimensions)
             )
 
@@ -327,7 +309,7 @@ def validate_integration_depth(
                 and (ln.startswith("-") or re.match(r"^\d+\.", ln))
             ]
             if not actionable:
-                severity.append(
+                warnings.append(
                     "Coverage matrix has partial/missing dimensions but `## Open gaps` lacks actionable next retrieval steps"
                 )
 
@@ -335,7 +317,6 @@ def validate_integration_depth(
 def validate_skill(
     skill_path: Path,
     selected_skill_class: str = "auto",
-    strict_depth: bool = False,
 ) -> tuple[bool, list[str], list[str], str]:
     """Validate a skill directory. Returns (valid, errors, warnings, resolved_skill_class)."""
     errors: list[str] = []
@@ -410,9 +391,9 @@ def validate_skill(
             if not description:
                 errors.append("description must not be empty")
             elif len(description) > MAX_DESCRIPTION_LENGTH:
-                errors.append(f"description is too long ({len(description)} chars, max {MAX_DESCRIPTION_LENGTH})")
+                warnings.append(f"description is long ({len(description)} chars, recommended max {MAX_DESCRIPTION_LENGTH})")
             if "<" in description or ">" in description:
-                errors.append("description must not contain angle brackets (< or >)")
+                warnings.append("description should avoid angle brackets (< or >)")
 
             lower_desc = description.lower()
             if not any(kw in lower_desc for kw in ["use when", "use for", "use to", "trigger", "invoke"]):
@@ -464,7 +445,7 @@ def validate_skill(
             "Use skill-local references/... paths and run scripts via <skill-dir>/scripts/..."
         )
 
-    validate_skill_writer_reference_routing(skill_path, content, strict_depth, errors, warnings)
+    validate_skill_writer_reference_routing(skill_path, content, warnings)
 
     resolved_skill_class = (
         selected_skill_class
@@ -473,10 +454,10 @@ def validate_skill(
     )
 
     if resolved_skill_class == "integration-documentation":
-        validate_integration_depth(skill_path, strict_depth, errors, warnings)
-    validate_portable_paths(skill_path, content, strict_depth, errors, warnings)
+        validate_integration_depth(skill_path, warnings)
+    validate_portable_paths(skill_path, content, warnings)
     validate_reference_lengths(skill_path, warnings)
-    validate_spec_md(skill_path, strict_depth, errors, warnings)
+    validate_spec_md(skill_path, warnings)
 
     return len(errors) == 0, errors, warnings, resolved_skill_class
 
@@ -491,12 +472,10 @@ def main() -> None:
     valid, errors, warnings, resolved_skill_class = validate_skill(
         skill_path,
         selected_skill_class=args.skill_class,
-        strict_depth=args.strict_depth,
     )
     result = {
         "valid": valid,
         "skill_class": resolved_skill_class,
-        "strict_depth": args.strict_depth,
         "errors": errors,
         "warnings": warnings,
     }

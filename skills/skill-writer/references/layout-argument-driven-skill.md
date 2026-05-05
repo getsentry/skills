@@ -28,5 +28,5 @@ disable-model-invocation: true
 
 ## Also load
 
-- `references/claude-code/argument-substitutions.md` when using Claude Code substitutions or named arguments
-- `references/claude-code/frontmatter-and-invocation.md` when invocation control needs provider-specific fields
+- `references/claude-argument-substitutions.md` when using Claude Code substitutions or named arguments
+- `references/claude-frontmatter-invocation.md` when invocation control needs provider-specific fields

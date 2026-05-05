@@ -8,7 +8,7 @@ Use this guide to create or update a root-level `SPEC.md`.
 - scope
 - trigger context
 - evidence model
-- evaluation expectations
+- validation expectations
 - limitations
 - maintenance rules
 
@@ -20,7 +20,7 @@ Do not put runtime instructions or full provenance tables here.
 - trigger strategy changes
 - evidence sources or storage policy changes
 - reference architecture changes
-- evaluation gates change
+- validation gates change
 - privacy, security, or data-handling assumptions change
 
 For tiny wording-only fixes, update `SOURCES.md` changelog instead.
@@ -32,7 +32,6 @@ For tiny wording-only fixes, update `SOURCES.md` changelog instead.
 | `SKILL.md` | runtime activation and execution |
 | `SPEC.md` | maintenance contract |
 | `SOURCES.md` | source inventory, decisions, gaps, changelog |
-| `EVAL.md` | reusable eval prompts or runbooks |
 | `references/` | runtime-loadable depth |
 | `references/evidence/` | persistent iteration examples |
 
@@ -76,7 +75,7 @@ Useful improvement sources:
 - negative examples:
 - commit logs/changelogs:
 - issue or PR feedback:
-- eval results:
+- validation results:
 
 Data that must not be stored:
 - secrets
@@ -91,10 +90,10 @@ Data that must not be stored:
 - `scripts/` contains:
 - `assets/` contains:
 
-## Evaluation
+## Validation
 
 - Lightweight validation:
-- Deeper evaluation:
+- Deeper validation:
 - Holdout examples:
 - Acceptance gates:
 
@@ -106,7 +105,6 @@ Data that must not be stored:
 
 - When to update `SKILL.md`:
 - When to update `SOURCES.md`:
-- When to update `EVAL.md`:
 - When to update `references/evidence/`:
 ```
 

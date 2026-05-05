@@ -11,6 +11,29 @@ Use this path to create or update skill files.
 5. Prefer tables, checklists, templates, and examples over prose.
 6. Use `SKILL.md` as the runtime decision layer for complex skills.
 
+## Precision Pass
+
+Run the pre-edit check before creating new sections, references, scripts, or assets.
+
+| Question | Required answer |
+|----------|-----------------|
+| What behavior should change? | one concrete behavior delta |
+| What existing rule can be narrowed or replaced? | file and section, or `none` with reason |
+| What can be removed or moved out of runtime? | obsolete, duplicate, provenance, or maintenance-only content |
+| Why is any new artifact necessary? | branch, lookup, automation, template, or validation need |
+
+Prefer editing existing guidance when it can express the behavior without making that guidance broader.
+
+After any skill artifact changes, run the post-change pass:
+
+1. Re-read changed `SKILL.md` and routed references as a user of the skill would.
+2. Remove or narrow any rule made redundant by the change.
+3. Move provenance, rationale, or maintenance-only notes out of runtime files.
+4. Confirm every added line changes an agent decision, action, or verification step.
+5. Record the precision result in the final output as `replaced`, `narrowed`, `moved`, `deleted`, or `added with reason`.
+
+This is a judgment pass. Do not add validators or rigid checklists solely to make the precision pass machine-checkable.
+
 ## Path Rules
 
 1. Treat the skill directory as the root for bundled files.
@@ -31,16 +54,17 @@ Create only what the skill needs:
 | `scripts/` | repeatable automation or validation |
 | `assets/` | reusable templates or static artifacts |
 
-Subfolders inside `references/` are acceptable only when they make the lookup path clearer.
+Keep runtime references as direct children of `references/`. Use clear filename prefixes instead of nested folders when references are related.
 
 ## File Creation Rules
 
 1. Read `references/reference-architecture.md` before adding bundled files.
-2. Create a new reference only when it has a clear "open when..." reason.
+2. Create a new reference only when it has a clear "open when..." reason and cannot be handled by tightening an existing reference.
 3. If you add a bundled reference, add a direct routing entry for it in `SKILL.md`.
-4. Do not create catch-all docs that mix workflow, source notes, examples, and eval results.
+4. Do not create catch-all docs that mix workflow, source notes, examples, and validation results.
 5. Keep provenance in `SOURCES.md`, not in runtime files.
 6. Update `SPEC.md` when the skill contract changes materially.
+7. Do not add nested runtime reference folders unless the content is non-runtime evidence or static assets.
 
 ## Class-Specific Requirements
 
@@ -66,7 +90,6 @@ Default minimum depth:
 | `router` | route criteria, fallback, per-route contract, misroute recovery |
 | `script-backed-workflow` | documented scripts, non-interactive execution, structured output, fallback |
 | `parallelization` / `orchestrator-workers` | unit of work, worker output schema, merge rule, stop condition |
-| `evaluator-optimizer` | rubric, stop rule, acceptance condition, evidence handling |
 | `subagent-fork` | actionable task, return contract, isolation reason, portability note |
 | `hook-backed` | event scope, side-effect boundary, fallback, safety note |
 | `asset-template` | asset routing, placeholder guidance, validation checklist when needed |
@@ -87,5 +110,6 @@ Do not accept abstract-only guidance when a concrete example is needed.
 - updated `SKILL.md`
 - updated `SPEC.md` when required
 - updated or added supporting files
+- precision-pass decision: replaced, narrowed, moved, deleted, or added with reason
 - explanation of major authoring decisions
 - description-optimization handoff

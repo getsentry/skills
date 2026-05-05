@@ -25,4 +25,4 @@ my-skill/
 
 - most invocations need only a subset of a large knowledge base
 - scripts or validators carry important runtime behavior
-- routing or iterative evaluation is central to the skill
+- routing or iterative validation is central to the skill
