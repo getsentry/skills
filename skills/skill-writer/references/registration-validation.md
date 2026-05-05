@@ -24,7 +24,7 @@ When a repository does maintain its own skill catalog, verify and update any req
 
 ## Validation checklist
 
-The validator is a structural check. It should fail only for invalid skill format or missing referenced files. Size and machine-specific path warnings require author judgment, not machine gates.
+The validator is a structural check. It should fail only for invalid skill format or missing referenced files. The size warning requires author judgment, not a machine gate.
 
 1. Run:
 
@@ -52,7 +52,7 @@ If you must run the validator from another working directory, convert both paths
 - provider-specific path variables (for example `${CLAUDE_SKILL_ROOT}`) either follow established repository prior art or are explicitly scoped, rather than being introduced ad hoc
 - provider-specific behavior, if any, is labeled as compatibility guidance rather than the primary workflow
 
-5. Review validator warnings for oversized `SKILL.md` files or machine-specific paths.
+5. Review validator warnings for oversized `SKILL.md` files.
 6. Do not add validators for skill class, coverage quality, SPEC shape, trigger quality, or other qualitative guidance.
 
 ## Required output

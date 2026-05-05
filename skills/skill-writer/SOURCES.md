@@ -44,7 +44,7 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 11. Architectural choices are reviewed qualitatively during authoring, not inferred by validator heuristics.
 12. Reference files remain split by lookup need rather than topic buckets, even as the set of supported shapes expands.
 13. Runtime references stay flat under `references/`; related leaves use filename prefixes, and every bundled reference is directly discoverable from `SKILL.md`.
-14. The validator should enforce durable structural guarantees and required fields, but should not hardcode skill classes, source-coverage schemas, SPEC headings, trigger-quality heuristics, or provider-specific optional frontmatter keys.
+14. The validator should enforce durable structural guarantees and required fields, but should not hardcode name style, path-portability scans, skill classes, source-coverage schemas, SPEC headings, trigger-quality heuristics, or provider-specific optional frontmatter keys.
 15. `skill-writer` should default to dense structures such as tables, checklists, templates, and I/O examples, and should cut explanatory prose unless it prevents a concrete mistake.
 16. `SKILL.md` should stay a thin router; repeated policy belongs in routed references rather than always-loaded step prose.
 17. Validation stays lightweight and structural; qualitative precision remains an authoring judgment.
@@ -96,3 +96,4 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 - 2026-05-01: Thinned `SKILL.md` back toward a true router and removed duplicated execution-shape detail from `mode-selection.md`.
 - 2026-05-05: Flattened runtime reference files under `references/`, kept `SKILL.md` as the complete material index, removed unused runbooks, added source-adaptation guidance, and made precision passes part of every skill create/update flow while keeping validation lightweight.
 - 2026-05-05: Removed validator skill-class inference, integration coverage parsing, SPEC heading checks, SOURCES schema checks, and description-style heuristics.
+- 2026-05-05: Removed validator name-style checks and machine-specific path scanning; kept only format, required fields, directory-name match, referenced-file existence, and a high-threshold size warning.

@@ -129,7 +129,7 @@ Data that must not be stored:
 
 ## Known Limitations
 
-- The validator checks only structural requirements and limited advisory size/path warnings; it cannot prove that a generated skill is semantically complete.
+- The validator checks only structural requirements and a high-threshold advisory size warning; it cannot prove that a generated skill is semantically complete.
 - The validator intentionally does not classify skills, parse source coverage, enforce SPEC headings, judge trigger quality, or exhaustively validate provider-specific optional frontmatter fields.
 - Prose density, source adaptation quality, advanced-shape contracts, and precision rely on authoring judgment and review.
 - Source discovery can still miss private operational knowledge if it is not present in local files, accessible issue/PR history, or supplied context.
