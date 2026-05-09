@@ -83,6 +83,7 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 - 2026-03-19: Clarified path-resolution guidance so bundled skill references stay skill-root-relative while registration steps are resolved from the repository's active layout.
 - 2026-03-19: Made portability a default authoring rule and emphasized avoiding host-specific absolute filesystem paths.
 - 2026-04-19: Updated path guidance to preserve repository-standard root variables such as `${CLAUDE_SKILL_ROOT}` instead of banning them outright.
+- 2026-05-09: Replaced `${CLAUDE_SKILL_ROOT}` guidance with skill-root-relative paths. Environment variable path prefixes cause permission friction and runtime failures in Claude Code.
 - 2026-04-19: Restored `.agents/skills` as the default authoring target and kept repository-specific layouts as an inspected override rather than the default.
 - 2026-04-19: Added explicit prior-art inspection and user-confirmation guidance when the correct skill root is unclear.
 - 2026-04-26: Added reference architecture, source discovery, and iteration evidence guidance; updated synthesis, authoring, and iteration paths to prevent overloaded `SKILL.md` and catch-all reference files.

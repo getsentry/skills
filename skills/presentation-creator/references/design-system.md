@@ -172,7 +172,7 @@ Add the `.anim` class to `.slide-content` only when the slide is active. Use `.d
 
 ## Persistent Glyph Watermark
 
-Every slide shows a small, low-contrast Sentry glyph in the top-left corner. Use the exact path from `${CLAUDE_SKILL_ROOT}/references/sentry-glyph.svg`.
+Every slide shows a small, low-contrast Sentry glyph in the top-left corner. Use the exact path from `references/sentry-glyph.svg`.
 
 ```css
 .glyph-watermark {
@@ -281,8 +281,8 @@ Use Material Symbols Outlined for icons:
 
 **Do NOT hardcode the Sentry logo as inline SVG.** Read the official SVGs from the skill references directory:
 
-- **Full wordmark**: `${CLAUDE_SKILL_ROOT}/references/sentry-logo.svg` — the "Sentry" logotype with glyph. Use on title slides.
-- **Glyph only**: `${CLAUDE_SKILL_ROOT}/references/sentry-glyph.svg` — the standalone glyph mark. Use for compact branding.
+- **Full wordmark**: `references/sentry-logo.svg` — the "Sentry" logotype with glyph. Use on title slides.
+- **Glyph only**: `references/sentry-glyph.svg` — the standalone glyph mark. Use for compact branding.
 
 Read the SVG file contents and embed them as a React component using `dangerouslySetInnerHTML` or by extracting the `<path>` data:
 

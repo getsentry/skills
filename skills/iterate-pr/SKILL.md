@@ -11,7 +11,7 @@ Continuously iterate on the current branch until all CI checks pass and review f
 
 **Requires**: The `uv` CLI for python package management, install guide at https://docs.astral.sh/uv/getting-started/installation/
 
-**Important**: All scripts must be run from the repository root directory (where `.git` is located), not from the skill directory. Use the full path to the script via `${CLAUDE_SKILL_ROOT}`.
+**Important**: All scripts must be run from the repository root directory (where `.git` is located), not from the skill directory. Script paths like `scripts/fetch_pr_checks.py` are relative to this skill's root directory (the directory containing this SKILL.md), not relative to the target repository.
 
 ## Bundled Scripts
 
@@ -20,7 +20,7 @@ Continuously iterate on the current branch until all CI checks pass and review f
 Fetches CI check status and extracts failure snippets from logs.
 
 ```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py [--pr NUMBER]
+uv run scripts/fetch_pr_checks.py [--pr NUMBER]
 ```
 
 Returns JSON:
@@ -40,7 +40,7 @@ Returns JSON:
 Fetches and categorizes PR review feedback using the [LOGAF scale](https://develop.sentry.dev/engineering-practices/code-review/#logaf-scale).
 
 ```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py [--pr NUMBER]
+uv run scripts/fetch_pr_feedback.py [--pr NUMBER]
 ```
 
 Returns JSON with feedback categorized as:
@@ -57,7 +57,7 @@ Review bot feedback (from Sentry, Warden, Cursor, Bugbot, CodeQL, etc.) appears 
 Monitors PR checks until they all reach a terminal state. Retries transient `gh` failures, treats `skipping` and `cancel` as terminal states, and waits for checks to register after a fresh push instead of exiting early.
 
 ```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/monitor_pr_checks.py [--pr NUMBER]
+uv run scripts/monitor_pr_checks.py [--pr NUMBER]
 ```
 
 Prints one terminal marker followed by a tab-separated check summary:
@@ -76,7 +76,7 @@ Stop if no PR exists for the current branch.
 
 ### 2. Gather Review Feedback
 
-Run `${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py` to get categorized feedback already posted on the PR.
+Run `scripts/fetch_pr_feedback.py` to get categorized feedback already posted on the PR.
 
 ### 3. Handle Feedback by LOGAF Priority
 
@@ -112,7 +112,7 @@ Which would you like to address? (e.g., "1,3" or "all" or "none")
 
 ### 4. Check CI Status
 
-Run `${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py` to get structured failure data.
+Run `scripts/fetch_pr_checks.py` to get structured failure data.
 
 **Wait if pending:** If review bot checks (sentry, warden, cursor, bugbot, seer, codeql) are still running, wait before proceeding—they post actionable feedback that must be evaluated. Informational bots (codecov) are not worth waiting for.
 
@@ -149,27 +149,27 @@ git push
 
 Keep monitoring CI status and review feedback in a loop instead of blocking:
 
-1. Run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py` to get current CI status
+1. Run `uv run scripts/fetch_pr_checks.py` to get current CI status
 2. If all checks passed, proceed to exit conditions
 3. If any checks failed (none pending), return to step 5
 4. If checks are still pending:
-   a. Run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py` for new review feedback
+   a. Run `uv run scripts/fetch_pr_feedback.py` for new review feedback
    b. Address any new high/medium feedback immediately (same as step 3)
    c. If changes were needed, commit and push (this restarts CI), then continue monitoring from the refreshed branch state
    d. Sleep 30 seconds (don't increase on subsequent iterations), then repeat from sub-step 1
-5. After all checks pass, wait 10 seconds for late-arriving review bot comments, then run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_feedback.py`. Address any new high/medium feedback — if changes are needed, return to step 6.
+5. After all checks pass, wait 10 seconds for late-arriving review bot comments, then run `uv run scripts/fetch_pr_feedback.py`. Address any new high/medium feedback — if changes are needed, return to step 6.
 
 If you're in Claude Code, you can replace the sleep-based wait above with `MonitorTool` so the polling happens in the background instead of consuming context. This is a Claude-only optimization, not the default workflow for other agents.
 
 Run the bundled monitor script through `MonitorTool` with `persistent: false`:
 
 ```bash
-uv run ${CLAUDE_SKILL_ROOT}/scripts/monitor_pr_checks.py
+uv run scripts/monitor_pr_checks.py
 ```
 
 Set `timeout_ms` to match the repository's normal CI duration instead of hardcoding a 15-minute timeout.
 
-After `MonitorTool` reports completion, re-run `uv run ${CLAUDE_SKILL_ROOT}/scripts/fetch_pr_checks.py`:
+After `MonitorTool` reports completion, re-run `uv run scripts/fetch_pr_checks.py`:
 - If any checks failed, return to step 5.
 - If all checks passed, continue to sub-step 5 above.
 
