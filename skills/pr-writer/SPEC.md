@@ -86,7 +86,7 @@ Data that must not be stored:
 
 ## Known Limitations
 
-- The skill cannot guarantee that issue references are correct unless the branch, commits, or user provide them, and should omit references rather than invent placeholders.
+- The skill cannot guarantee that issue references are correct unless the branch, commits, or user provide them. It must omit references rather than invent placeholders.
 - It relies on the agent's judgment to decide whether a bold emphasis block is useful.
 - It relies on the agent's judgment to decide when a title is still accurate enough to keep versus rewrite.
 - Very large PRs may still need more context than the default body shape encourages.
