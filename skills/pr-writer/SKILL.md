@@ -110,7 +110,7 @@ Rules:
 - Lead with changed behavior, then implementation detail only when useful
 - Add 0-3 bold emphasis blocks for distinct reviewer-relevant changes
 - Use before/after fenced blocks only for changed contracts, output shapes, config, CLI output, payloads, permissions, or input formats
-- Add known issue references at the end; do not invent references
+- Include issue references only when the exact ID or URL is present in user input, branch name, commits, or verified tracker output — omit the line entirely otherwise
 - Cut file-by-file narration, copied commit logs, generic headings like "Summary" or "Changes", and stale template scaffolding
 
 ```markdown
@@ -137,6 +137,8 @@ gh pr create --draft --title "<type>(<scope>): <description>" --body "$(cat <<'E
 EOF
 )"
 ```
+
+Before running the create or update command, strip any issue reference not backed by known context. Never emit placeholder IDs (`XXXXX`, `<issue>`, `TODO`).
 
 For an existing PR, patch the title and body after you have re-evaluated both. If the current title still fits, keep it intentionally rather than skipping title review.
 
@@ -247,6 +249,8 @@ Reference issues in the PR body:
 | `Fixes SENTRY-1234` | Closes Sentry issue |
 | `Refs GH-1234` | Links without closing |
 | `Refs LINEAR-ABC-123` | Links Linear issue |
+
+These are syntax examples — do not copy example IDs into a real PR body.
 
 ## Guidelines
 
