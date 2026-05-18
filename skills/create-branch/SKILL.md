@@ -11,14 +11,7 @@ Keep this workflow non-interactive unless the user explicitly asks to choose the
 
 ## Workflow
 
-1. Resolve the prefix:
-   - First try `gh api user --jq .login`
-   - Then `git config github.user`
-   - Then the local part of `git config user.email`
-   - Then `whoami`
-   - Sanitize to lowercase ASCII letters, digits, and hyphens; if empty, use `local`
-
-2. Resolve the work description:
+1. Resolve the work description:
    - If `$ARGUMENTS` is present, use it
    - Otherwise inspect:
      ```bash
@@ -29,7 +22,7 @@ Keep this workflow non-interactive unless the user explicitly asks to choose the
    - If there are local changes, derive a short description from the diff
    - If there are no local changes, use a generic description like `repo-maintenance`, `tooling-update`, or `work-in-progress`
 
-3. Classify the branch type:
+2. Classify the branch type:
 
 | Type | Use when |
 |------|----------|
@@ -48,10 +41,10 @@ Keep this workflow non-interactive unless the user explicitly asks to choose the
 
    When unsure: use `feat` for new things, `ref` for restructuring, `chore` for maintenance.
 
-4. Generate `<prefix>/<type>/<short-description>`.
+3. Generate `<type>/<short-description>`.
    Keep `<short-description>` kebab-case, ASCII-only, and ideally 3 to 6 words.
 
-5. Choose the base without prompting:
+4. Choose the base without prompting:
    ```bash
    git branch --show-current
    git remote | grep -qx origin && echo origin || git remote | head -1
@@ -62,9 +55,9 @@ Keep this workflow non-interactive unless the user explicitly asks to choose the
    - If already on a non-default branch, branch from the current branch
    - Only switch to the default branch when the user explicitly asks
 
-6. Avoid collisions by appending `-2`, `-3`, and so on until the name is unused locally and remotely.
+5. Avoid collisions by appending `-2`, `-3`, and so on until the name is unused locally and remotely.
 
-7. Create the branch:
+6. Create the branch:
    ```bash
    git checkout -b <branch-name>
    ```
