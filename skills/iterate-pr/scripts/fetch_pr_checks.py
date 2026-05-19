@@ -6,7 +6,7 @@
 Fetch PR CI checks and extract relevant failure snippets.
 
 Usage:
-    python fetch_pr_checks.py [--pr PR_NUMBER]
+    uv run fetch_pr_checks.py [--pr PR_NUMBER]
 
 If --pr is not specified, uses the PR for the current branch.
 
@@ -20,6 +20,17 @@ import re
 import subprocess
 import sys
 from typing import Any
+
+HUMAN_GATE_PATTERNS = [
+    r"(?i)review\s+required",
+    r"(?i)required\s+review",
+    r"(?i)requires\s+review",
+    r"(?i)required\s+approving\s+review",
+    r"(?i)approval\s+required",
+    r"(?i)waiting\s+for\s+approval",
+    r"(?i)manual\s+approval",
+    r"(?i)draft\s+(pull\s+request|pr)",
+]
 
 
 def run_gh(args: list[str]) -> dict[str, Any] | list[Any] | None:
@@ -41,17 +52,23 @@ def run_gh(args: list[str]) -> dict[str, Any] | list[Any] | None:
 
 def get_pr_info(pr_number: int | None = None) -> dict[str, Any] | None:
     """Get PR info, optionally by number or for current branch."""
-    args = ["pr", "view", "--json", "number,url,headRefName,baseRefName"]
+    args = [
+        "pr",
+        "view",
+        "--json",
+        "number,url,headRefName,baseRefName,isDraft,reviewDecision",
+    ]
     if pr_number:
         args.insert(2, str(pr_number))
     return run_gh(args)
 
 
 def get_checks(pr_number: int | None = None) -> list[dict[str, Any]]:
-    """Get all checks for a PR by parsing tab-separated gh output."""
+    """Get all checks for a PR."""
     args = ["gh", "pr", "checks"]
     if pr_number:
         args.append(str(pr_number))
+    args.extend(["--json", "name,bucket,link,workflow,state,description,event"])
     try:
         result = subprocess.run(
             args,
@@ -60,6 +77,12 @@ def get_checks(pr_number: int | None = None) -> list[dict[str, Any]]:
         )
         if not result.stdout.strip():
             return []
+        try:
+            checks = json.loads(result.stdout)
+            return checks if isinstance(checks, list) else []
+        except json.JSONDecodeError:
+            pass
+
         checks = []
         for line in result.stdout.strip().split("\n"):
             if not line.strip():
@@ -75,6 +98,15 @@ def get_checks(pr_number: int | None = None) -> list[dict[str, Any]]:
         return checks
     except Exception:
         return []
+
+
+def is_human_gate_check(check: dict[str, Any]) -> bool:
+    """Return true when a pending entry is a human review/approval gate."""
+    haystack = " ".join(
+        str(check.get(field, ""))
+        for field in ("name", "state", "description", "workflow")
+    )
+    return any(re.search(pattern, haystack) for pattern in HUMAN_GATE_PATTERNS)
 
 
 def get_failed_runs(branch: str) -> list[dict[str, Any]]:
@@ -190,12 +222,20 @@ def main():
     failed_runs = None  # Lazy load
 
     for check in checks:
+        status = check.get("bucket", check.get("state", "unknown"))
+        human_gate = status == "pending" and is_human_gate_check(check)
         processed = {
             "name": check.get("name", "unknown"),
-            "status": check.get("bucket", check.get("state", "unknown")),
+            "status": status,
             "link": check.get("link", ""),
             "workflow": check.get("workflow", ""),
         }
+        if check.get("state"):
+            processed["state"] = check["state"]
+        if check.get("description"):
+            processed["description"] = check["description"]
+        if human_gate:
+            processed["human_gate"] = True
 
         # For failures, try to get log snippet
         if processed["status"] == "fail":
@@ -224,16 +264,39 @@ def main():
             "url": pr_info.get("url", ""),
             "branch": branch,
             "base": pr_info.get("baseRefName", ""),
+            "is_draft": bool(pr_info.get("isDraft")),
+            "review_decision": pr_info.get("reviewDecision", ""),
         },
         "summary": {
             "total": len(processed_checks),
             "passed": sum(1 for c in processed_checks if c["status"] == "pass"),
             "failed": sum(1 for c in processed_checks if c["status"] == "fail"),
             "pending": sum(1 for c in processed_checks if c["status"] == "pending"),
+            "actionable_pending": sum(
+                1
+                for c in processed_checks
+                if c["status"] == "pending" and not c.get("human_gate")
+            ),
+            "human_gate_pending": sum(
+                1
+                for c in processed_checks
+                if c["status"] == "pending" and c.get("human_gate")
+            ),
             "skipped": sum(1 for c in processed_checks if c["status"] in ("skipping", "cancel")),
         },
         "checks": processed_checks,
     }
+
+    if pr_info.get("isDraft") and not processed_checks:
+        output["action_required"] = "Draft PR has no registered checks; do not wait for CI indefinitely"
+    elif not processed_checks:
+        output["action_required"] = "No registered checks; monitor before reporting NO_CHECKS_REGISTERED"
+    elif output["summary"]["actionable_pending"]:
+        output["action_required"] = "Wait for actionable checks to finish; poll feedback while waiting"
+    elif output["summary"]["failed"]:
+        output["action_required"] = "Address failed checks"
+    elif output["summary"]["pending"] and not output["summary"]["actionable_pending"]:
+        output["action_required"] = "Only human review or approval gates remain pending"
 
     print(json.dumps(output, indent=2))
 
