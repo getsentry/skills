@@ -96,7 +96,7 @@ def get_checks(pr_number: int) -> list[dict[str, Any]] | None:
         str(pr_number),
         "--json",
         "name,bucket,link,workflow,state,description",
-    ], allowed_returncodes=(0, 1, 8))
+    ], allowed_returncodes=(0, 1, 8, 16))
     return checks if isinstance(checks, list) else None
 
 
