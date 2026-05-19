@@ -48,6 +48,7 @@ HUMAN_GATE_PATTERNS = [
 def run_gh_json(
     args: list[str],
     allowed_returncodes: tuple[int, ...] = (0,),
+    empty_stdout_value: list[dict[str, Any]] | dict[str, Any] | None = None,
 ) -> list[dict[str, Any]] | dict[str, Any] | None:
     """Run a gh command that returns JSON."""
     result = subprocess.run(
@@ -60,7 +61,7 @@ def run_gh_json(
         return None
 
     if not result.stdout.strip():
-        return None
+        return empty_stdout_value
 
     try:
         return json.loads(result.stdout)
@@ -96,7 +97,7 @@ def get_checks(pr_number: int) -> list[dict[str, Any]] | None:
         str(pr_number),
         "--json",
         "name,bucket,link,workflow,state,description",
-    ], allowed_returncodes=(0, 1, 8, 16))
+    ], allowed_returncodes=(0, 1, 8, 16), empty_stdout_value=[])
     return checks if isinstance(checks, list) else None
 
 
