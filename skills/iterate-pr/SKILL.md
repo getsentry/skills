@@ -123,7 +123,7 @@ Loop:
 5. if changed, verify, commit, push, restart loop
 6. otherwise sleep 30 seconds and repeat
 7. after checks pass, wait 10 seconds, fetch feedback once more
-8. if new high/medium feedback exists, return to step 5
+8. if new high/medium feedback exists, return to step 4
 
 Claude Code optional: run `uv run scripts/monitor_pr_checks.py` through `MonitorTool` with `persistent: false`; set timeout to normal repo CI duration. Restart the monitor after every push.
 

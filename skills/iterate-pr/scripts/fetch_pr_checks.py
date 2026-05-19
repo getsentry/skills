@@ -289,6 +289,8 @@ def main():
 
     if pr_info.get("isDraft") and not processed_checks:
         output["action_required"] = "Draft PR has no registered checks; do not wait for CI indefinitely"
+    elif not processed_checks:
+        output["action_required"] = "No registered checks; monitor before reporting NO_CHECKS_REGISTERED"
     elif output["summary"]["actionable_pending"]:
         output["action_required"] = "Wait for actionable checks to finish; poll feedback while waiting"
     elif output["summary"]["failed"]:
