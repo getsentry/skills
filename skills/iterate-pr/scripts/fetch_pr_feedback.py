@@ -6,7 +6,7 @@
 Fetch and categorize PR review feedback.
 
 Usage:
-    python fetch_pr_feedback.py [--pr PR_NUMBER]
+    uv run fetch_pr_feedback.py [--pr PR_NUMBER]
 
 If --pr is not specified, uses the PR for the current branch.
 

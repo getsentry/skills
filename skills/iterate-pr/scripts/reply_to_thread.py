@@ -6,14 +6,14 @@
 Reply to PR review threads.
 
 Usage:
-    python reply_to_thread.py THREAD_ID BODY [THREAD_ID BODY ...]
+    uv run reply_to_thread.py THREAD_ID BODY [THREAD_ID BODY ...]
 
 Accepts one or more (thread_id, body) pairs as positional arguments.
 Batches all replies into a single GraphQL mutation for efficiency.
 
 Example:
-    python reply_to_thread.py PRRT_abc "Fixed the issue.\n\n*— Claude Code*"
-    python reply_to_thread.py PRRT_abc "Fixed." PRRT_def "Also fixed."
+    uv run reply_to_thread.py PRRT_abc "Fixed the issue.\n\n*— Claude Code*"
+    uv run reply_to_thread.py PRRT_abc "Fixed." PRRT_def "Also fixed."
 """
 
 from __future__ import annotations
