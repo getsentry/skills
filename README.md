@@ -65,6 +65,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [skill-writer](skills/skill-writer/SKILL.md) | Canonical workflow to synthesize, create, and iteratively improve agent skills for this repository. |
 | [sred-project-organizer](skills/sred-project-organizer/SKILL.md) | Take a list of projects and their related documentation, and organize them into the SRED format for submission. |
 | [sred-work-summary](skills/sred-work-summary/SKILL.md) | Go back through the previous year of work and create a Notion doc that groups relevant links into projects that can then be documented as SRED projects. |
+| [triage-frontend-issues](skills/triage-frontend-issues/SKILL.md) | Triage the Sentry `javascript` project queue by archiving non-actionable noise (third-party libs, browser quirks, transient 5xx, test traffic) with `untilEscalating` after user approval. |
 | [typing-exclusion-worker](skills/typing-exclusion-worker/SKILL.md) | Python typing exclusion worker: remove assigned mypy exclusion modules in small scoped batches, fix typing issues, run validation, and produce a structured completion summary. |
 
 ## Available Subagents
