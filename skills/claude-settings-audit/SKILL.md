@@ -157,6 +157,7 @@ If this is a Sentry project (or sentry-skills plugin is installed), include:
   "Skill(sentry-skills:gh-review-requests)",
   "Skill(sentry-skills:gha-security-review)",
   "Skill(sentry-skills:iterate-pr)",
+  "Skill(sentry-skills:pr-link-issue)",
   "Skill(sentry-skills:pr-writer)",
   "Skill(sentry-skills:presentation-creator)",
   "Skill(sentry-skills:prompt-optimizer)",
