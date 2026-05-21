@@ -110,7 +110,7 @@ update_issue(
 )
 ```
 
-Run these sequentially (not in parallel) so any failure stops the batch and is visible.
+Run these sequentially (not in parallel). If a call fails, log the failure, continue with the remaining issues, and report the failed IDs in step 5.
 
 If the user replies `cancel` or asks to modify the plan, do NOT call `update_issue`. If they reply with edits ("change row 2 to skip"), rebuild the plan and re-confirm.
 

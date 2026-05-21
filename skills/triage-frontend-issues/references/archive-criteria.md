@@ -144,8 +144,8 @@ When negative criteria fire, mark `skip` with a short note, e.g. `Skip — top f
 | Third-party (`node_modules/<lib>/...`) | yes | any | `archive` |
 | Third-party | no clean category | any | `needs-human` |
 | Our app code | no | any | `skip` |
-| `<unknown>` | low (≤ 50 events) | low | `archive` (zero-impact) |
-| `<unknown>` | high (≥ 1000 events) | high | `needs-human` |
+| `<unknown>` | n/a | low (≤ 50 events) | `archive` (zero-impact) |
+| `<unknown>` | n/a | high (≥ 1000 events) | `needs-human` |
 | Customer proxy / synthetic | yes | low | `archive` |
 | Backend 5xx pattern | yes | low/medium | `archive` |
 | Backend 5xx pattern | yes | very high single-endpoint | `needs-human` |
