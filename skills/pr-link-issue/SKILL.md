@@ -29,7 +29,7 @@ Appends a Sentry-style `#### Issues` block to a PR description, referencing both
    ```bash
    gh issue view <n> --repo <owner>/<repo> --json comments \
      -q '.comments[] | select(.author.login=="linear-code") | .body' \
-     | grep -Eoe '[a-z]+-[0-9]+' | head -1
+     | grep -Eioe '[a-z]+-[0-9]+' | head -1
    ```
 
    If no match, fall back to asking the user for the Linear key, or omit it.
