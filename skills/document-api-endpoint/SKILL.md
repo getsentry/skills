@@ -24,7 +24,7 @@ curl -s -H "Authorization: Bearer $TOKEN" "https://us.sentry.io/api/0/<endpoint>
 ```
 
 ### 2. Reuse the canonical response type
-Match the codebase's `XxxResponseOptional(TypedDict, total=False)` mixin (main class declares required fields). Nullable-vs-absent: `T | None` = key always present, value may be null; `NotRequired[T]` = key only set under a condition (e.g. an `expand` query param). Reuse the existing canonical type instead of re-declaring a second or third copy in a `*_types.py`. If there's no clean canonical type to reuse (e.g. a payload proxied from another service like vroom/profiling), type it `dict[str, Any]` rather than inventing a new mirror, and confirm the shape from the owning service's repo, not just the serializer.
+Declare the response as a `TypedDict`, marking optional fields `NotRequired[...]`. Nullable-vs-absent: `T | None` = key always present, value may be null; `NotRequired[T]` = key may be absent (e.g. only set under an `expand` query param); `NotRequired[T | None]` when both. Reuse the existing canonical type instead of re-declaring another copy. If there's no clean canonical type to reuse (e.g. a payload proxied from another service like vroom/profiling), type it `dict[str, Any]` rather than inventing a new mirror, and confirm the shape from the owning service's repo, not just the serializer.
 
 ### 3. Infer the type. Avoid `cast` and `# type: ignore`
 When a serializer returns a base type plus extra fields, refactor the producing code so the response type is inferred rather than forced.
