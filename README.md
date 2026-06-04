@@ -52,6 +52,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [django-access-review](skills/django-access-review/SKILL.md) | Django access control and IDOR security review. |
 | [django-perf-review](skills/django-perf-review/SKILL.md) | Django performance code review. |
 | [doc-coauthoring](skills/doc-coauthoring/SKILL.md) | Guide users through a structured workflow for co-authoring documentation. |
+| [document-api-endpoint](skills/document-api-endpoint/SKILL.md) | Document and type a Sentry API endpoint with drf-spectacular OpenAPI schema — write/fix `@extend_schema`, specify response TypedDicts, type parameters, fix type drift, and promote to PUBLIC. |
 | [find-bugs](skills/find-bugs/SKILL.md) | Find bugs, security vulnerabilities, and code quality issues in local branch changes. |
 | [gh-review-requests](skills/gh-review-requests/SKILL.md) | Fetch unread GitHub notifications for open PRs where review is requested from a specified team or opened by a team member. |
 | [gha-security-review](skills/gha-security-review/SKILL.md) | GitHub Actions security review for workflow exploitation vulnerabilities. |
