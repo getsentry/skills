@@ -59,7 +59,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [iterate-pr](skills/iterate-pr/SKILL.md) | Iterate on a PR until CI passes and actionable review feedback is addressed. |
 | [presentation-creator](skills/presentation-creator/SKILL.md) | Create data-driven presentation slides using React, Vite, and Recharts with Sentry branding. |
 | [pr-link-issue](skills/pr-link-issue/SKILL.md) | Append a GitHub issue link and its Linear ticket to the current PR's description. |
-| [pr-writer](skills/pr-writer/SKILL.md) | Canonical workflow to create and update pull requests following Sentry conventions. |
+| [pr-writer](skills/pr-writer/SKILL.md) | Create, refresh, and rewrite pull request titles and descriptions following Sentry conventions. |
 | [prompt-optimizer](skills/prompt-optimizer/SKILL.md) | Optimize prompts with evals, model-family adapters, and exact external context references. |
 | [replay-ux-research](skills/replay-ux-research/SKILL.md) | Analyze Sentry session replays to surface UX patterns, pain points, and user journeys for a given product area. |
 | [security-review](skills/security-review/SKILL.md) | Security code review for vulnerabilities. |
