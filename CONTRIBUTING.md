@@ -14,6 +14,8 @@ Before merging, test your changes locally:
 
 1. **Install the plugin from your local clone**
 
+   Claude Code:
+
    ```bash
    claude plugin marketplace add ~/path/to/sentry-skills
    claude plugin install sentry-skills
@@ -21,7 +23,16 @@ Before merging, test your changes locally:
 
    If you use `claude plugin marketplace add --sparse` for this repo, include `skills` and `agents` in addition to `.claude-plugin` because the root plugin manifest loads repo-root `skills/` and `agents/`.
 
-2. **Restart Claude Code** to pick up changes
+   Codex:
+
+   ```bash
+   codex plugin marketplace add ~/path/to/sentry-skills
+   codex plugin add sentry-skills@sentry-skills
+   ```
+
+   If you use `codex plugin marketplace add --sparse` for this repo, include `.agents/plugins`, `.codex-plugin`, `plugins/sentry-skills`, `skills`, and `agents` because the Codex marketplace entry loads the repo root through that plugin source alias.
+
+2. **Restart your agent** to pick up changes
 
 3. **Invoke the skill** in a relevant context
 

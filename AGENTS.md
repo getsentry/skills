@@ -8,6 +8,8 @@ skills/<skill-name>/SPEC.md
 
 If you use Claude marketplace sparse checkouts for this repo, include `skills` and `agents` alongside `.claude-plugin` because the root plugin manifest loads repo-root `skills/` and `agents/`.
 
+If you use Codex marketplace sparse checkouts for this repo, include `.agents/plugins`, `.codex-plugin`, `plugins/sentry-skills`, `skills`, and `agents` because the Codex marketplace entry loads the repo root through that plugin source alias.
+
 ## Creating/Updating Skills
 ALWAYS use `/skill-writer` — it handles requirements, writing, registration, and validation.
 

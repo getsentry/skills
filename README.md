@@ -27,6 +27,24 @@ claude plugin update sentry-skills@sentry-skills
 
 Or run `/plugin` to open the plugin manager.
 
+### Codex
+
+```bash
+codex plugin marketplace add getsentry/skills
+codex plugin add sentry-skills@sentry-skills
+```
+
+If you use `codex plugin marketplace add --sparse` for this repo, include `.agents/plugins`, `.codex-plugin`, `plugins/sentry-skills`, `skills`, and `agents` because the Codex marketplace entry loads the repo root through that plugin source alias.
+
+Restart Codex after installation. Skills activate automatically when relevant.
+
+**Update:**
+
+```bash
+codex plugin marketplace upgrade
+codex plugin add sentry-skills@sentry-skills
+```
+
 ### Skills Package (skills.sh)
 
 For agents supporting the [skills.sh](https://skills.sh) ecosystem:
@@ -93,14 +111,20 @@ If you use `claude plugin marketplace add --sparse` for this repo, include `skil
 
 ```
 sentry-skills/
+├── .agents/
+│   ├── plugins/
+│   │   └── marketplace.json  # Codex marketplace manifest
+│   └── skills -> ../skills   # Local mirror for agent tooling
 ├── .claude-plugin/
 │   ├── marketplace.json      # Marketplace manifest
 │   └── plugin.json           # Root plugin manifest for sentry-skills
-├── .agents/
-│   └── skills -> ../skills   # Local mirror for agent tooling
+├── .codex-plugin/
+│   └── plugin.json           # Codex plugin manifest for sentry-skills
 ├── agents/
 │   ├── code-simplifier.md
 │   └── senpai.md
+├── plugins/
+│   └── sentry-skills -> ..   # Codex marketplace source alias
 ├── skills/
 │   ├── code-review/
 │   │   └── SKILL.md
@@ -232,6 +256,26 @@ To add a new domain-specific plugin:
 1. Create `plugins/<plugin-name>/.claude-plugin/plugin.json`
 2. Add skills under `plugins/<plugin-name>/skills/`
 3. Register the plugin in `.claude-plugin/marketplace.json`
+
+#### Codex Marketplace Structure
+
+This repository is also a Codex marketplace. The marketplace manifest (`.agents/plugins/marketplace.json`) exposes the `sentry-skills` plugin to Codex, and the plugin manifest (`.codex-plugin/plugin.json`) points Codex at the repo-root `skills/` tree.
+
+Users can install the Codex plugin:
+
+```bash
+codex plugin marketplace add getsentry/skills
+codex plugin add sentry-skills@sentry-skills
+```
+
+For local development, point Codex at your clone:
+
+```bash
+codex plugin marketplace add ~/path/to/sentry-skills
+codex plugin add sentry-skills@sentry-skills
+```
+
+The Codex marketplace entry uses `plugins/sentry-skills` as the plugin source. That symlink keeps Codex's `./plugins/<name>` source convention while preserving canonical `skills/` and `agents/` at the repo root.
 
 ### Vendoring Skills
 

@@ -1,0 +1,43 @@
+{
+  "name": "sentry-skills",
+  "version": "0.1.0",
+  "description": "Sentry-specific agent skills for code review, commits, and more.",
+  "author": {
+    "name": "Sentry",
+    "email": "oss@sentry.io",
+    "url": "https://sentry.io"
+  },
+  "homepage": "https://github.com/getsentry/skills",
+  "repository": "https://github.com/getsentry/skills",
+  "license": "Apache-2.0",
+  "keywords": [
+    "sentry",
+    "skills",
+    "code-review",
+    "commits",
+    "security-review",
+    "developer-tools"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Sentry Skills",
+    "shortDescription": "Sentry workflows for code review, commits, security review, and PRs.",
+    "longDescription": "Sentry-specific agent skills for engineering workflows including code review, commit discipline, PR writing, GitHub review handling, security review, and project documentation.",
+    "developerName": "Sentry",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/getsentry/skills",
+    "privacyPolicyURL": "https://sentry.io/privacy/",
+    "termsOfServiceURL": "https://sentry.io/terms/",
+    "defaultPrompt": [
+      "Review this branch using Sentry engineering practices.",
+      "Write a Sentry-style pull request description for this change.",
+      "Audit this repository for recommended Claude Code settings."
+    ],
+    "brandColor": "#362D59"
+  }
+}
