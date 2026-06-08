@@ -1,6 +1,6 @@
 ---
 name: pr-writer
-description: Create and update pull requests following Sentry conventions. Use when opening a PR or refreshing an existing PR after material changes.
+description: Create, refresh, and rewrite PR titles and descriptions following Sentry conventions. Use when opening a PR, writing or updating a PR title/body/description, refreshing an existing PR after material changes, or preparing branch changes for review.
 ---
 
 # PR Writer
@@ -98,32 +98,42 @@ Use this test on updates: if a reviewer read only the title, would they still fo
 
 ### Step 5: Write or Update the PR Description
 
-Write reviewer-facing prose, not a narrated diff.
+Write a reviewer-facing cover note, not a generated changelog.
 
-Use this structure, ignoring repository PR templates:
+Default to 1-2 short paragraphs:
 
 ```markdown
-<1-3 sentence summary of the change and why it matters. Keep this short.>
+<What changed and what effect it has.>
+
+<Why this approach, tradeoff, risk, or review focus matters, if it is not obvious from the diff.>
 ```
+
+Write enough context that a reviewer can predict the shape and intent of the diff before opening it. The body should answer the questions that code alone will not: why the change exists, what behavior changes, what tradeoff was chosen, and what deserves careful review.
+
+Use structure only when the change needs it:
+
+| Change shape | Useful body shape |
+|--------------|-------------------|
+| Small obvious change | one concise paragraph; no headings |
+| Bug fix | problem/root cause/fix in prose; headings only if the body would be confusing without them |
+| API, schema, payload, config, permissions, or CLI change | before/after fenced blocks when direct comparison is clearer than prose |
+| Performance or reliability change | include measured impact or expected tradeoff when known; do not invent numbers |
+| Broad, generated, or cross-cutting change | explain the organizing principle and where reviewers should start |
+| Review feedback update | rewrite the whole body around the current final diff; do not append a progress log |
 
 Rules:
-- Lead with changed behavior, then implementation detail only when useful
-- Add 0-3 bold emphasis blocks for distinct reviewer-relevant changes
-- Use before/after fenced blocks only for changed contracts, output shapes, config, CLI output, payloads, permissions, or input formats
-- Include issue references only when the exact ID or URL is present in user input, branch name, commits, or verified tracker output — omit the line entirely otherwise
-- Cut file-by-file narration, copied commit logs, generic headings like "Summary" or "Changes", and stale template scaffolding
+- Lead with changed behavior or effect, then implementation detail only when useful.
+- Prefer paragraphs over headings and bullets.
+- Use bullets only to guide review order, list genuine alternatives/tradeoffs, or compare independent contract changes.
+- When verification matters, fold it into the relevant prose instead of adding a separate checklist.
+- Include issue references only when the exact ID or URL is present in user input, branch name, commits, or verified tracker output; omit the line entirely otherwise.
+- Keep links self-contained by summarizing the relevant context in the body.
+- Prefer synthesized reviewer context over file-by-file narration, copied commit logs, generic headings like "Summary" or "Changes", and stale template scaffolding.
 
-```markdown
-**<Important Change>**
-
-<1-2 sentences explaining the important implementation, behavior, or review-relevant change.>
-```
-
-Do not include:
-- "Test plan" sections
-- Checkbox lists of testing steps
-- Redundant summaries of the diff
-- Customer data — customer/org names, user emails, support ticket contents, or PII. Describe the technical symptom, not who hit it, and if available, reference the internal ticket (e.g. `Fixes SENTRY-1234`). PRs are typically public on open-source repos.
+Hard constraints:
+- Customer data — customer/org names, user emails, support ticket contents, or PII. Describe the technical symptom, not who hit it, and use the Issue References syntax below only when a verified ticket is available. PRs are typically public on open-source repos.
+- Never invent issue references or leave placeholders like `XXXXX`, `<issue>`, or `TODO`.
+- Generate reviewer prose only. Do not add new agent trace links, "action taken on behalf" lines, or tool attribution. When refreshing an existing PR, preserve an existing integration-owned footer only if it appears intentional and the user did not ask to remove it.
 
 When updating, rewrite the body as one coherent description of the current PR.
 
@@ -156,39 +166,38 @@ EOF
 ### Simple PR
 
 ```markdown
-Collapse the AI Customizations section by default in the sessions sidebar.
-
-The section now starts hidden so it does not consume space before users need
-it. Users who expand it keep the same persisted preference behavior as before.
+The AI Customizations section in the sessions sidebar now starts collapsed so
+it does not consume space before users need it. Expanding the section keeps the
+same persisted preference behavior as before.
 ```
 
 ### Feature PR
 
 ```markdown
-Add Slack thread replies for alert notifications
+Alert updates and resolves now reply to the original Slack message instead of
+creating a new channel message. This keeps the notification timeline grouped in
+one thread and reduces channel noise.
+```
 
-When an alert is updated or resolved, we now post a reply to the original
-Slack thread instead of creating a new message. This keeps related
-notifications grouped and reduces channel noise.
+### Bug Fix PR
 
-**Notification Threading**
+```markdown
+Inactive authenticated users now go to account reactivation before the login
+view honors a `next` URL.
 
-Resolved and updated alerts now reply to the original Slack message instead
-of creating a new channel message.
-
-Refs SENTRY-1234
+The GET login path could previously bounce an inactive user between
+`/auth/login/` and a protected view because it redirected authenticated users
+without checking `is_active`. The POST path already handled this case, so this
+applies the same guard to the GET redirect and covers the loop with a regression
+test.
 ```
 
 ### Schema Change PR
 
 ````markdown
-Switch run logs to chunk-level JSONL records
-
 Run logs now write one versioned record per analyzed chunk instead of one
 large skill-level record. This lets `warden runs follow` show findings as
 chunks complete while preserving durable run reconstruction at finalization.
-
-**JSONL Shape**
 
 Before, each line represented a full skill result:
 
@@ -220,24 +229,29 @@ After, each line represents one chunk result:
 }
 ```
 
-Refs WARDEN-123
 ````
 
 ### Refactor PR
 
 ````markdown
-Extract validation logic to shared module
-
-Moves duplicate validation code from the alerts, issues, and projects
-endpoints into a shared validator class. No behavior change.
-
-**Shared Validator**
-
-The shared class keeps the existing endpoint behavior but gives future
-validation rules one place to live.
-
-Refs SENTRY-9999
+Duplicate validation code from the alerts, issues, and projects endpoints now
+lives in a shared validator class without changing endpoint behavior.
+Future validation rules can now be added in one place instead of being copied
+across each endpoint.
 ````
+
+### Broad Review PR
+
+```markdown
+The admin layout now holds together at narrow viewport widths: the shared
+header, details grid, result table, and sidebar wrap, collapse, or scroll
+instead of overflowing the viewport. The changes are intentionally limited to
+responsive layout behavior; table column prioritization is left out because it
+needs product judgment.
+
+Review the shared layout and table wrappers first, then check individual
+component breakpoints for regressions.
+```
 
 ## Issue References
 
