@@ -38,6 +38,8 @@
       "Write a Sentry-style pull request description for this change.",
       "Audit this repository for recommended Claude Code settings."
     ],
-    "brandColor": "#362D59"
+    "brandColor": "#362D59",
+    "composerIcon": "./assets/sentry-glyph.svg",
+    "logo": "./assets/sentry-logo.svg"
   }
 }

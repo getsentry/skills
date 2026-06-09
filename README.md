@@ -123,6 +123,9 @@ sentry-skills/
 ├── agents/
 │   ├── code-simplifier.md
 │   └── senpai.md
+├── assets/
+│   ├── sentry-glyph.svg      # Codex composer icon
+│   └── sentry-logo.svg       # Codex plugin logo
 ├── plugins/
 │   └── sentry-skills -> ..   # Codex marketplace source alias
 ├── skills/
