@@ -49,7 +49,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [code-simplifier](skills/code-simplifier/SKILL.md) | Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality. |
 | [commit](skills/commit/SKILL.md) | ALWAYS use this skill when committing code changes — never commit directly without it. |
 | [create-branch](skills/create-branch/SKILL.md) | Create git branches following Sentry naming conventions. |
-| [create-kafka-topic](skills/create-kafka-topic/SKILL.md) | Create a new Kafka topic across sentry-kafka-schemas, ops, sentry, and getsentry. |
+| [create-kafka-topic](skills/create-kafka-topic/SKILL.md) | Create a new Kafka topic across sentry-kafka-schemas, ops, and sentry. |
 | [django-access-review](skills/django-access-review/SKILL.md) | Django access control and IDOR security review. |
 | [django-perf-review](skills/django-perf-review/SKILL.md) | Django performance code review. |
 | [doc-coauthoring](skills/doc-coauthoring/SKILL.md) | Guide users through a structured workflow for co-authoring documentation. |

@@ -1,20 +1,21 @@
 ---
 name: create-kafka-topic
-description: Create a new Kafka topic across the Sentry stack — registers it in sentry-kafka-schemas, ops (shared_config/kafka), sentry, and getsentry, opening one PR per repo. Use when asked to "create a new Kafka topic", "add a Kafka topic", "register a Kafka topic", "set up a new Kafka topic", or provision a topic in sentry-kafka-schemas/ops/sentry/getsentry.
+description: Create a new Kafka topic across the Sentry stack — registers it in sentry-kafka-schemas, ops (shared_config/kafka), and sentry, opening one PR per repo. Use when asked to "create a new Kafka topic", "add a Kafka topic", "register a Kafka topic", "set up a new Kafka topic", or provision a topic in sentry-kafka-schemas/ops/sentry.
 ---
 
 # Create a Kafka Topic
 
-Create and register a new Kafka topic across four repos, opening a PR in each:
+Create and register a new Kafka topic across three repos, opening a PR in each:
 
 1. **sentry-kafka-schemas** — the topic schema definition + CODEOWNERS
 2. **ops** — deployment config (default partitions + per-region overrides)
 3. **sentry** — the `Topic` enum and cluster mapping
-4. **getsentry** — the cell-silo topic→cluster mapping
 
-**Requires**: GitHub CLI (`gh`) authenticated, and local checkouts of all four repos.
+**Requires**: GitHub CLI (`gh`) authenticated, and local checkouts of all three repos.
 
-Run the steps in order. The end deliverable is **four PR links** returned to the user.
+Run the steps in order. The end deliverable is **three PR links** returned to the user.
+
+> **Not getsentry.** getsentry no longer needs a per-topic change — it loads `KAFKA_TOPIC_TO_CLUSTER` at runtime from the topicctl-generated YAML that ops mounts (getsentry/getsentry#20512, #20661). Do not edit `cellsilo.py`.
 
 ## Step 0: Gather inputs and locate repos
 
@@ -22,7 +23,7 @@ Run the steps in order. The end deliverable is **four PR links** returned to the
    - **Topic name** (kebab-case, e.g. `ingest-foo`)
    - **Default number of partitions**
    - **Owning team** (GitHub team handle, e.g. `@getsentry/taskbroker`) — used for CODEOWNERS
-2. Locate each repo in the workspace (`sentry-kafka-schemas`, `ops`, `sentry`, `getsentry`). If any is not found near the working directory, ask the user for its path. Use `$SCHEMAS`, `$OPS`, `$SENTRY`, `$GETSENTRY` to refer to them below.
+2. Locate each repo in the workspace (`sentry-kafka-schemas`, `ops`, `sentry`). If any is not found near the working directory, ask the user for its path. Use `$SCHEMAS`, `$OPS`, `$SENTRY` to refer to them below.
 3. **Check for collision**: if `$SCHEMAS/topics/<topic_name>.yaml` already exists, tell the user the topic already exists and ask for a different name. Do not proceed until the name is free.
 
 Before each repo's work, ensure a clean tree on an updated default branch:
@@ -83,7 +84,7 @@ gh pr create --fill --title "feat: add <topic_name> topic schema"
 
 Capture the PR URL.
 
-> **Release dependency**: the new topic only becomes usable downstream once a new `sentry-kafka-schemas` release is published (after this PR merges, per the repo's release process). The sentry and getsentry/ops dependency bumps in later steps reference that released version, so they may need to happen after this PR merges and releases.
+> **Release dependency**: the new topic only becomes usable downstream once a new `sentry-kafka-schemas` release is published (after this PR merges, per the repo's release process). The sentry and ops dependency bumps in later steps reference that released version, so they may need to happen after this PR merges and releases.
 
 ## Step 2: Choose regions, partitions, and clusters
 
@@ -94,7 +95,7 @@ Capture the PR URL.
    done
    ```
    The `control` region typically does **not** carry these topics (it only has `taskworker-control*` topics) — exclude it unless the sibling topic includes it.
-2. From that region set, prompt the user for **which regions the topic should be enabled in**.
+2. **STOP and ask the user which regions the topic should be enabled in.** This is a required gate — never infer the enabled set from a reference topic, even when the user said "use the same values as `<topic>`" (that covers partitions/cluster/schema defaults, not enablement). Wait for an explicit answer before continuing.
 3. For each **enabled** region, prompt for:
    - **Number of partitions** in that region
    - **Cluster** — present the valid choices for that region:
@@ -165,34 +166,14 @@ gh pr create --fill --title "feat: register <topic_name> kafka topic"
 
 Capture the PR URL.
 
-## Step 5: getsentry PR
+## Step 5: Report
 
-In `$GETSENTRY`, edit `getsentry/conf/settings/cellsilo.py`:
-
-Add an entry to the topic→cluster mapping that contains the other Kafka topics (find it by the sibling `taskworker-*`/topic entries). The value is a **real cluster name**, not `"default"` — use the same cluster the sibling topics in this dict use (e.g. `kafka-small`). Note the cluster name here can differ from the ops cluster name for the same region.
-
-```python
-"<topic_name>": "<cluster_name>",
-```
-
-Commit and open the PR:
-
-```bash
-git add getsentry/conf/settings/cellsilo.py
-git commit -m "feat: add <topic_name> topic"
-gh pr create --fill --title "feat: add <topic_name> topic"
-```
-
-Capture the PR URL.
-
-## Step 6: Report
-
-Return all four PR links to the user **and the dependency ordering between them**, so the user knows what must merge first. The schemas PR must merge and publish a release before the dependency-bump PRs can reference the released version.
+Return all three PR links to the user **and the dependency ordering between them**, so the user knows what must merge first. The schemas PR must merge and publish a release before the dependency-bump PRs can reference the released version.
 
 Output in this shape (annotate each PR with its dependency):
 
 ```
-Opened 4 PRs for the `<topic_name>` topic:
+Opened 3 PRs for the `<topic_name>` topic:
 
 1. sentry-kafka-schemas: <url>
    └─ Merge + release FIRST. Blocks #2 and #3 (they pin the new schemas version).
@@ -200,10 +181,8 @@ Opened 4 PRs for the `<topic_name>` topic:
    └─ Depends on #1's release (python/requirements.txt bump).
 3. sentry: <url>
    └─ Depends on #1's release (pyproject.toml + uv.lock bump).
-4. getsentry: <url>
-   └─ Independent config; safe to merge anytime.
 
-Merge order: #1 (and its release) → then #2, #3, #4.
+Merge order: #1 (and its release) → then #2 and #3.
 ```
 
 If a dependency bump was deferred because the schemas release was not yet published, say so explicitly and note which PR(s) still need the version updated.
@@ -211,4 +190,4 @@ If a dependency bump was deferred because the schemas release was not yet publis
 ## Notes
 
 - For commit messages and PR descriptions, you may use the `commit` and `pr-writer` skills to follow Sentry conventions; the commands above are a self-contained fallback.
-- The schemas PR (Step 1) gates the dependency bumps in ops (Step 3) and sentry (Step 4), which reference the released schemas version. The enum/config PRs and the getsentry PR are otherwise independent — open them even if one needs follow-up.
+- The schemas PR (Step 1) gates the dependency bumps in ops (Step 3) and sentry (Step 4), which reference the released schemas version. If the release is not yet published, open the ops/sentry PRs without the bump and flag it as a follow-up.
