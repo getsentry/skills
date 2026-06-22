@@ -127,15 +127,20 @@ In `$OPS`:
      ```yaml
      cluster: {cluster_name}
      ```
-3. **Register for deployment** — add `<topic_name>` to the `all_deployed_topics:` list in `shared_config/kafka/topics/defaults/all_topics.yaml`. The list is grouped by topic family, not strictly alphabetical — insert it next to its sibling topics (e.g. right after `<sibling_topic>`).
-4. **Bump the schemas dependency** — update the `sentry-kafka-schemas==` pin in `python/requirements.txt` to the version that includes the new topic (see the release dependency note in Step 1).
+3. **Cookiecutter region template** — also create the regional override in the new-region template so future regions get the topic: `cookiecutters/cookiecutter-region/shared_config/kafka/topics/regional_overrides/{{region}}/<topic_name>.yaml`. New regions start disabled, so its contents are exactly:
+   ```yaml
+   disabled: true
+   ```
+   (Skipping this is flagged by Warden's `cookiecutter-region-backport` check — see the `taskworker-seer-push.yaml` precedent.)
+4. **Register for deployment** — add `<topic_name>` to the `all_deployed_topics:` list in `shared_config/kafka/topics/defaults/all_topics.yaml`. The list is grouped by topic family, not strictly alphabetical — insert it next to its sibling topics (e.g. right after `<sibling_topic>`).
+5. **Bump the schemas dependency** — update the `sentry-kafka-schemas==` pin in `python/requirements.txt` to the version that includes the new topic (see the release dependency note in Step 1).
 
 > **Do not edit generated/materialized files.** CI regenerates `shared_config/_materialized_configs/`, `k8s/clusters/*/_topicctl_generated.yaml`, `k8s/materialized_manifests/`, and topicctl job manifests via `make materialize`. Only edit the source files above.
 
 Commit and open the PR:
 
 ```bash
-git add shared_config/kafka/topics/ python/requirements.txt
+git add shared_config/kafka/topics/ cookiecutters/cookiecutter-region/ python/requirements.txt
 git commit -m "feat: deploy <topic_name> topic"
 gh pr create --fill --reviewer <owning-team-slug> --title "feat: deploy <topic_name> topic"
 ```

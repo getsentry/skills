@@ -14,7 +14,7 @@ In scope:
 
 - Prompting for the topic name, default partition count, owning team, and per-region enablement/partitions/cluster.
 - Creating the schema file and CODEOWNERS entry in `sentry-kafka-schemas`.
-- Creating the default partition file, per-region override files, and `all_topics.yaml` entry in `ops`, plus the `sentry-kafka-schemas` requirement bump.
+- Creating the default partition file, per-region override files, the cookiecutter-region template override (`disabled: true`), and `all_topics.yaml` entry in `ops`, plus the `sentry-kafka-schemas` requirement bump.
 - Adding the `Topic` enum entry and `KAFKA_TOPIC_TO_CLUSTER` entry in `sentry`, plus the `sentry-kafka-schemas` dependency bump.
 - Opening one PR per repo and reporting all three URLs.
 
