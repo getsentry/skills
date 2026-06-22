@@ -36,7 +36,7 @@ Out of scope:
 
 - Required first actions: prompt for topic name, default partitions, and owning team; locate all three repos; verify the topic name is not already taken in `sentry-kafka-schemas/topics/`.
 - Per-repo precondition: a clean working tree on an updated default branch before creating the topic branch.
-- Required outputs: three pull requests (one per repo) plus the three URLs returned to the user.
+- Required outputs: three pull requests (one per repo), each with the owning team requested as a reviewer, plus the three URLs returned to the user.
 - Non-negotiable constraints:
   - Always ask the user which regions to enable; never infer the enabled set from a reference topic, even when told to "use the same values as `<topic>`".
   - Do not edit generated/materialized files in `ops`, and do not edit `getsentry`.

@@ -22,7 +22,7 @@ Run the steps in order. The end deliverable is **three PR links** returned to th
 1. Prompt the user for:
    - **Topic name** (kebab-case, e.g. `ingest-foo`)
    - **Default number of partitions**
-   - **Owning team** (GitHub team handle, e.g. `@getsentry/taskbroker`) — used for CODEOWNERS
+   - **Owning team** (GitHub team handle, e.g. `@getsentry/taskbroker`) — used for the `sentry-kafka-schemas` CODEOWNERS entry and requested as a **reviewer on all three PRs**. For `gh pr create --reviewer`, pass it as the `org/team` slug **without** the leading `@` (e.g. `getsentry/taskbroker`) — referred to as `<owning-team-slug>` below.
 2. Locate each repo in the workspace (`sentry-kafka-schemas`, `ops`, `sentry`). If any is not found near the working directory, ask the user for its path. Use `$SCHEMAS`, `$OPS`, `$SENTRY` to refer to them below.
 3. **Check for collision**: if `$SCHEMAS/topics/<topic_name>.yaml` already exists, tell the user the topic already exists and ask for a different name. Do not proceed until the name is free.
 
@@ -79,7 +79,7 @@ Also add the topic to `$SCHEMAS/CODEOWNERS`, next to the sibling `topics/*` entr
 ```bash
 git add topics/<topic_name>.yaml CODEOWNERS
 git commit -m "feat: add <topic_name> topic schema"
-gh pr create --fill --title "feat: add <topic_name> topic schema"
+gh pr create --fill --reviewer <owning-team-slug> --title "feat: add <topic_name> topic schema"
 ```
 
 Capture the PR URL.
@@ -137,7 +137,7 @@ Commit and open the PR:
 ```bash
 git add shared_config/kafka/topics/ python/requirements.txt
 git commit -m "feat: deploy <topic_name> topic"
-gh pr create --fill --title "feat: deploy <topic_name> topic"
+gh pr create --fill --reviewer <owning-team-slug> --title "feat: deploy <topic_name> topic"
 ```
 
 Capture the PR URL.
@@ -161,7 +161,7 @@ Commit and open the PR:
 ```bash
 git add src/sentry/conf/types/kafka_definition.py src/sentry/conf/server.py pyproject.toml uv.lock
 git commit -m "feat: register <topic_name> kafka topic"
-gh pr create --fill --title "feat: register <topic_name> kafka topic"
+gh pr create --fill --reviewer <owning-team-slug> --title "feat: register <topic_name> kafka topic"
 ```
 
 Capture the PR URL.
