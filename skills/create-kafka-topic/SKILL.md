@@ -84,7 +84,9 @@ gh pr create --fill --reviewer <owning-team-slug> --title "feat: add <topic_name
 
 Capture the PR URL.
 
-> **Release dependency**: the new topic only becomes usable downstream once a new `sentry-kafka-schemas` release is published (after this PR merges, per the repo's release process). The sentry and ops dependency bumps in later steps reference that released version, so they may need to happen after this PR merges and releases.
+> **Release dependency**: the new topic only becomes usable downstream once a new `sentry-kafka-schemas` release is published (after this PR merges, per the repo's release process). The ops and sentry PRs still **bump the pin now** to the anticipated next version so the required change is visible in the diff — see Steps 3 and 4.
+>
+> Compute the anticipated version: take the latest released version and increment the patch (`git -C $SCHEMAS tag --sort=-v:refname | head -1` → e.g. `2.1.35` → `2.1.36`). Releases are manually versioned, so always note in the PR that this is the *anticipated* version and must be confirmed/adjusted to match the actual published release before merge. Call this `<next-version>` below.
 
 ## Step 2: Choose regions, partitions, and clusters
 
@@ -133,7 +135,7 @@ In `$OPS`:
    ```
    (Skipping this is flagged by Warden's `cookiecutter-region-backport` check — see the `taskworker-seer-push.yaml` precedent.)
 4. **Register for deployment** — add `<topic_name>` to the `all_deployed_topics:` list in `shared_config/kafka/topics/defaults/all_topics.yaml`. The list is grouped by topic family, not strictly alphabetical — insert it next to its sibling topics (e.g. right after `<sibling_topic>`).
-5. **Bump the schemas dependency** — update the `sentry-kafka-schemas==` pin in `python/requirements.txt` to the version that includes the new topic (see the release dependency note in Step 1).
+5. **Bump the schemas dependency** — update the `sentry-kafka-schemas==` pin in `python/requirements.txt` to `<next-version>` (see the release-dependency note in Step 1). The pin lives only in the compiled `requirements.txt`, not `requirements.in`. This is a clean, complete change (no hashes in this file).
 
 > **Do not edit generated/materialized files.** CI regenerates `shared_config/_materialized_configs/`, `k8s/clusters/*/_topicctl_generated.yaml`, `k8s/materialized_manifests/`, and topicctl job manifests via `make materialize`. Only edit the source files above.
 
@@ -159,7 +161,7 @@ In `$SENTRY`:
    ```python
    "<topic_name>": "default",
    ```
-3. **Bump the schemas dependency** — update `sentry-kafka-schemas>=` in `pyproject.toml` to the released version that includes the new topic, then regenerate the lock so `uv.lock` matches (`uv lock`). See the release dependency note in Step 1.
+3. **Bump the schemas dependency** — update `sentry-kafka-schemas>=` in `pyproject.toml` to `<next-version>`, and bump the matching `specifier = ">=..."` line for `sentry-kafka-schemas` in `uv.lock` so the two agree. If `<next-version>` is already published, run `uv lock` to fully regenerate. If it is **not** published yet (the usual case when this PR precedes the schemas release), you cannot regenerate `uv.lock`'s resolved version + wheel hash — leave the `[[package]]` `version`/`wheels` block as-is and note in the PR that `uv lock` must be re-run once the release publishes. See the release-dependency note in Step 1.
 
 Commit and open the PR:
 
@@ -195,4 +197,4 @@ If a dependency bump was deferred because the schemas release was not yet publis
 ## Notes
 
 - For commit messages and PR descriptions, you may use the `commit` and `pr-writer` skills to follow Sentry conventions; the commands above are a self-contained fallback.
-- The schemas PR (Step 1) gates the dependency bumps in ops (Step 3) and sentry (Step 4), which reference the released schemas version. If the release is not yet published, open the ops/sentry PRs without the bump and flag it as a follow-up.
+- The schemas PR (Step 1) gates the dependency bumps in ops (Step 3) and sentry (Step 4). Bump the pins to the anticipated `<next-version>` anyway so reviewers see the required change; flag in each PR body that the version is anticipated (confirm against the actual release) and, for sentry, that `uv.lock` needs `uv lock` once the release publishes. CI on those PRs may stay red until then.

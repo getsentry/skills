@@ -43,7 +43,7 @@ Out of scope:
   - Per-region override contents follow the exact rules: `disabled: true` when not enabled; `cluster:` only when enabled and partitions equal the default; `cluster:` + `partitions:` when they differ.
   - Insert enum / `all_topics.yaml` entries next to sibling topics (grouped by family), not alphabetically.
   - Confirm the generated schema file with the user before opening the first PR.
-- Sequencing: the schemas PR gates the dependency bumps in `sentry`/`ops`, which reference the released schema version; these may need to follow the schemas release.
+- Sequencing: the schemas PR gates the dependency bumps in `sentry`/`ops`. The ops/sentry PRs still bump the pin to the anticipated next version (latest released patch + 1) so the required change is visible; the PR body must flag it as anticipated and, for sentry, note that `uv.lock` must be regenerated with `uv lock` once the release publishes.
 - Expected bundled files loaded at runtime: only `SKILL.md`.
 
 ## Evaluation
@@ -61,7 +61,7 @@ Reference examples:
 
 ## Limitations
 
-- Cannot determine the released `sentry-kafka-schemas` version until that release is published; the dependency bumps may be deferred.
+- The exact published `sentry-kafka-schemas` version is not known until release (versioning is manual); the skill bumps to the anticipated patch increment, which must be confirmed against the actual release. Sentry's `uv.lock` resolved entry + wheel hash cannot be regenerated until the release publishes.
 - Relies on a sibling topic to infer the correct region set and good field values; an entirely novel topic shape may need extra user input.
 - Does not run repo test suites or CI; reviewers/CI validate the generated config.
 
