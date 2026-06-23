@@ -90,7 +90,7 @@ Capture the PR URL.
 
 ## Step 2: Choose regions, partitions, and clusters
 
-1. Determine the set of regions that get an override file. Do **not** assume every folder under `regional_overrides/`. Mirror a comparable existing topic — list which regions a sibling topic defines:
+1. Build the **candidate region set**. Do **not** assume every folder under `regional_overrides/`. Start from a comparable existing topic — list which regions a sibling topic defines:
    ```bash
    for d in "$OPS"/shared_config/kafka/topics/regional_overrides/*/; do
      [ -f "$d/<sibling_topic>.yaml" ] && basename "$d"
@@ -98,14 +98,14 @@ Capture the PR URL.
    ```
    The `control` region typically does **not** carry these topics (it only has `taskworker-control*` topics) — exclude it unless the sibling topic includes it.
 2. **STOP and ask the user which regions the topic should be enabled in.** This is a required gate — never infer the enabled set from a reference topic, even when the user said "use the same values as `<topic>`" (that covers partitions/cluster/schema defaults, not enablement). Wait for an explicit answer before continuing.
-3. For each **enabled** region, prompt for:
+3. The **file set** — regions that get an override file — is the candidate set **plus every region the user enabled** (an enabled region must always get a file, even if the sibling topic did not define it). For each **enabled** region, prompt for:
    - **Number of partitions** in that region
    - **Cluster** — present the valid choices for that region:
      ```bash
      grep -rh '^cluster:' "$OPS/shared_config/kafka/topics/regional_overrides/<region>/" | sort -u
      ```
 
-Regions not listed as enabled will be written as `disabled: true` in Step 3.
+Every region in the file set that is **not** enabled gets `disabled: true` (Step 3).
 
 ## Step 3: ops PR
 
@@ -115,7 +115,7 @@ In `$OPS`:
    ```yaml
    partitions: {default_partitions}
    ```
-2. **Per-region overrides** — for **each region in the set from Step 2** (not every folder; `control` is normally excluded), create `regional_overrides/<region>/<topic_name>.yaml`:
+2. **Per-region overrides** — for **each region in the file set from Step 2** (not every folder; `control` is normally excluded), create `shared_config/kafka/topics/regional_overrides/<region>/<topic_name>.yaml`:
    - Region **not** enabled by the user → contents are exactly:
      ```yaml
      disabled: true
@@ -153,11 +153,12 @@ Capture the PR URL.
 
 In `$SENTRY`:
 
-1. **`src/sentry/conf/types/kafka_definition.py`** — add an entry to the `class Topic(Enum)`, matching the existing `SCREAMING_SNAKE_CASE = "kebab-name"` convention. Place it next to its sibling topics (the enum is grouped by family, not strictly alphabetical):
+1. **`src/sentry/conf/types/kafka_definition.py`** — add an entry to the `class Topic(Enum)`. The **member name** is the topic name in `SCREAMING_SNAKE_CASE` (hyphens → underscores, uppercased); the **value** is the kebab-case topic name. Place it next to its sibling topics (the enum is grouped by family, not strictly alphabetical):
    ```python
-   TOPIC_NAME = "<topic_name>"
+   # e.g. topic "taskworker-launchpad-push":
+   TASKWORKER_LAUNCHPAD_PUSH = "taskworker-launchpad-push"
    ```
-2. **`src/sentry/conf/server.py`** — add an entry to the `KAFKA_TOPIC_TO_CLUSTER` dict with value `"default"`, next to the sibling entries:
+2. **`src/sentry/conf/server.py`** — add an entry to the `KAFKA_TOPIC_TO_CLUSTER` dict next to the sibling entries. Use `"default"` (every current entry maps to `"default"`); if a sibling in the same family ever uses a different value, match that instead:
    ```python
    "<topic_name>": "default",
    ```
