@@ -1,30 +1,38 @@
 ---
 name: create-kafka-topic
-description: Create a new Kafka topic across the Sentry stack — registers it in sentry-kafka-schemas, ops (shared_config/kafka), and sentry, opening one PR per repo. Use when asked to "create a new Kafka topic", "add a Kafka topic", "register a Kafka topic", "set up a new Kafka topic", or provision a topic in sentry-kafka-schemas/ops/sentry.
+description: Create a new Kafka topic for Sentry. Public topics (available to self-hosted) get PRs in sentry-kafka-schemas, ops, and sentry; private topics (internal regions only, inheriting settings from a public topic via override_topic) get a single ops PR. Use when asked to "create a new Kafka topic", "add a Kafka topic", "register a Kafka topic", "set up a new Kafka topic", or provision a public or private Kafka topic.
 ---
 
 # Create a Kafka Topic
 
-Create and register a new Kafka topic across three repos, opening a PR in each:
+First decide whether the topic is **public** or **private** (Step 0 asks). The path differs:
 
-1. **sentry-kafka-schemas** — the topic schema definition + CODEOWNERS
-2. **ops** — deployment config (default partitions + per-region overrides)
-3. **sentry** — the `Topic` enum and cluster mapping
+- **Public** — available to self-hosted Sentry. Defined in `sentry-kafka-schemas`, registered in the `sentry` `Topic` enum, and deployed via `ops`. Opens **three PRs**:
+  1. **sentry-kafka-schemas** — the topic schema definition + CODEOWNERS
+  2. **ops** — deployment config (default partitions + per-region overrides)
+  3. **sentry** — the `Topic` enum and cluster mapping
+- **Private** — used only in our internal regions; **not** in `sentry-kafka-schemas` or `sentry`. It inherits its `topic_creation_config` from an existing public topic via `override_topic`. Opens **one PR**: just **ops**.
 
-**Requires**: GitHub CLI (`gh`) authenticated, and local checkouts of all three repos.
+**Requires**: GitHub CLI (`gh`) authenticated, and local checkouts of the repos you'll touch (all three for public; just `ops` for private).
 
-Run the steps in order. The end deliverable is **three PR links** returned to the user.
+Run the steps in order. For **private** topics, do only Step 0, Step 2, Step 3, and Step 5 — **skip Step 1 (schemas) and Step 4 (sentry)**, which are marked *public only*.
 
 > **Not getsentry.** getsentry no longer needs a per-topic change — it loads `KAFKA_TOPIC_TO_CLUSTER` at runtime from the topicctl-generated YAML that ops mounts (getsentry/getsentry#20512, #20661). Do not edit `cellsilo.py`.
 
 ## Step 0: Gather inputs and locate repos
 
-1. Prompt the user for:
+1. **Ask whether the topic is public or private** — this determines the whole path:
+   - **Public** — available to self-hosted Sentry. Full three-PR flow.
+   - **Private** — only used in our internal regions. Single ops PR; inherits settings from a public topic via `override_topic`.
+2. Prompt the user for:
    - **Topic name** (kebab-case, e.g. `ingest-foo`)
    - **Default number of partitions**
-   - **Owning team** (GitHub team handle, e.g. `@getsentry/taskbroker`) — used for the `sentry-kafka-schemas` CODEOWNERS entry and requested as a **reviewer on all three PRs**. For `gh pr create --reviewer`, pass it as the `org/team` slug **without** the leading `@` (e.g. `getsentry/taskbroker`) — referred to as `<owning-team-slug>` below.
-2. Locate each repo in the workspace (`sentry-kafka-schemas`, `ops`, `sentry`). If any is not found near the working directory, ask the user for its path. Use `$SCHEMAS`, `$OPS`, `$SENTRY` to refer to them below.
-3. **Check for collision**: if `$SCHEMAS/topics/<topic_name>.yaml` already exists, tell the user the topic already exists and ask for a different name. Do not proceed until the name is free.
+   - **Owning team** (GitHub team handle, e.g. `@getsentry/taskbroker`) — for **public** topics it is the `sentry-kafka-schemas` CODEOWNERS entry; for **all** topics it is requested as a **reviewer on every PR this skill opens**. For `gh pr create --reviewer`, pass it as the `org/team` slug **without** the leading `@` (e.g. `getsentry/taskbroker`) — referred to as `<owning-team-slug>` below.
+   - **(private only) Override topic** — the existing **public** topic whose `topic_creation_config` this private topic inherits. It must already exist in `$OPS/shared_config/kafka/topics/defaults/all_topics.yaml` (verify it does); referred to as `<override_topic>` below.
+3. Locate the repos you'll touch. **Public**: `sentry-kafka-schemas`, `ops`, `sentry`. **Private**: just `ops`. If a needed repo isn't found near the working directory, ask the user for its path. Use `$SCHEMAS`, `$OPS`, `$SENTRY` to refer to them below.
+4. **Check for collision** — ask for a different name and do not proceed until it's free:
+   - **Public**: `$SCHEMAS/topics/<topic_name>.yaml` must not already exist.
+   - **Private**: no `$OPS/shared_config/kafka/topics/<topic_name>.yaml` or `$OPS/shared_config/kafka/topics/regional_overrides/*/<topic_name>.yaml` may already exist.
 
 Before each repo's work, ensure a clean tree on an updated default branch:
 
@@ -36,7 +44,9 @@ git checkout "$BASE" && git pull --ff-only
 git checkout -b add-kafka-topic-<topic_name>
 ```
 
-## Step 1: sentry-kafka-schemas PR
+## Step 1: sentry-kafka-schemas PR — *public only*
+
+> **Skip this entire step for private topics.** Private topics are not defined in `sentry-kafka-schemas`.
 
 Create `$SCHEMAS/topics/<topic_name>.yaml`. Read 2–3 existing files in `$SCHEMAS/topics/` that are closest to this topic's purpose to infer good values (pipeline, producer/consumer services, schema type, resource path).
 
@@ -120,26 +130,35 @@ In `$OPS`:
      ```yaml
      disabled: true
      ```
-   - Region enabled, partitions **differ** from the default:
-     ```yaml
-     cluster: {cluster_name}
-     partitions: {region_partitions}
-     ```
-   - Region enabled, partitions **equal** the default → omit `partitions`, write only:
-     ```yaml
-     cluster: {cluster_name}
-     ```
+   - Region **enabled** → write `cluster:`; for **private** topics also add `override_topic: <override_topic>`; add `partitions:` only when the region's partitions differ from the default.
+     - Public, partitions == default → only `cluster: {cluster_name}`
+     - Public, partitions differ:
+       ```yaml
+       cluster: {cluster_name}
+       partitions: {region_partitions}
+       ```
+     - Private, partitions == default:
+       ```yaml
+       cluster: {cluster_name}
+       override_topic: <override_topic>
+       ```
+     - Private, partitions differ:
+       ```yaml
+       cluster: {cluster_name}
+       override_topic: <override_topic>
+       partitions: {region_partitions}
+       ```
 3. **Cookiecutter region template** — also create the regional override in the new-region template so future regions get the topic: `cookiecutters/cookiecutter-region/shared_config/kafka/topics/regional_overrides/{{region}}/<topic_name>.yaml`. New regions start disabled, so its contents are exactly:
    ```yaml
    disabled: true
    ```
    (Skipping this is flagged by Warden's `cookiecutter-region-backport` check — see the `taskworker-seer-push.yaml` precedent.)
-4. **Register for deployment** — add `<topic_name>` to the `all_deployed_topics:` list in `shared_config/kafka/topics/defaults/all_topics.yaml`. The list is grouped by topic family, not strictly alphabetical — insert it next to its sibling topics (e.g. right after `<sibling_topic>`).
-5. **Bump the schemas dependency** — update the `sentry-kafka-schemas==` pin in `python/requirements.txt` to `<next-version>` (see the release-dependency note in Step 1). The pin lives only in the compiled `requirements.txt`, not `requirements.in`. This is a clean, complete change (no hashes in this file).
+4. **Register for deployment** — *public only*. Add `<topic_name>` to the `all_deployed_topics:` list in `shared_config/kafka/topics/defaults/all_topics.yaml`. The list is grouped by topic family, not strictly alphabetical — insert it next to its sibling topics (e.g. right after `<sibling_topic>`). **Skip for private topics** — they are intentionally not in `all_topics.yaml`.
+5. **Bump the schemas dependency** — *public only*. Update the `sentry-kafka-schemas==` pin in `python/requirements.txt` to `<next-version>` (see the release-dependency note in Step 1). The pin lives only in the compiled `requirements.txt`, not `requirements.in`. **Skip for private topics** — they reuse an already-released public topic, so no new schemas release is involved.
 
 > **Do not edit generated/materialized files.** CI regenerates `shared_config/_materialized_configs/`, `k8s/clusters/*/_topicctl_generated.yaml`, `k8s/materialized_manifests/`, and topicctl job manifests via `make materialize`. Only edit the source files above.
 
-Commit and open the PR:
+Commit and open the PR (drop `python/requirements.txt` from the `git add` for private topics):
 
 ```bash
 git add shared_config/kafka/topics/ cookiecutters/cookiecutter-region/ python/requirements.txt
@@ -149,7 +168,9 @@ gh pr create --fill --reviewer <owning-team-slug> --title "feat: deploy <topic_n
 
 Capture the PR URL.
 
-## Step 4: sentry PR
+## Step 4: sentry PR — *public only*
+
+> **Skip this entire step for private topics.** Private topics are not added to the `sentry` `Topic` enum or `KAFKA_TOPIC_TO_CLUSTER`.
 
 In `$SENTRY`:
 
@@ -176,9 +197,18 @@ Capture the PR URL.
 
 ## Step 5: Report
 
-Return all three PR links to the user **and the dependency ordering between them**, so the user knows what must merge first. The schemas PR must merge and publish a release before the dependency-bump PRs can reference the released version.
+Return the PR link(s) to the user.
 
-Output in this shape (annotate each PR with its dependency):
+**Private topic** — one PR, no cross-PR dependency:
+
+```
+Opened 1 PR for the private `<topic_name>` topic:
+
+1. ops: <url>
+   └─ Inherits topic_creation_config from public topic `<override_topic>`.
+```
+
+**Public topic** — three PRs, **with the dependency ordering** so the user knows what must merge first. The schemas PR must merge and publish a release before the dependency-bump PRs can reference the released version:
 
 ```
 Opened 3 PRs for the `<topic_name>` topic:
