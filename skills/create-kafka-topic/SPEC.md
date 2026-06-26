@@ -39,7 +39,7 @@ Out of scope:
 
 - Required first actions: determine public vs private; prompt for topic name, default partitions, a reference/sibling topic, and owning team (and, for private, the `override_topic`); for public, confirm a new schema is actually needed (outcomes topics are an exception); locate the repos for the chosen path; verify the name is free across **all** locations (`sentry-kafka-schemas/topics/`, `ops` default + regional override paths, and the `sentry` `Topic` enum / `KAFKA_TOPIC_TO_CLUSTER`).
 - Per-repo precondition: a clean working tree on an updated default branch before creating the topic branch.
-- Required outputs: public → three PRs (one per repo); private → one ops PR. Each PR has the owning team requested as a reviewer; return the URL(s).
+- Required outputs: public with a new schema → three PRs; public reusing an existing schema (Step 1 skipped, e.g. outcomes) → two PRs (ops + sentry), no version bump; private → one ops PR. Each PR has the owning team requested as a reviewer; return the URL(s).
 - Non-negotiable constraints:
   - Always ask the user which regions to enable; never infer the enabled set from a reference topic, even when told to "use the same values as `<topic>`".
   - Do not edit generated/materialized files in `ops`, and do not edit `getsentry`.
@@ -47,7 +47,7 @@ Out of scope:
   - Private topics: ops PR only — no `sentry-kafka-schemas` change, no `sentry` change, no `all_topics.yaml` entry, no version bump. The `override_topic` must be an existing public topic in `all_topics.yaml`.
   - Insert enum / `all_topics.yaml` entries next to sibling topics (grouped by family), not alphabetically.
   - Confirm the generated schema file with the user before opening the first PR (public).
-- Sequencing (public only): the schemas PR gates the dependency bumps in `sentry`/`ops`. The ops/sentry PRs still bump the pin to the anticipated next version (latest released patch + 1) so the required change is visible; the PR body must flag it as anticipated and, for sentry, note that `uv.lock` must be regenerated with `uv lock` once the release publishes. Private topics have no such dependency.
+- Sequencing (only when Step 1 adds a new schema): the schemas PR gates the dependency bumps in `sentry`/`ops`. When the topic reuses an existing schema (outcomes) or is private, there is no schemas release, no version bump, and no cross-PR ordering. The ops/sentry PRs still bump the pin to the anticipated next version (latest released patch + 1) so the required change is visible; the PR body must flag it as anticipated and, for sentry, note that `uv.lock` must be regenerated with `uv lock` once the release publishes. Private topics have no such dependency.
 - Expected bundled files loaded at runtime: only `SKILL.md`.
 
 ## Evaluation

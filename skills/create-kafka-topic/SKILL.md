@@ -35,10 +35,9 @@ Run the steps in order. For **private** topics, do only Step 0, Step 2, Step 3, 
    - **outcomes** topics are an exception: they reuse an existing schema and infra-specific variants should **not** be added to `sentry-kafka-schemas`. For an outcomes-style topic, skip Step 1 — confirm the exact handling with the topic owner.
    - If the topic reuses an existing public topic's settings wholesale and adds nothing new to the schema registry, it is really a **private** topic — use `override_topic` (Step 3 only).
 4. Locate the repos you'll touch. **Public**: `sentry-kafka-schemas`, `ops`, `sentry`. **Private**: just `ops`. If a needed repo isn't found near the working directory, ask the user for its path. Use `$SCHEMAS`, `$OPS`, `$SENTRY` to refer to them below.
-5. **Check for collision across every location** (regardless of public/private) — ask for a different name and do not proceed until it's free:
-   - `$SCHEMAS/topics/<topic_name>.yaml`
-   - `$OPS/shared_config/kafka/topics/<topic_name>.yaml` and `$OPS/shared_config/kafka/topics/regional_overrides/*/<topic_name>.yaml`
-   - `$SENTRY` `Topic` enum / `KAFKA_TOPIC_TO_CLUSTER` (grep the kebab name in `src/sentry/conf/types/kafka_definition.py` and `src/sentry/conf/server.py`)
+5. **Check for collision in every repo you located** — ask for a different name and do not proceed until it's free:
+   - `$OPS/shared_config/kafka/topics/<topic_name>.yaml` and `$OPS/shared_config/kafka/topics/regional_overrides/*/<topic_name>.yaml` (always — covers both private topics and the ops files of deployed public topics).
+   - **Public only** (these repos are located only for public): `$SCHEMAS/topics/<topic_name>.yaml`, and the `$SENTRY` `Topic` enum / `KAFKA_TOPIC_TO_CLUSTER` (grep the kebab name in `src/sentry/conf/types/kafka_definition.py` and `src/sentry/conf/server.py`).
 
 Before each repo's work, ensure a clean tree on an updated default branch:
 
@@ -162,7 +161,7 @@ In `$OPS`:
    ```
    (Skipping this is flagged by Warden's `cookiecutter-region-backport` check — see the `taskworker-seer-push.yaml` precedent.)
 4. **Register for deployment** — *public only*. Add `<topic_name>` to the `all_deployed_topics:` list in `shared_config/kafka/topics/defaults/all_topics.yaml`. The list is grouped by topic family, not strictly alphabetical — insert it next to its sibling topics (e.g. right after `<sibling_topic>`). **Skip for private topics** — they are intentionally not in `all_topics.yaml`.
-5. **Bump the schemas dependency** — *public only*. Update the `sentry-kafka-schemas==` pin in `python/requirements.txt` to `<next-version>` (see the release-dependency note in Step 1). The pin lives only in the compiled `requirements.txt`, not `requirements.in`. **Skip for private topics** — they reuse an already-released public topic, so no new schemas release is involved.
+5. **Bump the schemas dependency** — *only when Step 1 added a new schema* (i.e. a new `sentry-kafka-schemas` release is required). Update the `sentry-kafka-schemas==` pin in `python/requirements.txt` to `<next-version>` (see the release-dependency note in Step 1). The pin lives only in the compiled `requirements.txt`, not `requirements.in`. **Skip the bump** for private topics and for public topics that reuse an existing schema (Step 1 skipped) — no new release is involved.
 
 > **Do not edit generated/materialized files.** CI regenerates `shared_config/_materialized_configs/`, `k8s/clusters/*/_topicctl_generated.yaml`, `k8s/materialized_manifests/`, and topicctl job manifests via `make materialize`. Only edit the source files above.
 
@@ -191,7 +190,7 @@ In `$SENTRY`:
    ```python
    "<topic_name>": "default",
    ```
-3. **Bump the schemas dependency** — update `sentry-kafka-schemas>=` in `pyproject.toml` to `<next-version>`, and bump the matching `specifier = ">=..."` line for `sentry-kafka-schemas` in `uv.lock` so the two agree. If `<next-version>` is already published, run `uv lock` to fully regenerate. If it is **not** published yet (the usual case when this PR precedes the schemas release), you cannot regenerate `uv.lock`'s resolved version + wheel hash — leave the `[[package]]` `version`/`wheels` block as-is and note in the PR that `uv lock` must be re-run once the release publishes. See the release-dependency note in Step 1.
+3. **Bump the schemas dependency** — *only when Step 1 added a new schema* (skip when the topic reuses an existing schema, e.g. outcomes — no new release exists to pin to). Update `sentry-kafka-schemas>=` in `pyproject.toml` to `<next-version>`, and bump the matching `specifier = ">=..."` line for `sentry-kafka-schemas` in `uv.lock` so the two agree. If `<next-version>` is already published, run `uv lock` to fully regenerate. If it is **not** published yet (the usual case when this PR precedes the schemas release), you cannot regenerate `uv.lock`'s resolved version + wheel hash — leave the `[[package]]` `version`/`wheels` block as-is and note in the PR that `uv lock` must be re-run once the release publishes. See the release-dependency note in Step 1.
 
 Commit and open the PR:
 
@@ -216,7 +215,7 @@ Opened 1 PR for the private `<topic_name>` topic:
    └─ Inherits topic_creation_config from public topic `<override_topic>`.
 ```
 
-**Public topic** — three PRs, **with the dependency ordering** so the user knows what must merge first. The schemas PR must merge and publish a release before the dependency-bump PRs can reference the released version:
+**Public topic with a new schema** (Step 1 produced a PR) — three PRs, **with the dependency ordering** so the user knows what must merge first. The schemas PR must merge and publish a release before the dependency-bump PRs can reference the released version:
 
 ```
 Opened 3 PRs for the `<topic_name>` topic:
@@ -233,7 +232,16 @@ Merge order: #1 (and its release) → then #2 and #3.
 
 If a dependency bump was deferred because the schemas release was not yet published, say so explicitly and note which PR(s) still need the version updated.
 
+**Public topic that reuses an existing schema** (Step 1 skipped, e.g. outcomes) — two PRs, **no schemas release and no version bump**, so no cross-PR ordering:
+
+```
+Opened 2 PRs for the `<topic_name>` topic:
+
+1. ops: <url>
+2. sentry: <url>
+```
+
 ## Notes
 
 - For commit messages and PR descriptions, you may use the `commit` and `pr-writer` skills to follow Sentry conventions; the commands above are a self-contained fallback.
-- The schemas PR (Step 1) gates the dependency bumps in ops (Step 3) and sentry (Step 4). Bump the pins to the anticipated `<next-version>` anyway so reviewers see the required change; flag in each PR body that the version is anticipated (confirm against the actual release) and, for sentry, that `uv.lock` needs `uv lock` once the release publishes. CI on those PRs may stay red until then.
+- When Step 1 adds a new schema, its PR gates the dependency bumps in ops (Step 3) and sentry (Step 4). Bump the pins to the anticipated `<next-version>` anyway so reviewers see the required change; flag in each PR body that the version is anticipated (confirm against the actual release) and, for sentry, that `uv.lock` needs `uv lock` once the release publishes. CI on those PRs may stay red until then. When Step 1 is skipped (private, or public reusing an existing schema), there is no release dependency and no version bump.
