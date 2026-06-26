@@ -22,17 +22,23 @@ Run the steps in order. For **private** topics, do only Step 0, Step 2, Step 3, 
 ## Step 0: Gather inputs and locate repos
 
 1. **Ask whether the topic is public or private** — this determines the whole path:
-   - **Public** — available to self-hosted Sentry. Full three-PR flow.
+   - **Public** — available to self-hosted Sentry. Up to three PRs.
    - **Private** — only used in our internal regions. Single ops PR; inherits settings from a public topic via `override_topic`.
 2. Prompt the user for:
    - **Topic name** (kebab-case, e.g. `ingest-foo`)
    - **Default number of partitions**
+   - **Reference topic** — the closest existing topic of the same family. It drives region discovery (Step 2) and where the `all_topics.yaml` / `Topic` enum entries go (Steps 3–4). Referred to as `<sibling_topic>` below.
    - **Owning team** (GitHub team handle, e.g. `@getsentry/taskbroker`) — for **public** topics it is the `sentry-kafka-schemas` CODEOWNERS entry; for **all** topics it is requested as a **reviewer on every PR this skill opens**. For `gh pr create --reviewer`, pass it as the `org/team` slug **without** the leading `@` (e.g. `getsentry/taskbroker`) — referred to as `<owning-team-slug>` below.
    - **(private only) Override topic** — the existing **public** topic whose `topic_creation_config` this private topic inherits. It must already exist in `$OPS/shared_config/kafka/topics/defaults/all_topics.yaml` (verify it does); referred to as `<override_topic>` below.
-3. Locate the repos you'll touch. **Public**: `sentry-kafka-schemas`, `ops`, `sentry`. **Private**: just `ops`. If a needed repo isn't found near the working directory, ask the user for its path. Use `$SCHEMAS`, `$OPS`, `$SENTRY` to refer to them below.
-4. **Check for collision** — ask for a different name and do not proceed until it's free:
-   - **Public**: `$SCHEMAS/topics/<topic_name>.yaml` must not already exist.
-   - **Private**: no `$OPS/shared_config/kafka/topics/<topic_name>.yaml` or `$OPS/shared_config/kafka/topics/regional_overrides/*/<topic_name>.yaml` may already exist.
+3. **(public only) Confirm a new schema definition is actually needed.** Not every public topic adds a new `sentry-kafka-schemas` entry — ask the user:
+   - **taskworker** topics do get their own `topics/<name>.yaml` (reusing the shared `TaskActivation` protobuf) → proceed with Step 1.
+   - **outcomes** topics are an exception: they reuse an existing schema and infra-specific variants should **not** be added to `sentry-kafka-schemas`. For an outcomes-style topic, skip Step 1 — confirm the exact handling with the topic owner.
+   - If the topic reuses an existing public topic's settings wholesale and adds nothing new to the schema registry, it is really a **private** topic — use `override_topic` (Step 3 only).
+4. Locate the repos you'll touch. **Public**: `sentry-kafka-schemas`, `ops`, `sentry`. **Private**: just `ops`. If a needed repo isn't found near the working directory, ask the user for its path. Use `$SCHEMAS`, `$OPS`, `$SENTRY` to refer to them below.
+5. **Check for collision across every location** (regardless of public/private) — ask for a different name and do not proceed until it's free:
+   - `$SCHEMAS/topics/<topic_name>.yaml`
+   - `$OPS/shared_config/kafka/topics/<topic_name>.yaml` and `$OPS/shared_config/kafka/topics/regional_overrides/*/<topic_name>.yaml`
+   - `$SENTRY` `Topic` enum / `KAFKA_TOPIC_TO_CLUSTER` (grep the kebab name in `src/sentry/conf/types/kafka_definition.py` and `src/sentry/conf/server.py`)
 
 Before each repo's work, ensure a clean tree on an updated default branch:
 
@@ -47,6 +53,8 @@ git checkout -b add-kafka-topic-<topic_name>
 ## Step 1: sentry-kafka-schemas PR — *public only*
 
 > **Skip this entire step for private topics.** Private topics are not defined in `sentry-kafka-schemas`.
+>
+> **Caveat — not every public topic needs a schema entry.** Confirm (Step 0.3) that this topic actually introduces a new schema. **outcomes** topics in particular reuse an existing schema and must not be added to `sentry-kafka-schemas` (infra-specific variants don't belong in the registry that self-hosted consumes). When in doubt, ask the topic owner before creating the file.
 
 Create `$SCHEMAS/topics/<topic_name>.yaml`. Read 2–3 existing files in `$SCHEMAS/topics/` that are closest to this topic's purpose to infer good values (pipeline, producer/consumer services, schema type, resource path).
 

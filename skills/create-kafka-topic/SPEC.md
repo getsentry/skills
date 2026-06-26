@@ -37,7 +37,7 @@ Out of scope:
 
 ## Runtime Contract
 
-- Required first actions: determine public vs private; prompt for topic name, default partitions, and owning team (and, for private, the `override_topic`); locate the repos for the chosen path; verify the name is free (public: `sentry-kafka-schemas/topics/`; private: `ops` default + regional override paths).
+- Required first actions: determine public vs private; prompt for topic name, default partitions, a reference/sibling topic, and owning team (and, for private, the `override_topic`); for public, confirm a new schema is actually needed (outcomes topics are an exception); locate the repos for the chosen path; verify the name is free across **all** locations (`sentry-kafka-schemas/topics/`, `ops` default + regional override paths, and the `sentry` `Topic` enum / `KAFKA_TOPIC_TO_CLUSTER`).
 - Per-repo precondition: a clean working tree on an updated default branch before creating the topic branch.
 - Required outputs: public → three PRs (one per repo); private → one ops PR. Each PR has the owning team requested as a reviewer; return the URL(s).
 - Non-negotiable constraints:
