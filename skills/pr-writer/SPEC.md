@@ -89,6 +89,9 @@ Data that must not be stored:
 ## Reference Architecture
 
 - `SKILL.md` contains runtime workflow, command patterns, conditional PR body guidance, examples, and safety constraints.
+- `EVAL.md` contains the maintainer playbook for evaluating `pr-writer` output quality.
+- `evals/axis.config.json` contains the AXIS configuration for running `pr-writer` evals with Codex.
+- `evals/scenarios/` contains durable AXIS cases for PR title/body output regressions.
 - `references/` contains no files currently; add focused style or evidence examples only if the runtime file becomes too long or repeated regressions show the examples need more room.
 - `references/evidence/` contains no files currently; use it for durable positive and negative PR body examples if iteration data accumulates.
 - `scripts/` contains no files currently.
@@ -96,8 +99,8 @@ Data that must not be stored:
 
 ## Evaluation
 
-- Lightweight validation: compare generated titles and PR bodies against representative feature, bug-fix, schema-change, breaking-change, migration, UI, performance/reliability, broad-review, generated-change, workflow-diagram, and refactor prompts for brevity, clarity, justified structure, issue references, update-path title handling, and privacy handling.
-- Deeper evaluation: maintain a small prompt set with expected body shapes if regressions recur.
+- Lightweight validation: run the AXIS command in `EVAL.md` for the current Codex-backed regression case, then compare generated titles and PR bodies against representative feature, bug-fix, schema-change, breaking-change, migration, UI, performance/reliability, broad-review, generated-change, workflow-diagram, and refactor prompts for brevity, clarity, justified structure, issue references, update-path title handling, and privacy handling.
+- Deeper evaluation: expand `evals/scenarios/` with expected body shapes when regressions recur.
 - Holdout examples: include at least one simple PR that should be one paragraph, one bug fix that should explain root cause without file bullets, one PR with no known issue reference, and one API or input-format change that should use separate before/after fenced blocks.
 - Holdout examples: include at least one breaking contract change that should identify affected consumers and migration guidance, one workflow-heavy PR that should use a compact Mermaid diagram, one UI PR that should mention screenshots or visual evidence only if available, one broad generated PR that should explain generation/review order, and one small PR that must not grow a `Test Plan` or template headings.
 - Holdout examples: include at least one PR update where the old title no longer matches the whole PR diff and must be rewritten.
@@ -117,5 +120,6 @@ Data that must not be stored:
 
 - Update `SKILL.md` when PR creation workflow, title rules, body template, examples, or safety constraints change.
 - Update `SPEC.md` when intent, scope, evaluation gates, or evidence policy changes.
+- Update `EVAL.md` and `evals/` when the maintained regression cases, AXIS configuration, or evaluation gates change.
 - Add focused reference files only when examples or guidance would make `SKILL.md` noisy.
 - Keep public inventories pointed at the canonical `skills/pr-writer` skill, not mirrors.

@@ -1,0 +1,58 @@
+{
+  "name": "Reference-backed integration",
+  "prompt": "Create a skill named sentry-event-search for helping agents write correct Sentry event-search queries. It should use the supplied repository conventions, keep SKILL.md as a router, and place query syntax, examples, and edge cases in focused references. Include a lightweight validation result before finishing.",
+  "judge": [
+    {
+      "check": "The agent created and registered skills/sentry-event-search with SKILL.md, SPEC.md, and focused routed reference files.",
+      "weight": 0.25
+    },
+    {
+      "check": "SKILL.md is a compact router with direct open-when reasons for references; it does not hide required instructions in optional references.",
+      "weight": 0.25
+    },
+    {
+      "check": "The references are scoped by lookup need, such as syntax, examples, and edge cases, rather than one catch-all document.",
+      "weight": 0.2
+    },
+    {
+      "check": "The generated skill is honest about source gaps and does not invent unsupported Sentry query behavior.",
+      "weight": 0.2
+    },
+    {
+      "check": "The transcript or final response shows structural validation was run.",
+      "weight": 0.1
+    }
+  ],
+  "setup": [
+    {
+      "action": "run_script",
+      "command": "rsync -a --exclude .git --exclude .axis --exclude .codex --exclude .agents \"$AXIS_CONFIG_DIR/../../..\"/ ."
+    },
+    {
+      "action": "run_script",
+      "command": "git init"
+    },
+    {
+      "action": "run_script",
+      "command": "git config user.email skill-writer-eval@example.invalid"
+    },
+    {
+      "action": "run_script",
+      "command": "git config user.name 'Skill Writer Eval'"
+    },
+    {
+      "action": "run_script",
+      "command": "git add ."
+    },
+    {
+      "action": "run_script",
+      "command": "git commit -m baseline"
+    }
+  ],
+  "artifacts": [
+    "skills/sentry-event-search/**",
+    "README.md",
+    ".claude/settings.json",
+    "skills/claude-settings-audit/SKILL.md"
+  ]
+}

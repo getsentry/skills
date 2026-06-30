@@ -1,0 +1,54 @@
+{
+  "name": "Small inline workflow",
+  "prompt": "Create a skill named release-note-polisher that rewrites rough release-note bullets into concise customer-facing notes. It should preserve product names, remove internal jargon, and return only the polished bullets. Keep it simple. Run the repository's structural validator before finishing.",
+  "judge": [
+    {
+      "check": "The agent created skills/release-note-polisher/SKILL.md and skills/release-note-polisher/SPEC.md and registered the skill according to repository conventions.",
+      "weight": 0.25
+    },
+    {
+      "check": "The generated skill stays inline: it does not create references, scripts, assets, or broad source-research files for this simple workflow.",
+      "weight": 0.25
+    },
+    {
+      "check": "The runtime instructions are concise, imperative, and include one compact before/after example that teaches the desired bullet style without generic writing advice.",
+      "weight": 0.3
+    },
+    {
+      "check": "The transcript or final response shows structural validation was run, and any remaining gaps are concrete rather than validation theater.",
+      "weight": 0.2
+    }
+  ],
+  "setup": [
+    {
+      "action": "run_script",
+      "command": "rsync -a --exclude .git --exclude .axis --exclude .codex --exclude .agents \"$AXIS_CONFIG_DIR/../../..\"/ ."
+    },
+    {
+      "action": "run_script",
+      "command": "git init"
+    },
+    {
+      "action": "run_script",
+      "command": "git config user.email skill-writer-eval@example.invalid"
+    },
+    {
+      "action": "run_script",
+      "command": "git config user.name 'Skill Writer Eval'"
+    },
+    {
+      "action": "run_script",
+      "command": "git add ."
+    },
+    {
+      "action": "run_script",
+      "command": "git commit -m baseline"
+    }
+  ],
+  "artifacts": [
+    "skills/release-note-polisher/**",
+    "README.md",
+    ".claude/settings.json",
+    "skills/claude-settings-audit/SKILL.md"
+  ]
+}

@@ -28,6 +28,7 @@ Follow the workflow steps in order. Load only the reference files required for t
 | iterate from positive, negative, or fix examples | `references/iteration-path.md` |
 | store persistent working and holdout examples for future revisions | `references/iteration-evidence.md` |
 | choose a response template, schema, or output contract | `references/output-contracts.md` |
+| add or update evals for a skill's generated outputs or runtime behavior | `references/skill-evals.md` |
 | troubleshoot overloaded layouts, hidden refs, or other structure failures | `references/structure-troubleshooting.md` |
 | register the skill and run final validation checks | `references/registration-validation.md` |
 
@@ -126,7 +127,8 @@ Read `references/authoring-path.md`.
    - happy-path
    - secure/robust variant
    - anti-pattern + corrected version
-12. After any skill artifact changes, run the post-change precision pass in `references/authoring-path.md` before description optimization or validation.
+12. Read `references/skill-evals.md` when the request asks for evals, regression cases, benchmark cases, or model-graded quality checks for the skill being authored.
+13. After any skill artifact changes, run the post-change precision pass in `references/authoring-path.md` before description optimization or validation.
 
 ## Step 5: Optimize description quality
 

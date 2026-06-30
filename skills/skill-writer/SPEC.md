@@ -59,6 +59,7 @@ Out of scope:
   - `SPEC.md` records the maintenance contract for new or materially changed skills.
   - Lightweight structural validation runs before completion.
   - A post-change precision pass runs after any skill artifact change.
+  - Semantic output quality is evaluated with repo-level evals rather than encoded in the structural validator.
 - Expected bundled files loaded at runtime:
   - `references/mode-selection.md`
   - `references/execution-shapes.md`
@@ -70,6 +71,7 @@ Out of scope:
   - `references/description-optimization.md`
   - `references/registration-validation.md`
   - `references/source-adaptation.md`
+  - `references/skill-evals.md`
   - flat `references/*.md` files listed in `SKILL.md`
   - `scripts/quick_validate.py`
 
@@ -111,6 +113,9 @@ Data that must not be stored:
 - `scripts/` contains validation automation.
 - `assets/` is unused unless a future skill-authoring workflow needs static templates or media.
 
+`EVAL.md`, `evals/axis.config.json`, and `evals/scenarios/` test changes to `skill-writer` itself. Keep eval files outside runtime `SKILL.md` routing.
+Skill evals use AXIS as the open source harness, with AXIS's built-in `codex` adapter exercising the Codex `codex exec --json` path rather than a repo-local runner script.
+
 ## Validation
 
 - Lightweight validation:
@@ -131,6 +136,7 @@ Data that must not be stored:
 
 - The validator checks only structural requirements and a high-threshold advisory size warning; it cannot prove that a generated skill is semantically complete.
 - The validator intentionally does not classify skills, parse source coverage, enforce SPEC headings, judge trigger quality, or exhaustively validate provider-specific optional frontmatter fields.
+- Semantic evaluation requires representative cases and reviewer judgment; it is not fully automated by the structural validator.
 - Prose density, source adaptation quality, advanced-shape contracts, and precision rely on authoring judgment and review.
 - Source discovery can still miss private operational knowledge if it is not present in local files, accessible issue/PR history, or supplied context.
 - Provider-specific skill extensions may drift; `skill-writer` treats them as compatibility guidance unless a skill is intentionally provider-specific.
@@ -143,3 +149,4 @@ Data that must not be stored:
 - Update `SPEC.md` when intent, scope, user/trigger context, evidence model, validation expectations, limitations, or maintenance rules change.
 - Update `SOURCES.md` when source inventory, decisions, coverage, gaps, or changelog entries change.
 - Update `references/evidence/` when preserving examples for future iteration or regression tracking.
+- Update `EVAL.md`, `evals/axis.config.json`, and `evals/scenarios/` when eval case format, rubric dimensions, AXIS settings, or regression cases for `skill-writer` change.

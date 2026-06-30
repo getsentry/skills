@@ -1,0 +1,74 @@
+{
+  "name": "Iteration from bad output",
+  "prompt": "Improve the existing csv-cleaner skill in this repository. It currently over-triggers, has a bloated SKILL.md, and creates references for tiny rules. Make it precise and compact while preserving the useful behavior: clean CSV rows by trimming whitespace, normalizing empty cells, and preserving column order. Run structural validation before finishing.",
+  "judge": [
+    {
+      "check": "The agent updated skills/csv-cleaner rather than creating an unrelated new skill.",
+      "weight": 0.2
+    },
+    {
+      "check": "The description becomes narrower and no longer claims broad analytics, spreadsheet, or generic table-editing behavior.",
+      "weight": 0.25
+    },
+    {
+      "check": "The runtime guidance is materially shorter and more actionable, with unnecessary references removed unless clearly justified.",
+      "weight": 0.25
+    },
+    {
+      "check": "The improvement generalizes from the negative evidence instead of merely patching words from this prompt.",
+      "weight": 0.2
+    },
+    {
+      "check": "The transcript or final response shows structural validation was run.",
+      "weight": 0.1
+    }
+  ],
+  "setup": [
+    {
+      "action": "run_script",
+      "command": "rsync -a --exclude .git --exclude .axis --exclude .codex --exclude .agents \"$AXIS_CONFIG_DIR/../../..\"/ ."
+    },
+    {
+      "action": "run_script",
+      "command": "mkdir -p skills/csv-cleaner/references"
+    },
+    {
+      "action": "run_script",
+      "command": "printf '%s\n' '---' 'name: csv-cleaner' 'description: Clean CSV files, spreadsheets, analytics exports, tables, tabular data, reports, dashboards, and anything involving rows or columns.' '---' '' '# CSV Cleaner' '' 'Use this skill for any tabular data task.' '' 'Read references/rules.md for basic trimming rules.' '' 'Always explain every transformation in detail.' > skills/csv-cleaner/SKILL.md"
+    },
+    {
+      "action": "run_script",
+      "command": "printf '%s\n' '# CSV Cleaner Specification' '' '## Intent' '' 'Clean CSV row data while preserving column order.' > skills/csv-cleaner/SPEC.md"
+    },
+    {
+      "action": "run_script",
+      "command": "printf '%s\n' '# Rules' '' '- Trim whitespace.' '' '- Normalize empty cells.' > skills/csv-cleaner/references/rules.md"
+    },
+    {
+      "action": "run_script",
+      "command": "git init"
+    },
+    {
+      "action": "run_script",
+      "command": "git config user.email skill-writer-eval@example.invalid"
+    },
+    {
+      "action": "run_script",
+      "command": "git config user.name 'Skill Writer Eval'"
+    },
+    {
+      "action": "run_script",
+      "command": "git add ."
+    },
+    {
+      "action": "run_script",
+      "command": "git commit -m baseline"
+    }
+  ],
+  "artifacts": [
+    "skills/csv-cleaner/**",
+    "README.md",
+    ".claude/settings.json",
+    "skills/claude-settings-audit/SKILL.md"
+  ]
+}
