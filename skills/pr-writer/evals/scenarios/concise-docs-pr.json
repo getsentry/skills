@@ -1,0 +1,52 @@
+{
+  "name": "Concise docs PR",
+  "prompt": "Use pr-writer to draft only a PR title and body for the current uncommitted docs-only skill change. Do not create or update a GitHub PR.",
+  "judge": [
+    {
+      "check": "The title uses an allowed conventional commit type, preferably docs, and accurately describes the docs-only skill guidance change.",
+      "weight": 0.3
+    },
+    {
+      "check": "The body is concise reviewer-facing prose that explains the behavior impact of the guidance without file-by-file narration.",
+      "weight": 0.3
+    },
+    {
+      "check": "The body does not include default template headings such as Summary or Test Plan.",
+      "weight": 0.2
+    },
+    {
+      "check": "The body does not include validation command dumps or agent/tool attribution unless tied to reviewer risk.",
+      "weight": 0.2
+    }
+  ],
+  "setup": [
+    {
+      "action": "run_script",
+      "command": "rsync -a --exclude .git --exclude .axis --exclude .codex --exclude .agents \"$AXIS_CONFIG_DIR/../../..\"/ ."
+    },
+    {
+      "action": "run_script",
+      "command": "git init"
+    },
+    {
+      "action": "run_script",
+      "command": "git config user.email pr-writer-eval@example.invalid"
+    },
+    {
+      "action": "run_script",
+      "command": "git config user.name 'PR Writer Eval'"
+    },
+    {
+      "action": "run_script",
+      "command": "git add ."
+    },
+    {
+      "action": "run_script",
+      "command": "git commit -m baseline"
+    },
+    {
+      "action": "run_script",
+      "command": "printf '%s\n' '' '## Concision Guidance' '' 'For documentation-only skill changes, keep generated PR bodies to one short paragraph unless the diff changes user-visible behavior, contracts, or migration risk.' >> skills/pr-writer/SKILL.md"
+    }
+  ]
+}

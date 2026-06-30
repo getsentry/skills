@@ -1,6 +1,10 @@
 # Claude Code local settings
 .claude/settings.local.json
 
+# AXIS reports
+.axis/
+**/.axis/
+
 # OS
 .DS_Store
 

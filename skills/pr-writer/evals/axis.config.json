@@ -1,0 +1,21 @@
+{
+  "scenarios": "./scenarios",
+  "agents": [
+    {
+      "agent": "codex",
+      "flags": {
+        "full-auto": true,
+        "skip-git-repo-check": true
+      }
+    }
+  ],
+  "skills": ["./.."],
+  "settings": {
+    "concurrency": 1,
+    "limits": {
+      "scenario": {
+        "time_minutes": 10
+      }
+    }
+  }
+}

@@ -10,6 +10,14 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 | `references/*.md` | local canonical | canonical | 2026-05-05 | high | Detailed path guidance, examples, routed leaf references, and validation requirements | local active skill root | Flat runtime reference files listed directly from `SKILL.md` |
 | `SPEC.md` | local canonical | canonical | 2026-05-05 | high | Canonical maintenance contract for intent, scope, evidence model, validation, and limitations | local active skill root | Updated to treat `skill-writer` as a meta-router |
 | `https://agentskills.io/specification` | external canonical spec | canonical | 2026-05-01 | high | Portable skill structure, frontmatter, progressive disclosure, optional directories, and file-reference rules | spec-level constraints take precedence over local preferences | Cross-agent compatibility baseline |
+| `https://agentskills.io/skill-creation/evaluating-skills` | external official docs | canonical | 2026-06-30 | high | Evaluation guidance: run isolated task cases, compare outputs to a baseline, and judge invocation plus output quality | skill-authoring evaluation guidance, not a deterministic validator spec | Informed `EVAL.md` |
+| `https://platform.openai.com/docs/guides/evals` | external official docs | canonical | 2026-06-30 | high | Behavior-driven eval structure, test inputs, testing criteria, result analysis, and iteration loop | Evals platform is deprecated; retain general evaluation principles only | Informed `EVAL.md` |
+| `https://platform.openai.com/docs/guides/graders` | external official docs | canonical | 2026-06-30 | high | Deterministic graders, model graders, evidence-bearing grading, smooth scores, and reward-hacking cautions | Graders product path is deprecated; retain judge design principles only | Informed LLM judge guidance |
+| `https://github.com/anthropics/skills/tree/main/skills/skill-creator` | external official/adjacent skill | secondary | 2026-06-30 | high | Skill-eval loop with baseline runs, assertions after first outputs, timing capture, benchmark aggregation, human review, and blind comparison | Adapt concepts to this repo's Codex workflow rather than copying Claude-specific mechanics | Informed `EVAL.md` and eval case criteria |
+| `https://axis.run/` | external eval tooling | secondary | 2026-06-30 | high | Open source coding-agent eval harness with scenarios, built-in Codex support, isolated workspaces, judge checks, reports, artifacts, and baselines | use for skill evals that must run real coding agents through Codex; avoid custom runners unless AXIS cannot express the case | Informed prescriptive eval framework |
+| `https://www.promptfoo.dev/docs/providers/openrouter/` | external eval tooling | secondary | 2026-06-30 | medium | First-class OpenRouter provider syntax and API key/base URL configuration | rejected for skill evals because it does not exercise the Codex harness without custom glue | Preserved as research provenance only |
+| Codex manual: noninteractive mode, SDK, and Record & Replay | external official docs | canonical | 2026-06-30 | high | `codex exec --json`, `--output-schema`, sandbox, final-message output, SDK orchestration option, and skill recording guidance | Codex harness requirements are satisfied through AXIS's Codex adapter for repeatable skill evals | Informed AXIS requirement checks |
+| local `codex exec --help` | local tooling | canonical | 2026-06-30 | high | Installed CLI flag availability for ephemeral runs, output schemas, and working directory selection | local CLI behavior may vary by installed Codex version | Cross-checked manual guidance |
 | `https://agentskills.io/skill-creation/best-practices` | external official docs | canonical | 2026-05-01 | high | Coherent unit design, moderate detail, progressive disclosure, defaults over menus, validation loops, plan-validate-execute | skill-authoring guidance, not provider-specific runtime semantics | Informed shape-selection and workflow guidance |
 | `https://agentskills.io/skill-creation/using-scripts` | external official docs | canonical | 2026-05-01 | high | Script bundling, non-interactive requirements, `--help`, structured output, and safe script interfaces | script examples are illustrative, adapt to local tooling | Informed script-backed workflow requirements |
 | `https://code.claude.com/docs/en/skills` | external official docs | canonical | 2026-05-01 | high | Current Claude Code skill lifecycle, frontmatter fields, argument features, `context: fork`, `allowed-tools`, and hooks-in-skills support | provider-specific; do not generalize to portable Agent Skills behavior | Replaced stale local assumptions about Claude-specific fields |
@@ -49,6 +57,12 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 16. `SKILL.md` should stay a thin router; repeated policy belongs in routed references rather than always-loaded step prose.
 17. Validation stays lightweight and structural; qualitative precision remains an authoring judgment.
 18. Missing referenced bundled files are structural failures because they break runtime loading.
+19. Generated skill quality should be evaluated with repo-level repeatable task cases, baseline comparison, and a rubric rather than by adding semantic heuristics to `quick_validate.py`.
+20. Eval cases for `skill-writer` itself belong outside runtime `SKILL.md` routing so they do not affect normal skill use.
+21. The prescriptive default for skill evals is AXIS with `agents: ["codex"]` when the eval must exercise Codex; AXIS uses the Codex `codex exec --json` harness while adding scenarios, artifacts, reports, judge checks, and baselines.
+22. Promptfoo is not part of the prescribed skill-eval path; AXIS is the only framework choice for skill evals in this repo.
+23. `skill-writer` needs runtime guidance for authoring evals for other skills, but its own maintainer eval files must stay out of `SKILL.md` routing.
+24. Skill evals should combine deterministic assertions with LLM-as-judge for qualitative dimensions and require concrete evidence for every grade.
 
 ## Coverage matrix
 
@@ -67,6 +81,7 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 | Subagent-fork guidance | complete | Claude Code skills docs, subagents docs |
 | Hook-backed guidance and security constraints | complete | Claude Code hooks docs |
 | Script-backed workflow design | complete | Agent Skills using scripts guide |
+| Skill-output evaluation | complete | Agent Skills evaluating skills guide, local iteration evidence model |
 | Planner/doer reasoning guidance | complete | OpenAI reasoning best practices |
 | Lookup-oriented reference architecture | complete | Diataxis user needs, DITA topic types, local reference architecture |
 | Flat reference routing | complete | local reference architecture, user feedback on generator simplicity |
@@ -76,6 +91,8 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 1. Advanced-shape contracts still rely on author judgment and review rather than deterministic validation.
 2. This repository still has few real shipped examples using `hooks`, `context: fork`, `when_to_use`, `arguments`, `paths`, or `effort`.
 3. Public repo docs outside `skill-writer` may need follow-up updates to fully reflect the current Claude-specific skill fields.
+4. The initial `skill-writer` eval cases are synthetic; they should be replaced or expanded with real generated-output regressions over time.
+5. AXIS is now the eval harness, but the initial scenarios are still synthetic and should be calibrated against real generated-output regressions.
 
 ## Changelog
 
@@ -98,3 +115,6 @@ This file tracks source material synthesized into `skill-writer`, plus iterative
 - 2026-05-05: Flattened runtime reference files under `references/`, kept `SKILL.md` as the complete material index, removed unused runbooks, added source-adaptation guidance, and made precision passes part of every skill create/update flow while keeping validation lightweight.
 - 2026-05-05: Removed validator skill-class inference, integration coverage parsing, SPEC heading checks, SOURCES schema checks, and description-style heuristics.
 - 2026-05-05: Removed validator name-style checks and machine-specific path scanning; kept only format, required fields, directory-name match, referenced-file existence, and a high-threshold size warning.
+- 2026-06-30: Added `skills/skill-writer/EVAL.md`, `evals/axis.config.json`, and AXIS scenarios with baseline comparison guidance, working/holdout cases, artifact capture, judge checks, and semantic grading that stays out of the structural validator and runtime `SKILL.md`.
+- 2026-06-30: Replaced framework-first and custom-runner eval guidance with AXIS as the prescriptive open source skill-eval harness. AXIS satisfies the Codex-harness requirement through its built-in `codex` adapter while adding reports, artifacts, transcripts, and baselines.
+- 2026-06-30: Added `references/skill-evals.md` so `skill-writer` can author skill-specific eval playbooks and cases without routing its own maintainer evals.
