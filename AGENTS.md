@@ -31,12 +31,6 @@ ALWAYS use `/skill-writer` — it handles requirements, writing, registration, a
 - Keep SKILL.md under 500 lines; move reference material to `references/`
 - Keep runtime instructions in `SKILL.md`; put intent, source/evidence model, evaluation, limitations, and maintenance rules in `SPEC.md`
 
-## Commit Attribution
-AI commits MUST include:
-```
-Co-Authored-By: (the agent's name and attribution byline)
-```
-
 ## References
 - Skill template and optional fields: `README.md`
 - Testing and PR workflow: `CONTRIBUTING.md`

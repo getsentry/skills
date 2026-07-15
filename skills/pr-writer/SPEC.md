@@ -17,7 +17,6 @@ In scope:
 - Producing natural PR bodies that default to short paragraphs and use structure only when the change shape needs it.
 - Choosing optional reviewer aids based on the actual diff shape, including code snippets, payload examples, schemas/interfaces, diagrams, screenshots, review-order notes, rollout notes, migration notes, or risk/tradeoff callouts.
 - Producing titles that accurately describe the dominant change in the PR.
-- Rejecting bracketed agent, bot, or tool prefixes in PR titles.
 - Including issue references, breaking-change context, and review focus when useful and supported by known evidence.
 
 Out of scope:
@@ -43,7 +42,7 @@ Out of scope:
 - Required update behavior: if an open PR exists and follow-up commits materially change reviewer expectations, refresh the PR even when the user did not explicitly ask for a PR edit.
 - Optional reviewer aids: use before/after blocks for contract or behavior comparisons; schemas or interface snippets for API, payload, type, config, event, or storage changes; Mermaid sequence/flow/state diagrams for async flows, queues, state transitions, lifecycle changes, or multi-component interactions; screenshots or recordings for UI behavior; review-order notes for broad or generated PRs; rollout, migration, compatibility, feature-flag, or deprecation notes for changes that affect adopters or operations.
 - Hard negatives: do not add a `Test Plan` section by default, do not paste command transcripts, do not list routine validation as its own heading unless it changes risk assessment, do not add empty template headings, do not narrate every file, do not include Mermaid when prose is clearer, and do not include schemas or examples that merely duplicate obvious code.
-- Non-negotiable constraints: never include customer data or PII, never use bracketed agent/tool labels such as `[codex]` in PR titles, never invent issue references, generate reviewer prose rather than tool attribution, ignore repository PR templates, and prefer draft PRs for newly opened pull requests.
+- Non-negotiable constraints: never include customer data or PII, never invent issue references, ignore repository PR templates, and prefer draft PRs for newly opened pull requests.
 - Expected bundled files loaded at runtime: only `SKILL.md`.
 
 ## Source And Evidence Model
@@ -73,7 +72,6 @@ Useful improvement sources:
 - negative examples: PR bodies with rote `Test Plan` headings, pasted command output, generic validation details, decorative diagrams, oversized Mermaid blocks, unnecessary schemas, empty headings, or file-by-file narration.
 - negative examples: PR bodies that read like release notes for the prompt rather than a human cover note for the change.
 - negative examples: PR titles that are vague, process-oriented, or stale after scope changes.
-- negative examples: PR titles that use bracketed agent/tool labels instead of conventional commit types, such as `[codex] Paginate replay segment downloads`.
 - negative examples: branches with material follow-up commits where the agent pushed changes but left the PR title/body stale.
 - commit logs/changelogs: only as source context, not as body text to paste.
 - issue or PR feedback: reviewer comments about missing context or excessive detail.
@@ -105,7 +103,7 @@ Data that must not be stored:
 - Holdout examples: include at least one breaking contract change that should identify affected consumers and migration guidance, one workflow-heavy PR that should use a compact Mermaid diagram, one UI PR that should mention screenshots or visual evidence only if available, one broad generated PR that should explain generation/review order, and one small PR that must not grow a `Test Plan` or template headings.
 - Holdout examples: include at least one PR update where the old title no longer matches the whole PR diff and must be rewritten.
 - Holdout examples: include at least one review-feedback or follow-up-commit scenario where the skill should refresh an open PR without an explicit PR-update request.
-- Acceptance gates: output title uses an allowed Sentry conventional commit type, uses `!` when the dominant change is breaking, contains no bracketed agent/tool prefix, matches the dominant change, update flows explicitly re-evaluate whether the existing title still fits, material follow-up commits to an open PR trigger a refresh even without an explicit PR-update request, output reads like natural reviewer-facing prose, default body uses paragraphs instead of generic headings, structure is present only when justified by the change shape, optional artifacts are used only when they reduce reviewer effort, body language describes concrete behavior and reviewer impact instead of internal process, breaking changes include affected surface and migration/compatibility context when known, before/after examples appear only when direct comparison is the clearest explanation, unknown issue references are omitted instead of invented, routine validation is omitted unless it changes reviewer risk assessment or explains coverage for changed behavior, generated tool attribution is absent, and customer data is excluded.
+- Acceptance gates: output title uses an allowed Sentry conventional commit type, uses `!` when the dominant change is breaking, matches the dominant change, update flows explicitly re-evaluate whether the existing title still fits, material follow-up commits to an open PR trigger a refresh even without an explicit PR-update request, output reads like natural reviewer-facing prose, default body uses paragraphs instead of generic headings, structure is present only when justified by the change shape, optional artifacts are used only when they reduce reviewer effort, body language describes concrete behavior and reviewer impact instead of internal process, breaking changes include affected surface and migration/compatibility context when known, before/after examples appear only when direct comparison is the clearest explanation, unknown issue references are omitted instead of invented, routine validation is omitted unless it changes reviewer risk assessment or explains coverage for changed behavior, and customer data is excluded.
 
 ## Known Limitations
 
