@@ -20,8 +20,9 @@ gh pr view --json number,title,body,url,baseRefName,headRefName
 gh repo view --json defaultBranchRef
 ```
 
-For an existing PR, use its `baseRefName`; otherwise use the repository default
-branch. Set `BASE`, then inspect:
+If `gh pr view` reports that no PR exists, continue with first-time PR
+creation. For an existing PR, use its `baseRefName`; otherwise use the
+repository default branch. Set `BASE`, then inspect:
 
 ```bash
 git log "$BASE"..HEAD --oneline
