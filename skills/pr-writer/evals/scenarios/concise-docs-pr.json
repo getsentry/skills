@@ -15,7 +15,7 @@
       "weight": 0.2
     },
     {
-      "check": "The body does not include validation command dumps or agent/tool attribution unless tied to reviewer risk.",
+      "check": "The body does not include validation command dumps unless tied to reviewer risk.",
       "weight": 0.2
     }
   ],
