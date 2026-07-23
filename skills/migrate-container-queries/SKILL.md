@@ -36,7 +36,7 @@ Breakpoint and container scales have **different keys and different pixel values
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | 0px | 320px | 384px | 448px | 512px | 576px | 640px | 768px | 896px | 1024px | 1152px | 1280px |
 
-**Rule:** take the old breakpoint's pixel value and pick the `container` token whose pixel value is *nearest* to it — never the token with the matching key. `breakpoints.sm` is 800px, so it maps to `container.xl` (768px), not `container.sm` (512px). Then confirm with a visual check: the container is often narrower than the viewport, so the nearest-px token is a starting point, not a guarantee.
+**Rule:** take the old breakpoint's pixel value and pick the `container` token whose pixel value is *nearest* to it — not the token with the same name. `breakpoints.sm` is 800px, so it maps to `container.xl` (768px), not `container.sm` (512px). Then confirm with a visual check: the container is often narrower than the viewport, so the nearest-px token is a starting point, not a guarantee.
 
 ## Genuine viewport width → `screen:` keys, not `useMedia`
 
@@ -103,7 +103,7 @@ const isNarrow = breakpoint === 'zero';
 
 Took the lowest rung that fits (above). Then verify the gotchas:
 
-- [ ] Chose the `container` token nearest the old breakpoint's pixel value — never reused the breakpoint key
+- [ ] Mapped by pixel value, not by name — e.g. `breakpoints.sm` → `container.xl`, not `container.sm`
 - [ ] Routed genuine viewport-width cases to `screen:` keys; kept `useMedia` only for non-width media features
 - [ ] Added `container-type` only when a subtree needs its own; used `inline-size`
 - [ ] Confirmed a query-container ancestor exists (`@container` silently no-ops without one)
