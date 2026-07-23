@@ -103,7 +103,7 @@ const isNarrow = breakpoint === 'zero';
 
 Took the lowest rung that fits (above). Then verify the gotchas:
 
-- [ ] Mapped by pixel value, not by name — e.g. `breakpoints.sm` → `container.xl`, not `container.sm`
+- [ ] Mapped to the `container` token with the nearest pixel value, not the same name — e.g. `breakpoints.sm` → `container.xl`, not `container.sm`
 - [ ] Routed genuine viewport-width cases to `screen:` keys; kept `useMedia` only for non-width media features
 - [ ] Added `container-type` only when a subtree needs its own; used `inline-size`
 - [ ] Confirmed a query-container ancestor exists (`@container` silently no-ops without one)
