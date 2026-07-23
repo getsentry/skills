@@ -27,11 +27,11 @@ Out of scope:
 ## Runtime Contract
 
 - Required first actions: identify the lowest rung that fits (primitive prop → `@container` → `useContainerBreakpoint()` → leave as `useMedia`).
-- Required outputs: migrated code plus a nearest-scale token choice justified by the element's real rendered width.
+- Required outputs: migrated code plus a token choice mapped from the old breakpoint's pixel value to the nearest `container` token.
 - Non-negotiable constraints:
-  - Convert to the container token *nearest* the element's real width; never reuse the breakpoint key.
-  - Always perform a visual check by resizing the element after migrating.
-  - Keep `useMedia` for genuine (non-width) media features.
+  - Convert to the container token *nearest* the old breakpoint's pixel value; never reuse the breakpoint key.
+  - Always perform a visual check by resizing the element after migrating (the container is often narrower than the viewport).
+  - Route genuine viewport-width cases to `screen:` keys; keep `useMedia` only for non-width media features.
 - Expected bundled files loaded at runtime: `SKILL.md` only.
 
 ## Source And Evidence Model
@@ -62,7 +62,7 @@ Data that must not be stored: secrets, customer data, private URLs or identifier
 
 ## Known Limitations
 
-- The breakpoint→container mapping requires knowing the element's real rendered width, which the skill cannot measure for the agent — the engineer must confirm it in the browser.
+- The nearest-px token is only a starting point: the container is often narrower than the viewport, so the true reflow width needs a browser visual check the skill cannot perform.
 - `@container` silently no-ops without a query-container ancestor; the skill flags this but cannot detect it statically.
 
 ## Maintenance Notes

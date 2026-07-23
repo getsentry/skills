@@ -38,7 +38,7 @@ Do not read these two tables across a row — the keys do not correspond.
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | 0px | 320px | 384px | 448px | 512px | 576px | 640px | 768px | 896px | 1024px | 1152px | 1280px |
 
-**Rule:** find the element's actual rendered width, then pick the `container` token whose pixel value is *nearest* to that width — never the token with the matching key. `breakpoints.sm` (800px) is nowhere near `container.sm` (512px). Confirm the choice with a visual check.
+**Rule:** take the old breakpoint's pixel value and pick the `container` token whose pixel value is *nearest* to it — never the token with the matching key. `breakpoints.sm` is 800px, so it maps to `container.xl` (768px), not `container.sm` (512px). Then confirm with a visual check: the container is often narrower than the viewport, so the nearest-px token is a starting point, not a guarantee.
 
 ## Genuine viewport width → `screen:` keys, not `useMedia`
 
@@ -51,14 +51,10 @@ Width — container or viewport — has a prop/hook path above. Leave `useMedia`
 
 ## container-type: only when no query container is in scope
 
-The app's main content is already wrapped in a query container: `ContentStack` (`#main`) in `views/organizationLayout/index.tsx` sets `containerType="inline-size"` and wraps the routed `<Outlet />`, so product views have a container ancestor. `topBar` has its own, and `#modal-portal` (in `styles/global.tsx`) covers portaled content that lives outside the app tree. **Do not add `container-type: inline-size` reflexively.**
-
-**Default: don't add one.** Bare responsive keys (`{xs: …}`) and `@container` queries already resolve against the nearest ancestor container. Add `container-type` only when this subtree must respond to *its own* width rather than the page's.
-
-When you do add one:
+**Default: don't add one.** Bare keys and `@container` already resolve against the nearest ancestor container, and product views have one: `ContentStack` (`#main`, `views/organizationLayout/index.tsx`) wraps the routed `<Outlet />` with `containerType="inline-size"`; `topBar` and `#modal-portal` cover their own subtrees. Add `container-type` only when a subtree must respond to *its own* width rather than the page's — then:
 
 - Use `inline-size` (width only). `size` also queries height, which collapses content unless height is set elsewhere.
-- For a reusable component that may or may not already sit inside a container, make it conditional so it doesn't create a redundant one — `containerType={hasParentQueryContainer ? 'normal' : 'inline-size'}` via `useHasContainerQuery()` (see `components/core/breadcrumbList/breadcrumbList.tsx`).
+- In a reusable component that may already sit inside a container, make it conditional to avoid a redundant one — `containerType={hasParentQueryContainer ? 'normal' : 'inline-size'}` via `useHasContainerQuery()` (see `components/core/breadcrumbList/breadcrumbList.tsx`).
 
 ## Examples
 
@@ -86,9 +82,9 @@ import {Flex} from '@sentry/scraps/layout';
 // Old
 @media (max-width: ${p => p.theme.breakpoints.md}) { ... }
 
-// New — swap at-rule AND scale; md breakpoint (992px) → nearest container by real width,
-// NOT theme.container.md by matching key
-@container (max-width: ${p => p.theme.container.sm}) { ... }
+// New — swap at-rule AND scale; md breakpoint (992px) → nearest container token by px
+// is 3xl (1024px), NOT theme.container.md by matching key
+@container (max-width: ${p => p.theme.container['3xl']}) { ... }
 ```
 
 ### Rung 3 — `useMedia` (width) → `useContainerBreakpoint()`
@@ -107,11 +103,10 @@ const isNarrow = breakpoint === 'zero';
 
 ## Migration Checklist
 
-- [ ] Rung 1: replace styled `@media` with `Container`/`Flex`/`Grid`/`Stack` responsive props
-- [ ] Rung 2 (CSS can't be a prop): `@media` → `@container`, `theme.breakpoints.*` → `theme.container.*`
-- [ ] Choose the `container` token nearest the element's real width — never reuse the breakpoint key
-- [ ] Rung 3: width `useMedia` → `useContainerBreakpoint()`
-- [ ] Genuine viewport-width cases → `screen:` responsive keys (not `useMedia`); keep `useMedia` only for non-width media features
-- [ ] Add `container-type` only when a subtree must respond to its own width; prefer `inline-size`
-- [ ] Confirm a query-container ancestor exists so `@container` resolves (it silently no-ops otherwise)
-- [ ] **Visual check:** resize the element and confirm identical output flipping at the intended width
+Took the lowest rung that fits (above). Then verify the gotchas:
+
+- [ ] Chose the `container` token nearest the old breakpoint's pixel value — never reused the breakpoint key
+- [ ] Routed genuine viewport-width cases to `screen:` keys; kept `useMedia` only for non-width media features
+- [ ] Added `container-type` only when a subtree needs its own; used `inline-size`
+- [ ] Confirmed a query-container ancestor exists (`@container` silently no-ops without one)
+- [ ] **Visual check:** resized the element and confirmed identical output flipping at the intended width
