@@ -42,7 +42,7 @@ Width is the only thing that migrates. Leave `useMedia` in place for:
 
 ## container-type: only when no query container is in scope
 
-A root query container is declared in `styles/global.tsx`, and app layout containers (`organizationLayout`, `topBar`, modal portal) provide others. **Do not add `container-type: inline-size` reflexively.**
+The app's main content is already wrapped in a query container: `ContentStack` (`#main`) in `views/organizationLayout/index.tsx` sets `containerType="inline-size"` and wraps the routed `<Outlet />`, so product views have a container ancestor. `topBar` has its own, and `#modal-portal` (in `styles/global.tsx`) covers portaled content that lives outside the app tree. **Do not add `container-type: inline-size` reflexively.**
 
 - Bare responsive keys (`{xs: …}`) already resolve against the nearest container.
 - Add a container only when this subtree needs its own local one.
