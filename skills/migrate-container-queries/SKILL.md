@@ -22,9 +22,7 @@ Stop at the first rung that fits. Prefer replacing hand-rolled CSS with primitiv
 
 ## ⚠️ Convert to the nearest container scale
 
-Breakpoint and container scales have **different keys and different pixel values** — this is not a rename. Reusing the same key is the #1 migration bug.
-
-Do not read these two tables across a row — the keys do not correspond.
+Breakpoint and container scales have **different keys and different pixel values** — this is not a rename. **MAP BY PIXEL VALUE, NOT BY KEY:** `breakpoints.sm` does NOT become `container.sm`. Reusing the same key is the #1 migration bug.
 
 `theme.breakpoints` (viewport / `@media`), base `2xs`:
 
