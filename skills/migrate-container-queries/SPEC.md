@@ -2,7 +2,7 @@
 
 ## Intent
 
-Give Sentry frontend engineers a reliable, low-risk path for converting viewport-based responsive logic (`@media`, `useMedia`) to container queries, so components respond to their own available width instead of the raw viewport. The dominant failure mode this skill guards against is mapping a breakpoint token to the container token of the same name: the two scales share names but not pixel values.
+Provide a reliable, low-risk path for converting viewport-based responsive logic (`@media`, `useMedia`) to container queries, so components respond to their own available width instead of the raw viewport. The dominant failure mode this skill guards against is mapping a breakpoint token to the container token of the same name: the two scales share names but not pixel values.
 
 ## Scope
 
