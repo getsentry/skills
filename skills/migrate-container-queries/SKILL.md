@@ -7,7 +7,7 @@ description: Guide for migrating viewport media queries (@media, useMedia) to co
 
 Migrate viewport-based responsive logic (`@media` + `useMedia`) to container queries so components respond to their own available space instead of the raw viewport.
 
-> **Always do a visual check.** After every migration, resize the *element* (not just the window) and confirm the layout is identical and flips at the intended width. The token scales differ, so a mechanical swap that compiles can still render wrong.
+> **Always do a visual check.** After every migration, resize the *element* (not just the window) and confirm the layout is identical and flips at the intended width. A good way to narrow an element without touching the window is to open a resizable panel next to it — e.g. drag out the Seer explorer sidebar, which squeezes the middle content. The token scales differ, so a mechanical swap that compiles can still render wrong.
 
 ## Approach: refactor first, swap second
 
@@ -17,27 +17,36 @@ Stop at the first rung that fits. Prefer replacing hand-rolled CSS with primitiv
 |------|------|-----|
 | 1. Primitive props | The `@media` only flips layout (`flex-direction`, `display`, `grid-template`, gap, visibility, width) | Delete the styled component; use `Container`/`Flex`/`Grid`/`Stack` responsive props (`direction={{xs: 'column', md: 'row'}}`) |
 | 2. `@container` swap | CSS can't be a prop (descendant selectors, pseudo-elements, `font-size`, complex `grid-template-areas`) | Keep the styled component; swap `@media` → `@container`, `theme.breakpoints.*` → `theme.container.*` |
-| 3. `useResponsivePropValue()` | Width is read in JS to branch rendering | Replace `useMedia(...)` with `useResponsivePropValue({...})`; use `useContainerBreakpoint()` only when you need the raw active key |
+| 3. `useContainerBreakpoint()` | Width is read in JS to branch rendering | Replace `useMedia(...)` with `useContainerBreakpoint()` — the container-scoped `useMedia` |
 | 4. Leave as `useMedia` | Genuine media feature, not width | Do nothing — these do not migrate |
 
 ## ⚠️ Convert to the nearest container scale
 
 Breakpoint and container scales have **different keys and different pixel values** — this is not a rename. Reusing the same key is the #1 migration bug.
 
-| `theme.breakpoints` | | `theme.container` | |
-|---|---|---|---|
-| `2xs` | 0px | `zero` | 0px |
-| `xs` | 500px | `3xs` | 320px |
-| `sm` | 800px | `2xs` | 384px |
-| `md` | 992px | `xs` | 448px |
-| `lg` | 1200px | `sm` | 512px |
-| `xl` | 1440px | `md` | 576px |
+Do not read these two tables across a row — the keys do not correspond.
+
+`theme.breakpoints` (viewport / `@media`), base `2xs`:
+
+| `2xs` | `xs` | `sm` | `md` | `lg` | `xl` | `2xl` |
+|---|---|---|---|---|---|---|
+| 0px | 500px | 800px | 992px | 1200px | 1440px | 2560px |
+
+`theme.container` (container / `@container`), base `zero`:
+
+| `zero` | `3xs` | `2xs` | `xs` | `sm` | `md` | `lg` | `xl` | `2xl` | `3xl` | `4xl` | `5xl` |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 0px | 320px | 384px | 448px | 512px | 576px | 640px | 768px | 896px | 1024px | 1152px | 1280px |
 
 **Rule:** find the element's actual rendered width, then pick the `container` token whose pixel value is *nearest* to that width — never the token with the matching key. `breakpoints.sm` (800px) is nowhere near `container.sm` (512px). Confirm the choice with a visual check.
 
-## Keep `useMedia` for genuine media features
+## Genuine viewport width → `screen:` keys, not `useMedia`
 
-Width is the only thing that migrates. Leave `useMedia` in place for:
+When layout truly must follow the *window* (not the component's room), don't keep `useMedia` — use a `screen:`-prefixed responsive prop, which resolves against the viewport on the `theme.breakpoints` scale: `direction={{zero: 'column', 'screen:lg': 'row'}}`. Bare keys and `screen:` keys can mix on one prop. Prefer bare (container) keys; reach for `screen:` only when the viewport genuinely drives the layout.
+
+## Keep `useMedia` only for non-width media features
+
+Width — container or viewport — has a prop/hook path above. Leave `useMedia` in place only for:
 `prefers-color-scheme`, `prefers-reduced-motion`, `hover`, `pointer`, `max-height` / height-based, `resolution`, `print`.
 
 ## container-type: only when no query container is in scope
@@ -82,19 +91,18 @@ import {Flex} from '@sentry/scraps/layout';
 @container (max-width: ${p => p.theme.container.sm}) { ... }
 ```
 
-### Rung 3 — `useMedia` (width) → `useResponsivePropValue()`
+### Rung 3 — `useMedia` (width) → `useContainerBreakpoint()`
+
+`useContainerBreakpoint()` is the container-scoped replacement for width-based `useMedia`. Call it from a descendant of a query container; it returns the container's active breakpoint on the container scale (`zero` … `5xl`) and updates as the container crosses a breakpoint.
 
 ```tsx
 // Old
 const isNarrow = useMedia(`(max-width: ${theme.breakpoints.sm})`);
 
-// New — resolve a per-breakpoint map against the current container (mirrors rung-1 props)
-import {useResponsivePropValue} from '@sentry/scraps/layout';
-const isNarrow = useResponsivePropValue({xs: true, sm: false});
-
-// Only when you need the raw active key itself (to log or pass along):
+// New — reads the container's active breakpoint, not the viewport
 import {useContainerBreakpoint} from '@sentry/scraps/layout';
-const breakpoint = useContainerBreakpoint(); // 'zero' | '3xs' | ... | 'xl'
+const breakpoint = useContainerBreakpoint(); // 'zero' | '3xs' | ... | '5xl'
+const isNarrow = breakpoint === 'zero';
 ```
 
 ## Migration Checklist
@@ -102,7 +110,8 @@ const breakpoint = useContainerBreakpoint(); // 'zero' | '3xs' | ... | 'xl'
 - [ ] Rung 1: replace styled `@media` with `Container`/`Flex`/`Grid`/`Stack` responsive props
 - [ ] Rung 2 (CSS can't be a prop): `@media` → `@container`, `theme.breakpoints.*` → `theme.container.*`
 - [ ] Choose the `container` token nearest the element's real width — never reuse the breakpoint key
-- [ ] Rung 3: width `useMedia` → `useResponsivePropValue({...})` (or `useContainerBreakpoint()` for the raw key); keep `useMedia` for non-width media features
+- [ ] Rung 3: width `useMedia` → `useContainerBreakpoint()`
+- [ ] Genuine viewport-width cases → `screen:` responsive keys (not `useMedia`); keep `useMedia` only for non-width media features
 - [ ] Add `container-type` only when a subtree must respond to its own width; prefer `inline-size`
 - [ ] Confirm a query-container ancestor exists so `@container` resolves (it silently no-ops otherwise)
 - [ ] **Visual check:** resize the element and confirm identical output flipping at the intended width

@@ -8,9 +8,10 @@ Give Sentry frontend engineers a reliable, low-risk path for converting viewport
 
 In scope:
 - Migrating `@media` CSS and `useMedia` width checks to container-query equivalents.
-- Choosing between primitive layout props, `@container` CSS, and the JS width hooks (`useResponsivePropValue`, `useContainerBreakpoint`).
+- Choosing between primitive layout props, `@container` CSS, and the `useContainerBreakpoint()` JS width hook.
 - Mapping a breakpoint width to the *nearest* container token by pixel value.
 - Deciding when to add `container-type`.
+- Routing genuine viewport-width cases to `screen:` responsive keys rather than `useMedia`.
 
 Out of scope:
 - Non-width media features (`prefers-*`, `hover`, `pointer`, `resolution`, height-based, `print`) — these stay on `useMedia`.
@@ -25,7 +26,7 @@ Out of scope:
 
 ## Runtime Contract
 
-- Required first actions: identify the lowest rung that fits (primitive prop → `@container` → `useResponsivePropValue()` → leave as `useMedia`).
+- Required first actions: identify the lowest rung that fits (primitive prop → `@container` → `useContainerBreakpoint()` → leave as `useMedia`).
 - Required outputs: migrated code plus a nearest-scale token choice justified by the element's real rendered width.
 - Non-negotiable constraints:
   - Convert to the container token *nearest* the element's real width; never reuse the breakpoint key.
@@ -36,6 +37,7 @@ Out of scope:
 ## Source And Evidence Model
 
 Authoritative sources:
+- Scraps `Container` story, "Container Queries" section (container vs. `screen:` keys, both token scales, `useContainerBreakpoint`, `container-type` guidance).
 - Reference migration PR getsentry/sentry#120315 (trace-view).
 - Sentry theme token definitions (`theme.breakpoints`, `theme.container`).
 - `components/core/breadcrumbList/breadcrumbList.tsx` (conditional `container-type` pattern).
