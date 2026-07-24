@@ -30,6 +30,7 @@ Out of scope:
 ## Users And Trigger Context
 
 - Primary users: engineers and coding agents iterating on existing pull requests.
+- Invocation: model-invocable in Claude Code and Codex when the request or current PR state matches this skill's trigger context.
 - Common user requests: fix CI on this PR, iterate on this PR until checks pass, address PR feedback, keep pushing fixes until green.
 - Should not trigger for: creating a PR, writing commits without a PR, reviewing unrelated code, or monitoring merge approval state only.
 

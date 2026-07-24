@@ -25,9 +25,14 @@ Load this when the skill needs Claude Code-specific frontmatter or invocation co
 ## Invocation rules
 
 1. If Claude should not decide when to run the skill, set `disable-model-invocation: true`.
-2. If the skill is not a meaningful command for humans, consider `user-invocable: false`.
-3. Keep trigger-rich language in `description` even if `when_to_use` is present.
+2. If deliberate metadata should document that Claude may select the skill, set `disable-model-invocation: false`.
+3. If the skill is not a meaningful command for humans, consider `user-invocable: false`.
+4. Keep trigger-rich language in `description` even if `when_to_use` is present.
+
+## Cross-provider parity
+
+For Codex, add `agents/openai.yaml` under the skill root. Match Claude's behavior with `policy.allow_implicit_invocation`: use `false` when `disable-model-invocation` is `true`, and `true` when it is `false`. The same file may include `interface.display_name`, `interface.short_description`, and an explicit `interface.default_prompt` that references the skill as `$skill-name`.
 
 ## Portability rule
 
-When using any Claude-specific field, say why it is necessary and note that it is not portable Agent Skills behavior.
+When using Claude or Codex-specific fields, say why they are necessary and note that they are not portable Agent Skills behavior.

@@ -21,6 +21,7 @@ ALWAYS use `/skill-writer` — it handles requirements, writing, registration, a
 3. Add to `README.md` Available Skills table (alphabetical by canonical skill name; exclude aliases/symlinks)
 4. Add to `.claude/settings.json`: `Skill(sentry-skills:<skill-name>)`
 5. Add to allowlist in `skills/claude-settings-audit/SKILL.md`
+6. For skills with deliberate invocation policy, set Claude's `disable-model-invocation` in `SKILL.md` and Codex's `policy.allow_implicit_invocation` in `agents/openai.yaml` to matching behavior
 
 ## Key Conventions
 - Frontmatter `---` must be the **first line** of SKILL.md — no comments before it
