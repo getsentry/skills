@@ -1,6 +1,7 @@
 ---
 name: iterate-pr
 description: Iterate on a PR until actionable CI passes and high/medium review feedback is addressed. Use for PR CI failures, review feedback, or green-check loops; do not wait for human approval, draft status, or merge gates.
+disable-model-invocation: false
 ---
 
 # Iterate on PR Until CI Passes

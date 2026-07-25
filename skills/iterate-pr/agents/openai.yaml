@@ -1,0 +1,6 @@
+interface:
+  display_name: "Iterate PR"
+  short_description: "Fix PR feedback and CI until green"
+  default_prompt: "Use $iterate-pr to address actionable review feedback and CI failures on the current pull request until the actionable checks pass."
+policy:
+  allow_implicit_invocation: true
