@@ -1,12 +1,12 @@
 ---
 name: pr-writer
-description: Create or refresh reviewer-facing PR titles and descriptions. Use when opening a PR, updating its title or body, or preparing branch changes for review.
+description: Write a PR title and body as a cover note for reviewers. Use when opening a PR or refreshing an existing one's title or body.
 ---
 
 # PR Writer
 
-Write the PR body as a cover note for reviewers, not a changelog, template,
-validation log, or file-by-file summary.
+A PR body is a cover note for reviewers: what changed, what it affects, and
+where to look.
 
 ## Inspect the Change
 
@@ -26,23 +26,30 @@ repository default branch. Set `BASE`, then inspect:
 
 ```bash
 git log "$BASE"..HEAD --oneline
+git diff --stat "$BASE"...HEAD
 git diff "$BASE"...HEAD
 ```
 
-If on `main` or `master`, create a feature branch first. Ensure intended
-changes are committed and review the whole branch diff, not only the latest
-commit or existing PR text.
+If on `main` or `master`, create a feature branch first. Commit the intended
+changes, then read the whole branch diff. The `--stat` total is the budget the
+cover note is written against.
 
 ## Core Rules
 
-- Describe concrete changed behavior, affected surfaces, and reviewer impact
-  before implementation detail.
-- Explain motivation, risk, tradeoffs, migration, or review focus only when
-  useful.
+- Lead with concrete changed behavior, affected surfaces, and reviewer impact;
+  implementation detail comes after, if at all.
 - Use the smallest structure that makes the change easier to review.
+- Match length to the diff: a body that takes longer to read than the diff
+  takes to review has failed. Every paragraph carries something the diff does
+  not show — root cause, rationale, risk, migration, or where to start. Cut
+  the ones that restate what the reviewer is about to read.
+- Write each body paragraph as one long line, with a blank line between
+  paragraphs. GitHub renders an intra-paragraph newline as a line break, so a
+  hard-wrapped body breaks raggedly at the source column. Fenced code blocks
+  keep their newlines.
 - Replace internal prompt or process terminology with specific behavior.
-- When refreshing a PR, rewrite around the current full diff without narrating
-  review history.
+- When refreshing, rewrite around the current full diff: the cover note
+  describes the PR as it now stands, not the revisions that got it there.
 
 ## Titles
 
@@ -55,8 +62,8 @@ Allowed types: `feat`, `fix`, `ref`, `perf`, `docs`, `test`, `build`,
   and scope.
 - Use `!` only when the change breaks an external contract, and explain the
   affected surface in the body.
-- Avoid vague subjects such as `update`, `cleanup`, `misc`, `fix stuff`,
-  or `address feedback`. Do not add a trailing period.
+- Name the specific behavior that changed in the subject, with no trailing
+  period.
 - Keep an existing title only when it still describes the whole diff.
 
 ## Body Shape
@@ -79,9 +86,6 @@ Default:
 <Why the approach, risk, migration, or review focus matters, if not obvious.>
 ```
 
-For review-feedback updates, describe the resulting PR as a whole rather than
-the sequence of revisions.
-
 ## Reviewer Aids
 
 Use an aid only when it reduces reviewer reconstruction work:
@@ -93,16 +97,15 @@ Use an aid only when it reduces reviewer reconstruction work:
   adopters need it.
 
 Introduce an artifact with one sentence explaining what reviewers should
-notice. Omit it when prose is clearer.
+notice.
 
 ## Boundaries
 
-- Do not add default `Summary`, `Changes`, or `Test Plan` sections.
-- Omit routine validation unless it changes risk assessment or explains
-  meaningful regression coverage. For docs, skills, copy, or config changes,
-  omit it by default.
-- Do not paste commands, CI logs, validation dumps, commit logs, placeholders,
-  or exhaustive file lists.
+- The cover note carries prose plus, when earned, one aid. Command output, CI
+  logs, commit logs, placeholders, and file lists stay out; include validation
+  only when it changes risk assessment or shows meaningful regression coverage.
+- Write the body from the diff, ignoring any repository PR template, and skip
+  default `Summary`, `Changes`, and `Test Plan` headings.
 - Never include customer or organization names, user emails, support ticket
   contents, secrets, or PII.
 - Use issue references only when verified from user input, branch names,
@@ -134,17 +137,13 @@ typo-only, formatting-only, and rename-only follow-ups.
 Small change:
 
 ```markdown
-The AI Customizations section now starts collapsed so it does not consume
-sidebar space before users need it. Expanding it preserves the existing saved
-preference behavior.
+The AI Customizations section now starts collapsed so it does not consume sidebar space before users need it. Expanding it preserves the existing saved preference behavior.
 ```
 
 Breaking contract:
 
 ````markdown
-Run logs now emit chunk-level records instead of one skill-level record.
-Consumers that read top-level `findings` must iterate over
-`chunk.findings` for each record.
+Run logs now emit chunk-level records instead of one skill-level record. Consumers that read top-level `findings` must iterate over `chunk.findings` for each record.
 
 Before:
 

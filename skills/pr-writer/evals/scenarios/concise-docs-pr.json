@@ -4,19 +4,23 @@
   "judge": [
     {
       "check": "The title uses an allowed conventional commit type, preferably docs, and accurately describes the docs-only skill guidance change.",
-      "weight": 0.3
+      "weight": 0.25
     },
     {
       "check": "The body is concise reviewer-facing prose that explains the behavior impact of the guidance without file-by-file narration.",
-      "weight": 0.3
+      "weight": 0.25
+    },
+    {
+      "check": "Each body paragraph outside a fenced code block is a single unwrapped line, with no hard wrapping at a fixed column.",
+      "weight": 0.2
     },
     {
       "check": "The body does not include default template headings such as Summary or Test Plan.",
-      "weight": 0.2
+      "weight": 0.15
     },
     {
       "check": "The body does not include validation command dumps unless tied to reviewer risk.",
-      "weight": 0.2
+      "weight": 0.15
     }
   ],
   "setup": [
