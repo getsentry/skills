@@ -61,7 +61,6 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [pr-link-issue](skills/pr-link-issue/SKILL.md) | Append a GitHub issue link and its Linear ticket to the current PR's description. |
 | [pr-writer](skills/pr-writer/SKILL.md) | Create, refresh, and rewrite pull request titles and descriptions following Sentry conventions. |
 | [prompt-optimizer](skills/prompt-optimizer/SKILL.md) | Optimize prompts with evals, model-family adapters, and exact external context references. |
-| [replay-ux-research](skills/replay-ux-research/SKILL.md) | Analyze Sentry session replays to surface UX patterns, pain points, and user journeys for a given product area. |
 | [security-review](skills/security-review/SKILL.md) | Security code review for vulnerabilities. |
 | [skill-scanner](skills/skill-scanner/SKILL.md) | Scan agent skills for security issues. |
 | [skill-writer](skills/skill-writer/SKILL.md) | Canonical workflow to synthesize, create, and iteratively improve agent skills for this repository. |
