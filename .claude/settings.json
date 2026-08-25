@@ -54,6 +54,7 @@
       "Skill(sentry-skills:gh-review-requests)",
       "Skill(sentry-skills:gha-security-review)",
       "Skill(sentry-skills:iterate-pr)",
+      "Skill(sentry-skills:mcp-usage-research)",
       "Skill(sentry-skills:pr-link-issue)",
       "Skill(sentry-skills:pr-writer)",
       "Skill(sentry-skills:presentation-creator)",
