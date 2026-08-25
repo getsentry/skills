@@ -12,7 +12,7 @@ Accepts one or more (thread_id, body) pairs as positional arguments.
 Batches all replies into a single GraphQL mutation for efficiency.
 
 Example:
-    uv run reply_to_thread.py PRRT_abc "Fixed the issue.\n\n*— Claude Code*"
+    uv run reply_to_thread.py PRRT_abc "Fixed the issue."
     uv run reply_to_thread.py PRRT_abc "Fixed." PRRT_def "Also fixed."
 """
 
@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 import subprocess
 import sys
 
@@ -29,27 +28,9 @@ def _normalize_body(body: str) -> str:
     """Normalize escaped newlines from shell input.
 
     Bash double quotes keep "\\n" literal, but reply bodies should contain
-    actual newlines for readability/signatures.
+    actual newlines for readability.
     """
-    normalized = body.replace("\\r\\n", "\\n").replace("\\n", "\n")
-    
-    # Add Claude Code attribution if not already present
-    # Check if the last line matches the bot signature pattern: *— Bot Name* or *- Bot Name*
-    lines = normalized.rstrip().split("\n")
-    last_line = lines[-1] if lines else ""
-    
-    # Match bot signatures like "*— Claude Code*", "*- Any Bot*", etc.
-    bot_signature_pattern = r"^\*[—-]\s+.+\*$"
-    
-    if not re.match(bot_signature_pattern, last_line.strip()):
-        # Ensure proper spacing before attribution
-        if normalized and not normalized.endswith("\n"):
-            normalized += "\n"
-        if normalized and not normalized.endswith("\n\n"):
-            normalized += "\n"
-        normalized += "*— Claude Code*"
-    
-    return normalized
+    return body.replace("\\r\\n", "\\n").replace("\\n", "\n")
 
 
 def reply_to_threads(pairs: list[tuple[str, str]]) -> list[tuple[str, bool]]:
