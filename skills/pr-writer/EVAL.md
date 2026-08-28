@@ -58,3 +58,4 @@ Adopt a `pr-writer` change only when:
 3. output title uses an allowed conventional type.
 4. output body avoids default `Summary` / `Test Plan` templates.
 5. validation is omitted unless it changes reviewer risk.
+6. output body paragraphs are single unwrapped lines.
