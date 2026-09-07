@@ -1,0 +1,7 @@
+%% steps: sdk, relay, queue
+graph LR
+  sdk[SDK<br/>browser · mobile] --> relay[Relay<br/>auth · rate limit]:::focus
+  relay -->|accepted| queue[(Kafka)]
+  relay -.->|429| reject([Rejected]):::fail
+  queue --> proc[Processing<br/>symbolicate · group]:::warn
+  proc --> store[(Snuba)]
