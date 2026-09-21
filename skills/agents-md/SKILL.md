@@ -1,6 +1,6 @@
 ---
 name: agents-md
-description: Creates and maintains concise AGENTS.md and CLAUDE.md project instruction files. Use when asked to create AGENTS.md, update AGENTS.md, maintain agent docs, set up CLAUDE.md, document repository agent conventions, or keep coding-agent instructions minimal and reference-backed.
+description: Creates and maintains concise AGENTS.md project instruction files. Use when asked to create AGENTS.md, update AGENTS.md, maintain agent docs, set up CLAUDE.md, document repository agent conventions, or keep coding-agent instructions minimal and reference-backed.
 ---
 
 # Maintaining AGENTS.md
@@ -24,8 +24,9 @@ Goal: concise, actionable agent instructions. Target under 60 lines; never excee
 ## File Setup
 
 - Create `AGENTS.md` at the repository root.
-- If a Claude-compatible entrypoint is required, symlink `CLAUDE.md` to `AGENTS.md`.
-- Do not maintain divergent `AGENTS.md` and `CLAUDE.md` copies.
+- Do not create `CLAUDE.md`; Claude Code reads `AGENTS.md` when no `CLAUDE.md` exists.
+- Remove a `CLAUDE.md` symlink to `AGENTS.md`.
+- If a real `CLAUDE.md` exists, move its instructions into `AGENTS.md` and delete it; Claude Code ignores `AGENTS.md` while `CLAUDE.md` exists.
 
 ## Default Sections
 

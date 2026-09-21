@@ -12,7 +12,7 @@ In scope:
 
 - Root `AGENTS.md` files.
 - Nested `AGENTS.md` files for subtree-specific overrides.
-- `CLAUDE.md` compatibility symlinks when needed.
+- Removing `CLAUDE.md` symlinks and merging existing `CLAUDE.md` files into `AGENTS.md`.
 - Concise command tables, external reference tables, and commit attribution rules.
 - Removing duplicated prose from existing agent docs.
 
@@ -38,7 +38,7 @@ Out of scope:
 - Keep root guidance broad and nested guidance narrow.
 - Keep `AGENTS.md` under 60 lines when practical and under 100 lines always.
 - Preserve the commit attribution section when the repo requires AI co-authorship.
-- Use a `CLAUDE.md` symlink only for compatibility; avoid divergent copies.
+- Do not create `CLAUDE.md`; Claude Code reads `AGENTS.md` when no `CLAUDE.md` exists.
 
 ## Source And Evidence Model
 

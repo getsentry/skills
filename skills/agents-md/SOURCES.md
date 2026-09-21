@@ -18,6 +18,7 @@ Why: this skill is a repeatable authoring workflow with pre-inspection, scoped o
 | `skills/skill-writer/SKILL.md` and references | local canonical | canonical | 2026-05-04 | high | Skill update workflow, source capture, authoring, validation | local repository authority | Primary authoring workflow |
 | `https://agents.md/` | official format guide | canonical | 2026-05-04 | high | AGENTS.md purpose, common sections, nested files, closest-file precedence | public format guidance | Supports path-backed and scoped instructions |
 | `https://developers.openai.com/codex/guides/agents-md` | official product docs | canonical | 2026-05-04 | high | Codex discovery order, global/project scopes, nested precedence, size cap, verification commands | OpenAI-specific behavior | Used only for compatibility guidance |
+| `https://github.com/anthropics/claude-code/tree/main/mods/agents-md` | official product docs | canonical | 2026-09-21 | high | Claude Code loads `AGENTS.md` by default when no `CLAUDE.md` exists on the path | Claude Code-specific behavior | Replaces the `CLAUDE.md` symlink convention |
 | `https://agentskills.io/specification` | official spec | canonical | 2026-05-04 | high | Skill frontmatter, progressive disclosure, focused references | skill format guidance | Supports concise runtime file shape |
 
 ## Decisions
@@ -30,9 +31,9 @@ Why: this skill is a repeatable authoring workflow with pre-inspection, scoped o
    Status: adopted
    Why: official AGENTS.md and Codex docs both describe hierarchical instructions where narrower files override broader guidance.
 
-3. Keep `CLAUDE.md` as a compatibility symlink when needed.
+3. Do not create `CLAUDE.md`; remove `CLAUDE.md` symlinks to `AGENTS.md`.
    Status: adopted
-   Why: one canonical instruction file avoids divergent provider-specific copies.
+   Why: Claude Code reads `AGENTS.md` directly, and any `CLAUDE.md` on the path stops it from loading `AGENTS.md`.
 
 4. Treat OpenAI `AGENTS.override.md` behavior as compatibility guidance, not a shared-repo default.
    Status: adopted
@@ -51,7 +52,7 @@ Why: this skill is a repeatable authoring workflow with pre-inspection, scoped o
 | Nested scope and precedence | complete | official AGENTS.md guide, OpenAI Codex docs |
 | Prose minimization | complete | user concern, Agent Skills progressive disclosure |
 | Command precision | complete | AGENTS.md examples, repo contribution conventions |
-| CLAUDE.md compatibility | complete | existing skill behavior, local repo convention |
+| CLAUDE.md compatibility | complete | Claude Code agents-md docs |
 | Provider-specific variance | partial | OpenAI Codex docs covered; other tools deferred until a concrete repo need |
 
 ## Open gaps
