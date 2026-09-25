@@ -1,7 +1,7 @@
 ---
 name: secret-serialization
 description: 'Finds secrets, tokens, passwords, and API keys that can leak through generated serialization: Python dataclass repr and asdict, attrs, pydantic model_dump, NamedTuple, JavaScript JSON.stringify and util.inspect, structured logs, tracing spans, and error reports. Use when asked to "check for secret serialization", "credential in repr", "repr=False audit", "secret in spans", "token in logs", or when a change adds a credential field to a dataclass, model, or config object, or adds code that stringifies whole objects or every kwarg into telemetry.'
-allowed-tools: Read, Grep, Glob
+allowed-tools: Read Grep Glob
 ---
 
 # Secret Serialization Review

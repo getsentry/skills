@@ -36,7 +36,24 @@ Neither change looked dangerous in its own diff, and the sink was already on the
 5. Name the sink's serializer in the regression test.
    - Reason: a `repr` check alone misses `__dict__`-based serializers.
 
+## Evaluation Runs
+
+Warden `pi` runtime, `openrouter/x-ai/grok-4.5`, effort `high`, against the original internal repository.
+
+| Case | Expected | Result |
+|------|----------|--------|
+| Incident diff: two credential fields added to dataclass RPC clients, `str(value)` kwarg sink already on the default branch | High findings naming both fields and the sink | Pass, twice. 3 and 4 high findings; every finding traced tool kwarg, tracing decorator, `str(value)`, span attribute. |
+| Same diff with `field(repr=False)` on both fields | No findings | Pass. No findings. |
+| Unrelated diff adding seven `*_tokens` usage-count fields to an LLM proxy model | No findings | Pass. No findings across 22 hunks. |
+
+Observations:
+
+1. With comma-delimited `allowed-tools`, the same incident run produced only 2 medium findings: the agent had no `read` or `grep`, so it could not trace the sink. Fixed by switching to space-delimited tools.
+2. Call-site hunks that pass a credential into the constructor produce extra findings for the same field. Warden analyzes hunks independently, so a per-hunk dedupe instruction did not help and was removed. These are duplicates, not false positives.
+3. Substring name matching did not cause false positives on LLM token counters in this run, so the name list was left unchanged.
+
 ## Open Gaps
 
-- No recorded runs yet against real repositories. Capture sanitized positive and negative examples before adding `references/evidence/`.
+- Sample size is one positive and two negative cases on one model. Add more negative diffs, such as OAuth request models that legitimately serialize a token into an outbound request body, before relying on precision.
+- Not yet run on Claude models.
 - Add Go, Java, or Rust references only if findings in those languages recur.

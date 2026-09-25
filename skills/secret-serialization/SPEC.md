@@ -34,6 +34,7 @@ This is opt-in and specialized. It reports an unexcluded credential field before
 - Required first actions: find changed credential fields and changed sinks in the diff, then read the full class or sink and enumerate generated paths.
 - Required evidence per finding: the field or sink, the generated path or serialization call, the exclusion looked for, and where instances travel or what the sink receives, including code outside the diff.
 - Constraints:
+  - Keep `allowed-tools` space-delimited (`Read Grep Glob`). Warden drops comma-suffixed tokens such as `Read,`, which leaves the agent with only `find` and `ls` and caps every finding at medium because no sink can be traced.
   - Do not downgrade because the other side predates the diff.
   - Do not accept underscore naming, TypeScript `private`, `__slots__`, or a custom `__init__` as exclusion.
   - Keep language-specific tables and examples in `references/`.
