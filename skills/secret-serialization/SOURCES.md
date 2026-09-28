@@ -5,7 +5,7 @@
 | Source | Trust tier | Confidence | Usage constraints | Decisions |
 |--------|------------|------------|-------------------|-----------|
 | Internal Sentry incident: an RPC client's shared secret reached tracing spans | Internal incident | High | Mechanism only. No repository names, PR links, secrets, or span data in this public repo. | Two-sided threat model; report each side alone; search the repository for the other side; require exclusion on every generated path; recommend a serializer-based regression test. |
-| Python `dataclasses`, `attrs`, `pydantic`, and `functools.cached_property` documentation | Official docs | High | Summarize as tables. | `repr=False` covers repr only; `asdict` has no field exclusion; `cached_property` writes to `__dict__`; `SecretStr` is an accepted exclusion. |
+| Python `dataclasses`, `attrs`, `pydantic`, and `functools.cached_property` documentation, checked against Pydantic 2.11 | Official docs and runtime | High | Summarize as tables. | `repr=False` covers repr only; `asdict` has no field exclusion; `cached_property` writes to `__dict__`; `SecretStr` redacts repr, str, and `model_dump`. Pydantic `Field(exclude=True)` leaves the raw value in `__repr__` and `__str__`. `Field(repr=False)` leaves it in `model_dump`. Both flags together still leave it in `__dict__`. |
 | Sentry Python SDK serializer and `include_local_variables` behavior | Official docs and SDK source | High | Treat as a sink, not an SDK bug. | Exception frames are a sink for any credential holder in scope. |
 | Node `util.inspect`, `JSON.stringify`, and `#private` field semantics | Official docs | High | Summarize as tables. | TypeScript `private` is not an exclusion; `#private` is; `toJSON` alone is partial when inspect or logger sinks exist. |
 | `security-review` skill in this repo | Local prior art | High | Avoid overlap. | Direct secret logging stays in `security-review`; this skill covers generated serialization and wholesale sinks. |
@@ -35,6 +35,9 @@ Neither change looked dangerous in its own diff, and the sink was already on the
    - Decision: severity follows the unblocked path.
 5. Name the sink's serializer in the regression test.
    - Reason: a `repr` check alone misses `__dict__`-based serializers.
+6. Do not treat a single Pydantic field flag as exclusion.
+   - Reason: a review treated `Field(exclude=True)` as complete. On Pydantic 2.11, `str(model)` and `repr(model)` still contain that field, which is the span path this skill targets. `Field(repr=False)` still appears in `model_dump`. Setting both flags covers those paths and does not clear `__dict__`.
+   - Decision: accept `Field(repr=False, exclude=True)` together, or `SecretStr` / `SecretBytes`. Report either flag alone at the severity of the unblocked path.
 
 ## Evaluation Runs
 

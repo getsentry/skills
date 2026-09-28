@@ -38,16 +38,17 @@ Treat a field as credential-bearing when its name, type, or source says so:
 
 ## Explicit Exclusion
 
-A credential field is protected only when every generated serialization path for its type excludes it. Blocking one path (`repr=False`) while another path (`asdict`, `__dict__`, `toJSON`) still includes it is a partial exclusion. Report it at the severity of the unblocked path.
+A credential field is protected only when every generated serialization path for its type excludes it. Blocking one path (`repr=False` or `exclude=True`) while another path (`asdict`, `model_dump`, `__repr__`, `__dict__`, `toJSON`) still includes it is a partial exclusion. Report it at the severity of the unblocked path.
 
 Accept as exclusion:
 
-- Field-level flags that remove the field from generated output: `dataclasses.field(repr=False)`, `attrs.field(repr=False)`, pydantic `Field(exclude=True)`, `enumerable: false`, JavaScript `#private` fields.
+- Field-level flags that remove the field from the paths they cover: `dataclasses.field(repr=False)`, `attrs.field(repr=False)`, `enumerable: false`, JavaScript `#private` fields. `repr=False` does not cover `asdict`.
+- On a plain Pydantic field, both `Field(repr=False)` and `Field(exclude=True)`. Either flag alone is partial: `exclude=True` leaves the raw value in `__repr__` and `str()`, and `repr=False` leaves it in `model_dump` and response serialization.
 - Wrapper types that redact themselves: `SecretStr`, a project `Redacted[T]`.
 - A hand-written `__repr__`, `__str__`, `toJSON`, or `[util.inspect.custom]` that omits the field, when it covers every path the type has.
 - Not storing the credential on the object: read it inside the method that needs it, or hold it in a closure.
 
-Do not accept underscore naming, TypeScript `private`, `__slots__`, type annotations, comments, `dataclass(init=False)`, or a custom `__init__` that still assigns the field.
+Do not accept underscore naming, TypeScript `private`, `__slots__`, type annotations, comments, `dataclass(init=False)`, a custom `__init__` that still assigns the field, or pydantic `Field(exclude=True)` or `Field(repr=False)` by itself.
 
 ## Investigation Process
 

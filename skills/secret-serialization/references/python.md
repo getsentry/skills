@@ -7,9 +7,9 @@ Use this when reviewing Python code. These notes refine the core skill; they do 
 | Type | Paths that include every field by default | Field-level exclusion |
 |------|-------------------------------------------|-----------------------|
 | `@dataclasses.dataclass` | `__repr__` (so `str()`, f-strings, `%s`, `%r`), `dataclasses.asdict`, `dataclasses.astuple`, `dataclasses.fields`, `__eq__` | `field(repr=False)` covers repr only. Nothing excludes a field from `asdict`; keep the value off the instance or wrap it. |
-| `attrs` `@define` / `@attr.s` | `__repr__`, `attrs.asdict`, `attrs.astuple` | `field(repr=False)`; `asdict(filter=...)` only at call sites. |
-| `pydantic.BaseModel` | `__repr__`, `__str__`, `model_dump`, `model_dump_json`, `.dict()`, `.json()`, FastAPI response serialization | `SecretStr` / `SecretBytes` (render as `**********`), `Field(exclude=True)`, `Field(repr=False)`. |
-| `pydantic_settings.BaseSettings` | Same as `BaseModel`; often logged wholesale at startup | `SecretStr` for every credential setting. |
+| `attrs` `@define` / `@attr.s` | `__repr__`, `attrs.asdict`, `attrs.astuple` | `field(repr=False)` covers repr only. `asdict` still includes the field unless the call passes `filter=`. |
+| `pydantic.BaseModel` | `__repr__`, `__str__`, `model_dump`, `model_dump_json`, `.dict()`, `.json()`, FastAPI response serialization | `SecretStr` / `SecretBytes` redact all of these (`**********`). `Field(repr=False)` covers `__repr__` and `__str__` only. `Field(exclude=True)` covers dump, JSON, and response serialization only. A plain field needs both flags, and both still leave the raw string in `__dict__`. |
+| `pydantic_settings.BaseSettings` | Same as `BaseModel`; often logged wholesale at startup | `SecretStr` for every credential setting. Plain fields follow the same `BaseModel` flag rules. |
 | `typing.NamedTuple` | `__repr__`, `_asdict`, iteration and unpacking | None. Do not hold credentials on a NamedTuple. |
 | `TypedDict` / `dict` | `repr`, `json.dumps`, iteration | None. Redact at the sink. |
 | `msgspec.Struct` | `__repr__`, `msgspec.to_builtins`, encoders | `field(repr=False)` on newer versions; otherwise none. |
@@ -109,6 +109,18 @@ class RpcClient:
 ```
 
 A plain `property` is not a dataclass field and does not write to `__dict__`. Switching it to `cached_property` would make `vars(obj)` leak after first access.
+
+**Report (high): `Field(exclude=True)` with a `str()` sink**
+
+```python
+class Settings(BaseModel):
+    service: str
+    api_key: str = Field(exclude=True)
+
+span.set_data("settings", str(settings))
+```
+
+Evidence: `exclude=True` omits `api_key` from `model_dump` and response serialization. `str(settings)` and `repr(settings)` still contain the raw key, and the span records `str(settings)`. Fix: `api_key: str = Field(repr=False, exclude=True)`, or use `SecretStr`. `repr=False` alone still leaks through `model_dump`. Both flags still leave the raw string in `__dict__`.
 
 **Do not report: pydantic `SecretStr`**
 
