@@ -36,7 +36,9 @@ This is opt-in and specialized. It reports an unexcluded credential field before
 - Constraints:
   - Keep `allowed-tools` space-delimited (`Read Grep Glob`). Warden drops comma-suffixed tokens such as `Read,`, which leaves the agent with only `find` and `ls` and caps every finding at medium because no sink can be traced.
   - Do not downgrade because the other side predates the diff.
-  - Do not accept underscore naming, TypeScript `private`, `__slots__`, a custom `__init__`, or pydantic `Field(exclude=True)` or `Field(repr=False)` alone as exclusion.
+  - Judge holders by generated paths only (`__repr__`, `asdict`, `model_dump`, `toJSON`, enumeration). A field is fully excluded when its mechanisms together block all of them.
+  - Treat raw attribute access (`vars`, `__dict__`, `pickle`, `default=vars`) as a sink category. No field flag or wrapper defeats it, so it never makes a fully excluded holder partial.
+  - Do not treat underscore naming, TypeScript `private`, `__slots__`, or a custom `__init__` as blocking any path. Pydantic `Field(exclude=True)` or `Field(repr=False)` alone is partial.
   - Keep language-specific tables and examples in `references/`.
 
 ## Source And Evidence Model
@@ -53,7 +55,8 @@ See `SOURCES.md`. Do not store secrets, customer data, span payloads, or interna
 
 - Run `uv run scripts/quick_validate.py ../secret-serialization` from `skills/skill-writer`.
 - Manual check against the incident shape: a diff that adds an unexcluded credential field to a dataclass, with a pre-existing `str(value)` kwarg sink elsewhere in the repository, should produce a high finding naming both.
-- Precision checks: `SecretStr`, `#private`, a lazily read `property`, and a filtered sink should produce no finding. `Field(exclude=True)` alone on a model passed to `str()` should produce a finding. `Field(repr=False, exclude=True)` covers repr, str, and `model_dump` only; a `__dict__` sink is still a finding.
+- Precision checks: `SecretStr`, `#private`, a lazily read `property`, a filtered sink, and `Field(repr=False, exclude=True)` with only repr or `model_dump` sinks should produce no finding.
+- Recall checks: `Field(exclude=True)` alone on a model passed to `str()` should produce a partial-exclusion finding. Any credential-bearing instance, including a fully excluded or `SecretStr` one, passed to `pickle` or `default=vars` should produce a raw attribute sink finding.
 
 ## Known Limitations
 

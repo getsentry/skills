@@ -5,8 +5,8 @@
 | Source | Trust tier | Confidence | Usage constraints | Decisions |
 |--------|------------|------------|-------------------|-----------|
 | Internal Sentry incident: an RPC client's shared secret reached tracing spans | Internal incident | High | Mechanism only. No repository names, PR links, secrets, or span data in this public repo. | Two-sided threat model; report each side alone; search the repository for the other side; require exclusion on every generated path; recommend a serializer-based regression test. |
-| Python `dataclasses`, `attrs`, `pydantic`, and `functools.cached_property` documentation, checked against Pydantic 2.11 | Official docs and runtime | High | Summarize as tables. | `repr=False` covers repr only; `asdict` has no field exclusion; `cached_property` writes to `__dict__`; `SecretStr` redacts repr, str, and `model_dump`. Pydantic `Field(exclude=True)` leaves the raw value in `__repr__` and `__str__`. `Field(repr=False)` leaves it in `model_dump`. Both flags together still leave it in `__dict__`. |
-| Sentry Python SDK serializer and `include_local_variables` behavior | Official docs and SDK source | High | Treat as a sink, not an SDK bug. | Exception frames are a sink for any credential holder in scope. |
+| Python `dataclasses`, `attrs`, `pydantic`, and `functools.cached_property` documentation, checked against Pydantic 2.11 | Official docs and runtime | High | Summarize as tables. | `repr=False` covers repr only; `asdict` has no field exclusion; `cached_property` writes to `__dict__`; `SecretStr` redacts repr, str, and `model_dump`, but `pickle` and a recursive `default=vars` walk reach its raw value. Pydantic `Field(exclude=True)` leaves the raw value in `__repr__` and `__str__`. `Field(repr=False)` leaves it in `model_dump`. Both flags together block every generated path and still leave the value in `__dict__` and `pickle`. |
+| Sentry Python SDK serializer and `include_local_variables` behavior | Official docs and SDK source | High | Treat as a sink, not an SDK bug. | Exception frames are a sink for any credential holder in scope. The serializer renders unknown objects with `safe_repr`, not a `__dict__` walk, so it follows generated repr exclusions. |
 | Node `util.inspect`, `JSON.stringify`, and `#private` field semantics | Official docs | High | Summarize as tables. | TypeScript `private` is not an exclusion; `#private` is; `toJSON` alone is partial when inspect or logger sinks exist. |
 | `security-review` skill in this repo | Local prior art | High | Avoid overlap. | Direct secret logging stays in `security-review`; this skill covers generated serialization and wholesale sinks. |
 
@@ -37,7 +37,13 @@ Neither change looked dangerous in its own diff, and the sink was already on the
    - Reason: a `repr` check alone misses `__dict__`-based serializers.
 6. Do not treat a single Pydantic field flag as exclusion.
    - Reason: a review treated `Field(exclude=True)` as complete. On Pydantic 2.11, `str(model)` and `repr(model)` still contain that field, which is the span path this skill targets. `Field(repr=False)` still appears in `model_dump`. Setting both flags covers those paths and does not clear `__dict__`.
-   - Decision: accept `Field(repr=False, exclude=True)` together, or `SecretStr` / `SecretBytes`. Report either flag alone at the severity of the unblocked path.
+   - Decision: accept `Field(repr=False, exclude=True)` together, or `SecretStr` / `SecretBytes`, as fully excluding generated paths. Report either flag alone at the severity of the unblocked path.
+7. Treat raw attribute access as a sink, not as a generated path.
+   - Reason: a follow-up review found the skill both accepted `Field(repr=False, exclude=True)` and called a leftover `__dict__` path partial. Every stored attribute is in `__dict__`, so counting it as a generated path would make every field-level mechanism, including the incident's `repr=False` fix, fail.
+   - Decision: judge holders by generated paths only. Report `vars`, `__dict__`, `pickle`, and `default=vars` as a raw attribute sink finding when they receive a credential-bearing instance, whatever its field flags or wrapper.
+8. Report a partial exclusion only when a sink uses the unblocked path.
+   - Reason: the report table required a sink while the severity table also listed a sinkless low partial exclusion. The incident eval expects no findings for `repr=False` fields with only a repr-based sink.
+   - Decision: drop the sinkless low case.
 
 ## Evaluation Runs
 

@@ -38,24 +38,33 @@ Treat a field as credential-bearing when its name, type, or source says so:
 
 ## Explicit Exclusion
 
-A credential field is protected only when every generated serialization path for its type excludes it. Blocking one path (`repr=False` or `exclude=True`) while another path (`asdict`, `model_dump`, `__repr__`, `__dict__`, `toJSON`) still includes it is a partial exclusion. Report it at the severity of the unblocked path.
+Separate two kinds of path:
 
-Accept as exclusion:
+- **Generated paths** are produced by the type itself: `__repr__` and `__str__`, `asdict`, `model_dump`, `toJSON`, and own-enumerable-property walks (`JSON.stringify`, `util.inspect`, spread). They are the holder's responsibility.
+- **Raw attribute access** reads the stored value directly: `vars(obj)`, `obj.__dict__`, `pickle`, `json.dumps(obj, default=vars)`. Every stored attribute is exposed this way, whatever flags the field has. Treat these only as sinks: report them when a sink in the repository applies one to a credential-bearing instance.
 
-- Field-level flags that remove the field from the paths they cover: `dataclasses.field(repr=False)`, `attrs.field(repr=False)`, `enumerable: false`, JavaScript `#private` fields. `repr=False` does not cover `asdict`.
-- On a plain Pydantic field, both `Field(repr=False)` and `Field(exclude=True)`. Either flag alone is partial: `exclude=True` leaves the raw value in `__repr__` and `str()`, and `repr=False` leaves it in `model_dump` and response serialization.
-- Wrapper types that redact themselves: `SecretStr`, a project `Redacted[T]`.
-- A hand-written `__repr__`, `__str__`, `toJSON`, or `[util.inspect.custom]` that omits the field, when it covers every path the type has.
-- Not storing the credential on the object: read it inside the method that needs it, or hold it in a closure.
+A field is fully excluded when every generated path its type has is blocked, whether by one mechanism or several together. A field is partially excluded when at least one generated path still includes it. No field-level mechanism defeats raw attribute access. Only not storing the value does, so fix raw attribute findings at the sink.
 
-Do not accept underscore naming, TypeScript `private`, `__slots__`, type annotations, comments, `dataclass(init=False)`, a custom `__init__` that still assigns the field, or pydantic `Field(exclude=True)` or `Field(repr=False)` by itself.
+| Mechanism | Blocks | Still includes the field |
+|-----------|--------|---------------------------|
+| `dataclasses.field(repr=False)`, `attrs.field(repr=False)` | `__repr__`, `__str__` | `asdict`, `astuple`, raw access |
+| Pydantic `Field(repr=False)` | `__repr__`, `__str__` | `model_dump`, `model_dump_json`, response serialization, raw access |
+| Pydantic `Field(exclude=True)` | `model_dump`, `model_dump_json`, response serialization | `__repr__`, `__str__`, raw access |
+| Pydantic `Field(repr=False, exclude=True)` | Every generated path | Raw access |
+| JavaScript `#private` field | Every generated path | Nothing outside the class body |
+| `Object.defineProperty(..., { enumerable: false })` | Every generated path | Explicit property reads, `Object.getOwnPropertyNames` |
+| Hand-written `__repr__`, `__str__`, `toJSON`, or `[util.inspect.custom]` that omits the field | Only the path it overrides (a `__repr__` also serves `str()` when there is no `__str__`) | Every other generated path, raw access |
+| Redacting wrapper: `SecretStr`, `SecretBytes`, a project `Redacted[T]` | Every generated path | `pickle` and recursive `__dict__` walks such as `default=vars`, which reach the value stored inside the wrapper |
+| Not stored on the object: read inside the method, or held in a closure | Everything | Nothing |
+
+Do not treat underscore naming, TypeScript `private`, `__slots__`, type annotations, comments, `dataclass(init=False)`, or a custom `__init__` that still assigns the field as blocking any path.
 
 ## Investigation Process
 
 1. Read the changed hunk. Find new or modified credential fields on auto-serializing types, and new or modified code that serializes objects or kwargs into logs, spans, error context, caches, queues, or responses.
-2. For each credential field, read the full class, decorators, base classes, and model config. List every generated path and check which ones exclude the field.
+2. For each credential field, read the full class, decorators, base classes, and model config. List every generated path and check which ones the field's mechanisms block, using the table above.
 3. Grep for where instances are constructed and passed. Instances handed to decorators, `**kwargs`, tool call arguments, task payloads, or middleware reach generic sinks.
-4. Grep the whole repository for sinks that can see those instances, not only the diff. Useful patterns: `str(value)`, `repr(`, `asdict(`, `model_dump(`, `set_data(`, `set_attribute(`, `set_context(`, `set_extra(`, `JSON.stringify(`, `util.inspect(`, and loggers called with objects.
+4. Grep the whole repository for sinks that can see those instances, not only the diff. Useful patterns: `str(value)`, `repr(`, `asdict(`, `model_dump(`, `set_data(`, `set_attribute(`, `set_context(`, `set_extra(`, `JSON.stringify(`, `util.inspect(`, loggers called with objects, and raw attribute access (`vars(`, `__dict__`, `pickle.dumps(`, `default=vars`).
 5. For each changed sink, check for a key allowlist, redaction keyed on credential names, or a filter that replaces objects with their type name. Then grep for callers that pass credential-bearing objects into it.
 6. Look at tests only to see whether one asserts the credential is absent from the serialized form. A missing test is fix guidance, not a finding.
 7. Confirm the code ships. Skip fixtures, examples, generated code, and test-only helpers.
@@ -64,8 +73,9 @@ Do not accept underscore naming, TypeScript `private`, `__slots__`, type annotat
 
 | Category | Report When |
 |----------|-------------|
-| Unexcluded credential field | A credential field is added or moved onto a type with generated serialization, and at least one generated path includes it. |
-| Partial exclusion | The field is excluded from one path, another generated path still includes it, and that path has a sink in the repository. |
+| Unexcluded credential field | A credential field is added or moved onto a type with generated serialization, and no mechanism blocks any of its generated paths. |
+| Partial exclusion | At least one generated path still includes the field, and a sink in the repository uses that path on instances of the type. |
+| Raw attribute sink | A sink applies `vars`, `__dict__`, `pickle`, or `default=vars` to an instance that stores a credential, even if the field is fully excluded or wrapped. |
 | Credential moved onto a holder | A refactor moves a credential from a lazy read or closure onto an object field. |
 | Wholesale serialization sink | New or changed telemetry, logging, error-context, cache, or response code serializes every kwarg, every attribute, or whole objects without an allowlist or redaction. |
 | Sink loses its filter | A change removes or weakens redaction, an allowlist, or object-to-type-name replacement in an existing sink. |
@@ -77,14 +87,15 @@ Do not accept underscore naming, TypeScript `private`, `__slots__`, type annotat
 |-------|---------|
 | high | The credential reaches a sink anywhere in the repository: log line, span attribute, error event, cache entry, persisted row, queue payload, or API response. The other side may predate the diff. Also a new wholesale sink whose existing callers pass credential-bearing objects. |
 | medium | An unexcluded credential field whose instances leave the constructing module, after a repository search found no sink. Also a wholesale sink with no allowlist and no traced credential-bearing caller. |
-| low | An unexcluded credential field whose instances never leave the constructing scope, or a partial exclusion whose remaining path has no sink. |
+| low | An unexcluded credential field whose instances never leave the constructing scope. |
 
 - Do not downgrade because the sink or the holder is outside the diff. That is the normal shape of this bug.
 - Choose the lower severity when reachability depends on unproven preconditions.
 
 ## What Not To Report
 
-- Fields excluded from every generated path their type has.
+- Fully excluded fields, unless a raw attribute sink receives the instance.
+- Partial exclusions when no sink in the repository uses the unblocked path.
 - Credentials read inside a method and never stored on the instance.
 - Placeholder or fake values in tests, fixtures, or examples.
 - Types with no generated serialization and no `__dict__` or enumeration sink.
@@ -96,7 +107,8 @@ Do not accept underscore naming, TypeScript `private`, `__slots__`, type annotat
 
 Include one concrete fix per finding:
 
-- Holder: exclude the field from every generated path, wrap it in a redacting type, or stop storing it on the object.
+- Holder: block every generated path, wrap the value in a redacting type, or stop storing it on the object.
+- Raw attribute sink: serialize an explicit allowlisted dict instead of the instance, or stop storing the credential on it. A field flag or wrapper does not fix it.
 - Sink: allowlist scalar keys, redact keys matching credential names, and record `type(value).__name__` instead of `str(value)` for non-scalar values.
 - Regression test: serialize an instance with the same serializer the sink uses (for example `sentry_sdk.serializer.serialize`, `json.dumps(asdict(obj))`, `JSON.stringify(obj)`, `util.inspect(obj)`) and assert the credential string is absent.
 
