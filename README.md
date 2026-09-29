@@ -172,7 +172,7 @@ Use `SPEC.md` as the maintenance contract for the skill. It should describe inte
 |-------|-------------|
 | `license` | License name or path to license file |
 | `compatibility` | Environment requirements (max 500 chars) |
-| `allowed-tools` | Comma-separated list of tools the skill can use |
+| `allowed-tools` | Space-separated list of tools the skill can use. Do not use commas: Warden drops comma-suffixed names like `Read,` |
 | `metadata` | Arbitrary key-value pairs for additional properties |
 
 ```yaml
@@ -180,7 +180,7 @@ Use `SPEC.md` as the maintenance contract for the skill. It should describe inte
 name: my-skill
 description: What this skill does
 license: Apache-2.0
-allowed-tools: Read, Grep, Glob
+allowed-tools: Read Grep Glob
 ---
 ```
 

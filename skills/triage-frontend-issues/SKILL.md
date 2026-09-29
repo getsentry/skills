@@ -1,7 +1,7 @@
 ---
 name: triage-frontend-issues
 description: Triage new issues in the Sentry `javascript` project by archiving non-actionable noise. Use when asked to "triage issues", "triage the javascript project", "archive non-actionable issues", "triage new frontend issues", or "clean up the sentry/javascript queue". Operates only on the sentry/javascript project, only archives (never resolves), and always archives with `untilEscalating`.
-allowed-tools: Read, mcp__sentry__search_issues, mcp__sentry__get_sentry_resource, mcp__sentry__update_issue
+allowed-tools: Read mcp__sentry__search_issues mcp__sentry__get_sentry_resource mcp__sentry__update_issue
 ---
 
 # Triage Frontend Issues
