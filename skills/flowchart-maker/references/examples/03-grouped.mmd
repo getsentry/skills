@@ -1,0 +1,8 @@
+%% note: Only Relay is shown in detail. The other ingest services are collapsed into the group.
+graph LR
+  subgraph ingest [Ingest tier]
+    sdk[SDK] --> relay[Relay<br/>auth · rate limit] --> queue[(Kafka)]
+  end
+  queue --> consumer[Consumer<br/>batch · 500ms]:::focus
+  consumer --> db[(Postgres)]
+  consumer -.->|[~40 ms]| cache[(Redis)]
