@@ -63,9 +63,10 @@ git commit -m "fix(api): Handle null response in user endpoint" \
 
 ## Attaching Images to the Pull Request
 
-`gh pr create` and `gh pr edit` upload images and videos with
+Since gh 2.99.0, `gh pr create` and `gh pr edit` upload images and videos with
 `--attach '<path>#<alt text>'`, so attach screenshots directly rather than
-asking the user to drag them in. A body reference to the local path, such as
+asking the user to drag them in. If `gh` rejects `--attach` as an unknown flag,
+ask the user to upgrade `gh`. A body reference to the local path, such as
 `![Before](./before.png)`, is rewritten to the uploaded asset; without one,
 the attachment is appended to the body.
 
