@@ -1,6 +1,6 @@
 ---
 name: commit
-description: Use for every request to commit changes or draft a commit message. Creates Sentry-style conventional commits with issue references.
+description: Use for every request to commit changes or draft a commit message. Creates Sentry-style conventional commits with issue references, and covers attaching screenshots to the pull request with gh.
 ---
 
 # Sentry Commit Messages
@@ -60,3 +60,18 @@ git commit -m "fix(api): Handle null response in user endpoint" \
   -m "Return 404 when the user API finds a deleted account." \
   -m "Fixes SENTRY-5678"
 ```
+
+## Attaching Images to the Pull Request
+
+`gh pr create` and `gh pr edit` upload images and videos with
+`--attach '<path>#<alt text>'`, so attach screenshots directly rather than
+asking the user to drag them in. A body reference to the local path, such as
+`![Before](./before.png)`, is rewritten to the uploaded asset; without one,
+the attachment is appended to the body.
+
+```bash
+gh pr edit --attach './before.png#Before' --attach './after.png#After' \
+  --body "... ![Before](./before.png) ![After](./after.png)"
+```
+
+Without a body flag, `gh pr edit --attach` keeps the existing body.
