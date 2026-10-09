@@ -1,6 +1,6 @@
 ---
 name: commit
-description: Use for every request to commit changes or draft a commit message. Creates Sentry-style conventional commits with issue references, and covers attaching screenshots to the pull request with gh.
+description: Use for every request to commit changes or draft a commit message. Creates Sentry-style conventional commits with issue references.
 ---
 
 # Sentry Commit Messages
