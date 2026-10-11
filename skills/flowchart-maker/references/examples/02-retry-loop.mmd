@@ -1,0 +1,7 @@
+graph LR
+  queue[(Queue)] --> send[Send webhook<br/>POST · 10s timeout]:::focus
+  send --> ok{2xx?}
+  ok -- yes --> done((Delivered))
+  ok -- no --> retry[Backoff<br/>attempt < 5]:::warn
+  retry -.->|requeue| queue
+  retry --x dead([Dead letter]):::fail
