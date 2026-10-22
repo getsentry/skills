@@ -20,7 +20,7 @@ Requires:
 |--------|-----|--------|
 | `scripts/fetch_pr_checks.py` | `uv run scripts/fetch_pr_checks.py [--pr NUMBER]` | JSON: `pr`, `summary`, `checks`, failure snippets |
 | `scripts/fetch_pr_feedback.py` | `uv run scripts/fetch_pr_feedback.py [--pr NUMBER]` | JSON buckets: `high`, `medium`, `low`, `bot`, `resolved` |
-| `scripts/monitor_pr_checks.py` | `uv run scripts/monitor_pr_checks.py [--pr NUMBER]` | terminal marker plus tab-separated checks |
+| `scripts/monitor_pr_checks.py` | `uv run scripts/monitor_pr_checks.py [--pr NUMBER] [--timeout-seconds N]` | terminal marker plus tab-separated checks |
 | `scripts/reply_to_thread.py` | `uv run scripts/reply_to_thread.py THREAD_ID BODY [...]` | JSON reply results |
 
 Check summary fields include `failed`, `pending`, `actionable_pending`, and `human_gate_pending`.
@@ -31,6 +31,7 @@ Monitor markers:
 - `NO_CHECKS_REGISTERED`
 - `DRAFT_PR_WITH_NO_CHECKS`
 - `CHECKS_BLOCKED_BY_REVIEW_GATE`
+- `TIMED_OUT`, when `--timeout-seconds` passes with checks still pending. Report CI as still running
 
 ## Workflow
 
@@ -126,7 +127,7 @@ Loop:
 7. after checks pass, wait 10 seconds, fetch feedback once more
 8. if new high/medium feedback exists, return to step 4
 
-Claude Code optional: run `uv run scripts/monitor_pr_checks.py` through `MonitorTool` with `persistent: false`; set timeout to normal repo CI duration. Restart the monitor after every push.
+Claude Code optional: run `uv run scripts/monitor_pr_checks.py` through `MonitorTool` with `persistent: false`; set timeout to normal repo CI duration and pass the same value as `--timeout-seconds` so the script ends with `TIMED_OUT` instead of being killed silently. Restart the monitor after every push.
 
 ## Exit Conditions
 
