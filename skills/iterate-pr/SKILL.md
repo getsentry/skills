@@ -127,7 +127,7 @@ Loop:
 7. after checks pass, wait 10 seconds, fetch feedback once more
 8. if new high/medium feedback exists, return to step 4
 
-Claude Code optional: run `uv run scripts/monitor_pr_checks.py` through `MonitorTool` with `persistent: false`; set timeout to normal repo CI duration and pass the same value as `--timeout-seconds` so the script ends with `TIMED_OUT` instead of being killed silently. Restart the monitor after every push.
+Claude Code optional: run `uv run scripts/monitor_pr_checks.py` through `MonitorTool` with `persistent: false`; set timeout to normal repo CI duration and pass a smaller `--timeout-seconds`, leaving room for one `gh` call, so the script ends with `TIMED_OUT` instead of being killed silently. Restart the monitor after every push.
 
 ## Exit Conditions
 

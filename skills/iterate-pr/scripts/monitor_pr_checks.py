@@ -106,6 +106,12 @@ def get_checks(pr_number: int) -> list[dict[str, Any]] | None:
     return checks if isinstance(checks, list) else None
 
 
+def sleep_before_deadline(seconds: float, deadline: float | None) -> None:
+    if deadline is not None:
+        seconds = min(seconds, max(0.0, deadline - time.monotonic()))
+    time.sleep(seconds)
+
+
 def is_human_gate_check(check: dict[str, Any]) -> bool:
     """Return true when a pending entry is a human review/approval gate."""
     haystack = " ".join(
@@ -175,17 +181,18 @@ def main() -> int:
 
     pr_number = pr_info["number"]
     no_checks_started_at: float | None = None
-    checks: list[dict[str, Any]] | None = None
+    checks: list[dict[str, Any]] = []
 
     while True:
         if deadline is not None and time.monotonic() >= deadline:
             print("TIMED_OUT", flush=True)
-            print_check_summary(checks or [])
+            print_check_summary(checks)
             return 0
-        checks = get_checks(pr_number)
-        if checks is None:
-            time.sleep(args.poll_seconds)
+        polled = get_checks(pr_number)
+        if polled is None:
+            sleep_before_deadline(args.poll_seconds, deadline)
             continue
+        checks = polled
 
         if not checks:
             now = time.monotonic()
@@ -196,7 +203,7 @@ def main() -> int:
                 print(marker, flush=True)
                 print_no_checks_summary(pr_info)
                 return 0
-            time.sleep(args.no_checks_seconds)
+            sleep_before_deadline(args.no_checks_seconds, deadline)
             continue
 
         no_checks_started_at = None
@@ -207,7 +214,7 @@ def main() -> int:
             check for check in pending_checks if not is_human_gate_check(check)
         ]
         if actionable_pending:
-            time.sleep(args.poll_seconds)
+            sleep_before_deadline(args.poll_seconds, deadline)
             continue
         if failed:
             print("CHECKS_DONE_WITH_FAILURES", flush=True)
