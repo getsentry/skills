@@ -145,6 +145,7 @@ If this is a Sentry project (or sentry-skills plugin is installed), include:
   "Skill(sentry-skills:agents-md)",
   "Skill(sentry-skills:blog-writing-guide)",
   "Skill(sentry-skills:brand-guidelines)",
+  "Skill(sentry-skills:browse-local-sentry)",
   "Skill(sentry-skills:claude-settings-audit)",
   "Skill(sentry-skills:code-review)",
   "Skill(sentry-skills:code-simplifier)",
