@@ -155,6 +155,7 @@ If this is a Sentry project (or sentry-skills plugin is installed), include:
   "Skill(sentry-skills:doc-coauthoring)",
   "Skill(sentry-skills:document-api-endpoint)",
   "Skill(sentry-skills:find-bugs)",
+  "Skill(sentry-skills:flowchart-maker)",
   "Skill(sentry-skills:gh-review-requests)",
   "Skill(sentry-skills:gha-security-review)",
   "Skill(sentry-skills:iterate-pr)",
