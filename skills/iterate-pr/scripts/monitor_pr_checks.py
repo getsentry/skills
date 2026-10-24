@@ -6,11 +6,12 @@
 Monitor PR checks until they reach a terminal state.
 
 Usage:
-    uv run monitor_pr_checks.py [--pr PR_NUMBER]
+    uv run monitor_pr_checks.py [--pr PR_NUMBER] [--repo OWNER/REPO] [--timeout-seconds N]
 
 If --pr is not specified, uses the PR for the current branch.
 
 Output:
+    - Prints `TIMED_OUT` when --timeout-seconds passes before a terminal state
     - Prints `ALL_CHECKS_PASSED` when all checks finish without failures
     - Prints `CHECKS_DONE_WITH_FAILURES` when checks finish with failures
     - Prints `NO_CHECKS_REGISTERED` when checks do not appear after the grace period
@@ -44,6 +45,8 @@ HUMAN_GATE_PATTERNS = [
     r"(?i)draft\s+(pull\s+request|pr)",
 ]
 
+REPO: str | None = None
+
 
 def run_gh_json(
     args: list[str],
@@ -51,6 +54,8 @@ def run_gh_json(
     empty_stdout_value: list[dict[str, Any]] | dict[str, Any] | None = None,
 ) -> list[dict[str, Any]] | dict[str, Any] | None:
     """Run a gh command that returns JSON."""
+    if REPO:
+        args = args + ["--repo", REPO]
     result = subprocess.run(
         ["gh"] + args,
         capture_output=True,
@@ -99,6 +104,12 @@ def get_checks(pr_number: int) -> list[dict[str, Any]] | None:
         "name,bucket,link,workflow,state,description",
     ], allowed_returncodes=(0, 1, 8, 16), empty_stdout_value=[])
     return checks if isinstance(checks, list) else None
+
+
+def sleep_before_deadline(seconds: float, deadline: float | None) -> None:
+    if deadline is not None:
+        seconds = min(seconds, max(0.0, deadline - time.monotonic()))
+    time.sleep(seconds)
 
 
 def is_human_gate_check(check: dict[str, Any]) -> bool:
@@ -151,7 +162,17 @@ def main() -> int:
         default=180,
         help="Maximum time to wait for checks to register before reporting no checks",
     )
+    parser.add_argument("--repo", help="OWNER/REPO (defaults to the current directory's repo)")
+    parser.add_argument(
+        "--timeout-seconds",
+        type=int,
+        help="Overall deadline; prints TIMED_OUT when reached (default: no deadline)",
+    )
     args = parser.parse_args()
+
+    global REPO
+    REPO = args.repo
+    deadline = None if args.timeout_seconds is None else time.monotonic() + args.timeout_seconds
 
     pr_info = get_pr_info(args.pr)
     if pr_info is None:
@@ -160,12 +181,18 @@ def main() -> int:
 
     pr_number = pr_info["number"]
     no_checks_started_at: float | None = None
+    checks: list[dict[str, Any]] = []
 
     while True:
-        checks = get_checks(pr_number)
-        if checks is None:
-            time.sleep(args.poll_seconds)
+        if deadline is not None and time.monotonic() >= deadline:
+            print("TIMED_OUT", flush=True)
+            print_check_summary(checks)
+            return 0
+        polled = get_checks(pr_number)
+        if polled is None:
+            sleep_before_deadline(args.poll_seconds, deadline)
             continue
+        checks = polled
 
         if not checks:
             now = time.monotonic()
@@ -176,7 +203,7 @@ def main() -> int:
                 print(marker, flush=True)
                 print_no_checks_summary(pr_info)
                 return 0
-            time.sleep(args.no_checks_seconds)
+            sleep_before_deadline(args.no_checks_seconds, deadline)
             continue
 
         no_checks_started_at = None
@@ -187,7 +214,7 @@ def main() -> int:
             check for check in pending_checks if not is_human_gate_check(check)
         ]
         if actionable_pending:
-            time.sleep(args.poll_seconds)
+            sleep_before_deadline(args.poll_seconds, deadline)
             continue
         if failed:
             print("CHECKS_DONE_WITH_FAILURES", flush=True)
