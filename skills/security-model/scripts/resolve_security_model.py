@@ -27,6 +27,7 @@ import argparse
 import fnmatch
 import json
 import os
+import posixpath
 import re
 import subprocess
 import sys
@@ -342,7 +343,9 @@ class Source:
             # (`api/authentication.py` for `src/sentry/api/authentication.py`),
             # so a match on the trailing path segments also counts.
             for cand in candidates:
-                cand = cand.rstrip("/")
+                # Collapse `./` and `../` so `./handler.py` matches at a
+                # revision too, not only through the worktree fallback.
+                cand = posixpath.normpath(cand.rstrip("/"))
                 if any(ch in cand for ch in "*?["):
                     if any(fnmatch.fnmatchcase(f, cand) or fnmatch.fnmatchcase(f, f"*/{cand}") for f in file_set):
                         return "path", True
