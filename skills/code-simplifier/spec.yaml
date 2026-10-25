@@ -1,0 +1,67 @@
+# ──────────────────────────────────────────────────────────
+# Skillet skill spec. Edit this file directly or use the
+# `skillet spec` subcommands — both are supported. Skillet
+# validates this file on read; malformed edits will fail fast
+# with a clear error before doing any work.
+#
+# After editing, run `skillet improve` to refresh SKILL.md and
+# eval cases against the updated spec.
+# ──────────────────────────────────────────────────────────
+managed_by: skillet
+spec_version: 1
+name: code-simplifier
+intent: Simplify and refine code for clarity, consistency, and maintainability while preserving exact functionality. Apply project-specific best practices to enhance readability without altering behavior, prioritizing readable, explicit code over overly compact solutions.
+triggers:
+  should:
+    - asked to simplify code
+    - asked to clean up code
+    - asked to refactor for clarity
+    - asked to improve readability
+    - reviewing recently modified code for elegance
+  should_not: []
+behaviors:
+  - id: preserve-functionality
+    statement: Preserve all original features, outputs, and behaviors — only change how the code does it, never what it does.
+    rationale: All original features, outputs, and behaviors must remain intact.
+  - id: follow-claude-md-standards
+    statement: Follow established coding standards from CLAUDE.md including ES modules with proper import sorting and extensions, `function` keyword over arrow functions, explicit return type annotations for top-level functions, proper React component patterns with explicit Props types, proper error handling (avoid try/catch when possible), and consistent naming conventions.
+    rationale: Apply project-specific best practices.
+  - id: reduce-complexity
+    statement: Reduce unnecessary complexity and nesting, eliminate redundant code and abstractions, improve readability through clear variable and function names, consolidate related logic, and remove unnecessary comments that describe obvious code.
+    rationale: Simplify code structure to enhance clarity.
+  - id: avoid-nested-ternaries
+    statement: Avoid nested ternary operators — prefer switch statements or if/else chains for multiple conditions.
+    rationale: Explicit conditional structures are clearer than nested ternaries.
+  - id: clarity-over-brevity
+    statement: Choose clarity over brevity — explicit code is often better than overly compact code; do not prioritize 'fewer lines' over readability.
+    rationale: Dense one-liners and overly clever solutions are harder to understand, debug, and extend.
+  - id: maintain-helpful-abstractions
+    statement: Do not over-simplify by combining too many concerns into single functions/components or removing helpful abstractions that improve code organization, such as named validation, formatting, parsing, or domain helpers.
+    rationale: Avoid over-simplification that could reduce maintainability or erase useful domain boundaries.
+  - id: scope-to-recent-changes
+    statement: Only refine code that has been recently modified or touched in the current session, unless explicitly instructed to review a broader scope.
+    rationale: Focus scope on recent work.
+  - id: follow-refinement-process
+    statement: "Follow the refinement process: identify recently modified code, analyze for elegance/consistency opportunities, apply project standards, ensure functionality is unchanged, verify the result is simpler and more maintainable, and document only significant changes that affect understanding."
+    rationale: Structured process ensures faithful and effective refinement.
+  - id: remove-redundant-abstractions
+    statement: Remove redundant abstractions such as trivial wrapper functions (e.g., `isNotEmpty(arr)` wrapping `arr.length > 0`) in favor of direct checks, but do not remove helpers that name domain rules or separate concerns.
+    rationale: Eliminating redundant abstractions improves clarity while preserving meaningful organization.
+  - id: break-up-compact-chains
+    statement: Break up overly compact method chains into clearly named intermediate variables that show each step.
+    rationale: Clear steps are more readable than dense one-liners.
+must_not:
+  - id: no-behavior-changes
+    statement: Never change what the code does — only how it does it.
+  - id: no-nested-ternaries
+    statement: Do not use nested ternary operators.
+  - id: no-overly-clever-solutions
+    statement: Do not create overly clever solutions that are hard to understand.
+  - id: no-combining-concerns
+    statement: Do not combine too many concerns into single functions or components.
+  - id: no-removing-helpful-abstractions
+    statement: Do not remove helpful abstractions that improve code organization.
+  - id: no-prioritizing-line-count
+    statement: Do not prioritize 'fewer lines' over readability.
+  - id: no-out-of-scope-refinement
+    statement: Do not refine code outside the recently modified scope unless explicitly instructed.
