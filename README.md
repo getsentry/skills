@@ -44,6 +44,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [agents-md](skills/agents-md/SKILL.md) | Create and maintain concise, reference-backed AGENTS.md and CLAUDE.md files. |
 | [blog-writing-guide](skills/blog-writing-guide/SKILL.md) | Write, review, and improve blog posts for the Sentry engineering blog following Sentry's specific writing standards, voice, and quality bar. |
 | [brand-guidelines](skills/brand-guidelines/SKILL.md) | Write copy following Sentry brand guidelines. |
+| [browse-local-sentry](skills/browse-local-sentry/SKILL.md) | Connect an agent's browser to a local Sentry dev server, trusted and signed in, to QA and screenshot the real product. |
 | [claude-settings-audit](skills/claude-settings-audit/SKILL.md) | Analyze a repository to generate recommended Claude Code settings.json permissions. |
 | [code-review](skills/code-review/SKILL.md) | Perform code reviews following Sentry engineering practices. |
 | [code-simplifier](skills/code-simplifier/SKILL.md) | Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality. |
