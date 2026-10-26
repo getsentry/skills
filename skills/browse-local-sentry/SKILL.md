@@ -1,6 +1,6 @@
 ---
 name: browse-local-sentry
-description: Connects an agent's browser to a local Sentry dev server (dev-ui on *.dev.getsentry.net or the full devserver) so it can QA and screenshot the real product. Use when asked to "open local sentry", "check this in the browser", "QA in dev-ui", "screenshot the local devserver", or when browser automation against dev.getsentry.net hits a certificate error, a blank page, a login wall, or isAuthenticated false.
+description: Connects an agent's browser to a local Sentry dev server (dev-ui on *.dev.getsentry.net or the full devserver).
 ---
 
 # Browse Local Sentry
