@@ -54,6 +54,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [doc-coauthoring](skills/doc-coauthoring/SKILL.md) | Guide users through a structured workflow for co-authoring documentation. |
 | [document-api-endpoint](skills/document-api-endpoint/SKILL.md) | Document and type a Sentry API endpoint with drf-spectacular OpenAPI schema — write/fix `@extend_schema`, specify response TypedDicts, type parameters, fix type drift, and promote to PUBLIC. |
 | [find-bugs](skills/find-bugs/SKILL.md) | Find bugs, security vulnerabilities, and code quality issues in local branch changes. |
+| [flowchart-maker](skills/flowchart-maker/SKILL.md) | Draw flat-editorial flowchart illustrations for engineering blog posts from a Mermaid spec, with a bundled renderer that outputs HTML and PNG. |
 | [gh-review-requests](skills/gh-review-requests/SKILL.md) | Fetch unread GitHub notifications for open PRs where review is requested from a specified team or opened by a team member. |
 | [gha-security-review](skills/gha-security-review/SKILL.md) | GitHub Actions security review for workflow exploitation vulnerabilities. |
 | [iterate-pr](skills/iterate-pr/SKILL.md) | Iterate on a PR until CI passes and actionable review feedback is addressed. |
