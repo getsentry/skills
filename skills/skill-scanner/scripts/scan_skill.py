@@ -568,13 +568,13 @@ def scan_skill(skill_dir: Path) -> dict[str, Any]:
     # 6. Scan reference files
     refs_dir = skill_dir / "references"
     if refs_dir.is_dir():
-        for ref_file in sorted(refs_dir.iterdir()):
-            if ref_file.suffix == ".md":
+        for ref_file in sorted(refs_dir.rglob("*.md")):
+            if ref_file.is_file():
                 try:
                     ref_content = ref_file.read_text(encoding="utf-8", errors="replace")
                 except OSError:
                     continue
-                rel_path = f"references/{ref_file.name}"
+                rel_path = f"references/{ref_file.relative_to(refs_dir).as_posix()}"
                 all_findings.extend(check_prompt_injection(ref_content, rel_path))
                 all_findings.extend(check_obfuscation(ref_content, rel_path))
                 all_findings.extend(check_secrets(ref_content, rel_path))
@@ -610,7 +610,7 @@ def scan_skill(skill_dir: Path) -> dict[str, Any]:
         "has_skill_md": True,
         "has_references": refs_dir.is_dir() if (refs_dir := skill_dir / "references") else False,
         "has_scripts": scripts_dir.is_dir() if (scripts_dir := skill_dir / "scripts") else False,
-        "reference_files": sorted(f.name for f in (skill_dir / "references").iterdir() if f.suffix == ".md") if (skill_dir / "references").is_dir() else [],
+        "reference_files": sorted(f.relative_to(skill_dir / "references").as_posix() for f in (skill_dir / "references").rglob("*.md") if f.is_file()) if (skill_dir / "references").is_dir() else [],
         "script_files": sorted(f.name for f in (skill_dir / "scripts").iterdir() if f.suffix in (".py", ".sh", ".js", ".ts")) if (skill_dir / "scripts").is_dir() else [],
     }
 
