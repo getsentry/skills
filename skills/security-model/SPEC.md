@@ -73,6 +73,7 @@ Data that must not be stored:
 - Acceptance gates:
   - in a repository whose PR adds a child policy excluding a directory, `resolve --ref <base>` omits that exclusion
   - `check` reports no false positives on a real draft whose references all exist
+  - every path in a draft's component map passes `check`
   - a draft from a real repository commits no open questions and records no suspected gaps
 
 ## Known Limitations
