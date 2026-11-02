@@ -82,8 +82,7 @@ Sentry Voice adds personality in appropriate moments. It's empathetic, self-awar
 ### Spelling and Grammar
 
 - Use **American English** spelling (color, not colour)
-- Use **Title Case** for headings and page titles
-- Use **Sentence case** for body text, buttons, and labels
+- Use **Sentence case** for headings, page titles, body text, buttons, and labels, preserving proper nouns and canonical product names
 
 ### Punctuation
 
