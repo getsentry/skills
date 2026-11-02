@@ -384,13 +384,20 @@ def check_structural_attacks(skill_dir: Path, content: str, frontmatter: dict[st
     # 1. Symlinks — files that resolve to paths outside the skill directory
     for path in skill_dir.rglob("*"):
         if path.is_symlink():
-            target = path.resolve()
-            is_internal = target.is_relative_to(skill_dir.resolve())
+            try:
+                target = path.resolve()
+            except RuntimeError:
+                # Python < 3.13 raises RuntimeError on a symlink loop (3.13+ returns
+                # the partial path). A loop never reaches a file, so report it like
+                # any other in-skill symlink instead of aborting the whole scan.
+                target = None
+            is_internal = target is None or target.is_relative_to(skill_dir.resolve())
+            resolution = f"resolves to {target}" if target is not None else "forms a symlink loop"
             findings.append({
                 "type": "Symlink Detected",
                 "severity": "medium" if is_internal else "critical",
                 "location": str(path.relative_to(skill_dir)),
-                "description": f"Symlink points to {path.readlink()} (resolves to {str(target)}). "
+                "description": f"Symlink points to {path.readlink()} ({resolution}). "
                               "Symlinks can trick agents into reading sensitive files (e.g., ~/.ssh/id_rsa) "
                               "disguised as example/reference files.",
                 "category": "Symlink Exfiltration",
