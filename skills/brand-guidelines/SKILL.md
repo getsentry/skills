@@ -6,6 +6,7 @@ description: Write copy following Sentry brand guidelines. Use when writing UI t
 # Brand guidelines
 
 Write user-facing copy following Sentry's brand guidelines.
+Write conversationally and help developers ship with confidence. Use the brand voice across marketing and communications; for product UI, follow the more specific tone limits below.
 
 ## Tone selection
 
@@ -48,14 +49,16 @@ Plain Speech is clear, direct, and functional. Use it for most UI elements.
 
 ## Sentry Voice
 
-Sentry Voice adds personality in appropriate moments. It's empathetic, self-aware, and occasionally snarky.
+Sentry Voice is informative, approachable, understanding, and fun. It can be dry, snarky, or self-deprecating without condescension or cruelty.
 
 ### Principles
 
-1. **Empathetic snark** - Direct frustration at the situation, never the user
-2. **Self-aware** - Acknowledge the absurdity of software
-3. **Fun but functional** - Personality should enhance, not obscure meaning
-4. **Earned moments** - Only use when users have time to appreciate it
+1. **Understand developers** - Make readers feel understood, without sales pressure
+2. **Inform honestly** - Give straightforward, accurate information without manipulation
+3. **Stay calm** - Avoid bubbly enthusiasm and sales-pitch exclamations
+4. **Be self-aware** - Be modest about what Sentry does; avoid grand promises
+5. **Sound human** - Write conversationally in plain American English
+6. **Have fun when it fits** - Use brief, dry humor about shared developer struggles such as bugs, late-night pages, and confusing logs. Keep jokes to one line, avoid slapstick and excessive sarcasm, and never force a joke or mock a user
 
 ### Examples
 
@@ -74,7 +77,7 @@ Sentry Voice adds personality in appropriate moments. It's empathetic, self-awar
 
 ### When to avoid Sentry Voice
 
-- Error messages (users are frustrated)
+- In-workflow error messages (users are frustrated); 404 and 500 pages can use personality after explaining the problem
 - Settings pages (users are focused)
 - Documentation (users need information)
 - Billing/payment flows (users need trust)
@@ -89,7 +92,7 @@ Sentry Voice adds personality in appropriate moments. It's empathetic, self-awar
 
 ### Punctuation
 
-- **Use exclamation marks sparingly** and avoid unusual punctuation such as interrobangs
+- **Use exclamation marks sparingly**; avoid sales-pitch excitement and unusual punctuation such as interrobangs
 - **No periods** in headings, short UI labels, or button text; keep question marks for questions
 - **Use periods** in complete sentences and help text
 - **No ALL CAPS** for ordinary words; preserve acronyms (API, SDK, URL) and canonical names
@@ -162,7 +165,7 @@ Avoid these common mistakes:
 - **Passive voice:** "Changes were saved" -> "Changes saved"
 - **Unnecessary words:** "In order to" -> "To"
 - **Unsupported certainty:** Use "may" or "might" when an outcome is uncertain; use "will" only when it is certain
-- **Double negatives:** "Not unlike..." -> "Similar to..."
+- **Confusing negation:** Simplify wording that makes readers decode the meaning. Brief understatement such as "not bad" can fit Sentry Voice
 - **Marketing speak in UI:** "Supercharge your workflow" -> "Speed up your workflow"
 
 ## References
