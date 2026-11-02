@@ -49,6 +49,7 @@ Runs on real repositories. Repository names, weaknesses, and drafted content are
 | Public Rust service with a separate docs site | The draft missed a shared cache across instances, retained minidumps, scraping headers, and several limits, because docs were found by filename only. The docs also disagreed with the code in three places. | Read project docs in full and confirm each documented control in code; report doc and code drift to the user. |
 | User feedback on question handling | Open questions reached the user as a list at the end instead of being asked. | Ask open decisions interactively as multiple-choice prompts, update the draft from answers, and confirm the user can decide for the owners. |
 | Cold re-run on the same public Rust service by a fresh agent | Draft passed `check`, but `check` skipped Rust-qualified names (`Type::method`) and flagged a backticked repository name. The agent found the severity-condition wording, the undefined "default" severity, and where conversation-only questions may live unclear. Owners in the header added noise. | `check` handles `::`; clarified base severity plus conditions, the default severity, partial enforcement, and local notes; owners no longer recorded in the file. |
+| Public Rust library with C, Python, and WASM bindings | Invariants named enforcing symbols, but the user asked for an overview of which directories handle untrusted input, unsafe code, and bindings. | Added a Component Map section grouped by input trust level, and a drafting rule for it. |
 
 ## Open Gaps
 
@@ -58,6 +59,7 @@ Runs on real repositories. Repository names, weaknesses, and drafted content are
 
 ## Changelog
 
+- Add a Component Map section that lists security-critical paths by input trust level.
 - `resolve --ref` and `check` use the parent directories for a scope missing at that revision, so a file a PR adds still gets its base policy chain (found by review).
 - Stop recording owners in the policy; `check` validates qualified symbols; clarify severity and question wording.
 - Read project docs in full instead of searching by filename; ask open decisions interactively.

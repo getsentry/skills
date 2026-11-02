@@ -81,7 +81,8 @@ Add security-critical tests and prior validated findings if the user can point y
 
 Establish what a reviewer needs to know:
 
-- **System and scope:** the product or component, deployment model (SaaS, self-hosted, SDK running in customer apps, internal tool), exposure, important assets and operations, and the paths that mark a real boundary.
+- **System and scope:** the product or component, deployment model (SaaS, self-hosted, SDK running in customer apps, internal tool), exposure, and important assets and operations.
+- **Component map:** the directories and files a reviewer must treat as security-critical: code that parses or receives untrusted input, enforces an invariant, holds unsafe or native code, handles authentication, tenant scoping, or secrets, or crosses a language or network boundary. For each, note its purpose and the trust level of its input.
 - **Threat model:** trusted callers, attacker-controlled inputs, and trust boundaries. Be specific about each actor class, for example an unauthenticated internet caller, an authenticated member of another organization, a member with a lower role in the same organization, an SDK-supplied event payload, an integration webhook, a self-hosted operator.
 - **Invariants:** properties that must hold, such as organization isolation, authorization before mutation, scoped tokens never widening, bounded parsing of untrusted payloads, secrets never serialized to logs or events, fail-closed behaviour. For each one, find the code that enforces it, meaning code that blocks, rejects, or raises. A control that only logs, alerts, or emits a metric is monitoring, not enforcement, however its name reads.
 - **Reportability and severity:** what makes a broken control meaningful here, including realistic reachability, impact, and exposure. Use the severity scale the user names or the repository's review config defines (for example `warden.toml`); otherwise use critical, high, medium, low.
@@ -121,6 +122,14 @@ Last reviewed: <YYYY-MM-DD, or "draft" until an owner reviews it> · Applies to:
 
 <assets; actors and what each is trusted to do; attacker-controlled inputs; boundaries and assumptions>
 
+## Component Map
+
+<one table per input trust level, for example "Untrusted input parsers" or "Internal callers only">
+
+| Path | Purpose | Invariants |
+| --- | --- | --- |
+| <`path/`> | <what it does, in one line> | INV-1, INV-3 |
+
 ## Security Invariants
 
 - **INV-1** <property that must hold>. Enforced by: <`symbol` or path, or "unknown">. Monitored by: <logging-only control, if any>.
@@ -158,6 +167,7 @@ Drafting rules:
 - **Ownership.** Do not record owners in the file; CODEOWNERS already says who approves changes. Use `Unresolved` only for decisions that are actually open.
 - **Open questions stay out of the file.** The committed policy keeps only the inline `Unresolved` markers, which tell review tools to use their defaults. Keep the questions themselves in a separate list. In a public repository, any question that hints at a possible weakness ("is this admin route reachable without a session?") goes to the user only, never into the file or a PR description.
 - **Enforcement points.** Name the symbol or file that enforces each invariant in backticks so `check` can catch it moving. Mark controls that only log or alert as "Monitored by", never as "Enforced by". When an invariant is enforced on some paths only, name those paths and write "Enforced on <other path> by: unknown" for the rest. Do not put repository names or other non-code identifiers in backticks.
+- **Component map.** Map directories, and name a single file only when it holds the control. Group entries by the trust level of their input, and mark a group `Unresolved` when that trust level is open. Give each entry a one-line purpose and the invariants it bears, and backtick every path so `check` catches it moving. Leave out tests, fixtures, and examples unless an exclusion names them, and leave out paths with no security role rather than mapping the whole tree.
 - **Public repositories.** Many getsentry repositories are public; check with `gh repo view --json visibility` or ask, and assume public if unsure. Do not record unfixed, exploitable gaps, secrets, internal hostnames, customer data, or exploit detail. Describe an owner-confirmed gap at the level a reviewer needs ("rate limiting on X is enforced at the edge, not in this service"), and keep anything more specific in the private tracker.
 - **Existing review skills.** Link to repository review skills (for example `.agents/skills/<name>-security/`) rather than copying their pattern catalogs. Move the reportability decisions they contain (exclusions, "not a finding" rules) into this file so they have an owner. Where their claims about the code no longer match the code, list the drift for the user separately; it is not part of the policy.
 - Keep useful existing language and structure, and keep the file short enough to read alongside code; the resolver warns above 64 KiB.
