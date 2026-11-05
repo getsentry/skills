@@ -1,0 +1,121 @@
+# ──────────────────────────────────────────────────────────
+# Skillet skill spec. Edit this file directly or use the
+# `skillet spec` subcommands — both are supported. Skillet
+# validates this file on read; malformed edits will fail fast
+# with a clear error before doing any work.
+#
+# After editing, run `skillet improve` to refresh SKILL.md and
+# eval cases against the updated spec.
+# ──────────────────────────────────────────────────────────
+managed_by: skillet
+spec_version: 1
+name: skillet
+intent: |
+  Create, evaluate, and improve agent skills using the skillet CLI.
+  Skillet is spec-driven: spec.yaml captures intent (behaviors,
+  must-nots, triggers). SKILL.md is regenerated from it. Eval files
+  (evals/*.eval.ts) are generated initially but durable after that —
+  edit them directly to refine specific test shapes. Iteration patches
+  the spec or tunes SKILL.md prose, not the eval implementations.
+
+triggers:
+  should:
+    - create a skill
+    - make a skill for X
+    - improve this skill
+    - add an eval
+    - test my skill
+    - verify a skill
+    - refine a skill
+    - working with spec.yaml
+    - working with SKILL.md
+    - working with eval files
+  should_not:
+    - run my unit tests
+    - lint this code
+
+behaviors:
+  - id: choose-create-for-new-skills
+    statement: Recommend `skillet create` when the user wants to start a new skill from a description.
+    rationale: |
+      `create` runs spec init + regen + improve in one shot. It's the
+      friendliest entry point for "I want a skill for X" requests.
+
+  - id: choose-improve-for-existing-skills
+    statement: Recommend `skillet improve` when the user has an existing skill (with or without spec.yaml) that needs work.
+    rationale: |
+      `improve` auto-imports a legacy SKILL.md into a spec on first run,
+      then runs the verify-driven iteration loop. Don't direct users to
+      manually run `spec import` — the loop handles it.
+
+  - id: choose-spec-show-for-inspection
+    statement: Recommend `skillet spec show` when the user wants to read the current spec without changing it.
+    rationale: |
+      Show is read-only and prints the parsed spec with the banner stripped.
+
+  - id: choose-spec-refine-for-feedback
+    statement: Recommend `skillet spec refine "<feedback>"` when the user wants to change a skill via natural-language feedback.
+    rationale: |
+      Refine produces structured SpecPatch operations, applies them, and
+      auto-regens. The user describes the change in their own words.
+
+  - id: choose-add-eval-for-named-behaviors
+    statement: Recommend `skillet add-eval "<behavior>"` when the user wants to add one or more named behaviors as eval cases.
+    rationale: |
+      `add-eval` is a wrapper over `spec refine` that auto-imports legacy
+      skills, then appends the named behaviors to the spec and regens.
+
+  - id: choose-verify-for-checking
+    statement: Recommend `skillet verify` (not "validate") when the user wants to check that a skill is internally consistent.
+    rationale: |
+      The old `validate` command is gone. `verify` runs four layers
+      (structural, coverage, results, semantic) and subsumes the
+      per-file lint that `validate` used to do.
+
+  - id: scope-package-name
+    statement: Always invoke skillet via `npx @sentry/skillet`, not `npx skillet`.
+    rationale: |
+      The package is published under the @sentry scope. The unscoped
+      name resolves to a different package or fails.
+
+  - id: capture-intent-before-generation
+    statement: When the user asks for a new skill or wants to add evals, ask 3-5 questions to capture intent (most important behaviors, realistic prompt + expected output, common mistakes, trigger phrases) before invoking the CLI.
+    rationale: |
+      Skillet's spec-init phase is single-turn — it generates a spec
+      from whatever description it receives. A rich, structured
+      description from the user yields a much better starting spec
+      than "make a skill for X". The agent acts as the front-end
+      interview before passing the combined description to skillet.
+
+  - id: explain-spec-as-source-of-truth
+    statement: When the user asks about editing SKILL.md, explain that SKILL.md is derived from spec.yaml (regen-clobbered) and direct them to `skillet spec refine` for behavioral changes. Eval files (evals/*.eval.ts) are generated initially but durable after that — direct edits there are fine for refining test shapes.
+    rationale: |
+      SKILL.md is rewritten on every regen, so prose hand-edits get
+      wiped. Eval files are different: skillet generates them once,
+      then they're committed to git and edited like any test file.
+      Behavior set changes (add/remove rules) flow through spec.yaml
+      so the eval coverage stays in sync.
+
+must_not:
+  - id: dont-mention-api-keys
+    statement: Never tell the user to set API keys or environment variables. Credentials are auto-discovered.
+    rationale: |
+      Skillet uses provider-autodiscovery; mentioning API keys both
+      contradicts the user-zero-config promise and might leak the
+      specific env var name into a transcript.
+    leakage_risk: env-var-leak
+
+  - id: dont-recommend-validate
+    statement: Don't recommend `skillet validate` — that command was removed.
+    rationale: |
+      Per-file structural checks now live as layer 1 of `verify`.
+      Telling the user to run `validate` will fail with an unknown-command error.
+
+  - id: dont-tell-user-to-handedit-derived-files
+    statement: Don't tell the user to hand-edit SKILL.md (it's regenerated and clobbered on every regen). Direct them to `skillet spec refine` for behavioral changes. Eval files are durable and can be edited directly to refine test shapes.
+    rationale: |
+      SKILL.md is rewritten from spec.yaml on every regen, so prose
+      hand-edits get wiped. Eval files (.eval.ts) are different —
+      generated once, committed, edited like any test file. The
+      CLI mutation channel is for behavior set changes, not test-shape
+      refinements.
