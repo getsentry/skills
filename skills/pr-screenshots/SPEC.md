@@ -11,7 +11,7 @@ and the table conventions can change without widening the PR prose guidance.
 - PR titles and prose bodies (`pr-writer`).
 - Commit messages (`commit`).
 - Product-specific setup for running a local app, logging in, or seeding data.
-- Browser automation tool setup.
+- Browser automation tool setup (`browse-local-sentry` for local Sentry).
 
 ## Should Not Trigger For
 
