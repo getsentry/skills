@@ -377,6 +377,14 @@ def extract_urls(content: str, filepath: str) -> list[dict[str, Any]]:
     return urls
 
 
+def _is_file(path: Path) -> bool:
+    """Path.is_file() that treats unreadable paths (e.g. PermissionError) as non-files."""
+    try:
+        return path.is_file()
+    except OSError:
+        return False
+
+
 def check_structural_attacks(skill_dir: Path, content: str, frontmatter: dict[str, Any] | None) -> list[dict[str, Any]]:
     """Detect structural attack patterns that go beyond text content."""
     findings: list[dict[str, Any]] = []
@@ -435,7 +443,7 @@ def check_structural_attacks(skill_dir: Path, content: str, frontmatter: dict[st
         "*.test.ts": "Jest/Vitest may discover .test.ts files if dot:true glob is set",
     }
     for path in skill_dir.rglob("*"):
-        if not path.is_file():
+        if not _is_file(path):
             continue
         name = path.name
         for pattern, desc in test_patterns.items():
@@ -568,17 +576,18 @@ def scan_skill(skill_dir: Path) -> dict[str, Any]:
     # 6. Scan reference files
     refs_dir = skill_dir / "references"
     if refs_dir.is_dir():
-        for ref_file in sorted(refs_dir.iterdir()):
-            if ref_file.suffix == ".md":
-                try:
-                    ref_content = ref_file.read_text(encoding="utf-8", errors="replace")
-                except OSError:
+        for ref_file in sorted(refs_dir.rglob("*.md")):
+            try:
+                if not ref_file.is_file():
                     continue
-                rel_path = f"references/{ref_file.name}"
-                all_findings.extend(check_prompt_injection(ref_content, rel_path))
-                all_findings.extend(check_obfuscation(ref_content, rel_path))
-                all_findings.extend(check_secrets(ref_content, rel_path))
-                all_urls.extend(extract_urls(ref_content, rel_path))
+                ref_content = ref_file.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
+            rel_path = f"references/{ref_file.relative_to(refs_dir).as_posix()}"
+            all_findings.extend(check_prompt_injection(ref_content, rel_path))
+            all_findings.extend(check_obfuscation(ref_content, rel_path))
+            all_findings.extend(check_secrets(ref_content, rel_path))
+            all_urls.extend(extract_urls(ref_content, rel_path))
 
     # 7. Scan scripts
     scripts_dir = skill_dir / "scripts"
@@ -610,7 +619,7 @@ def scan_skill(skill_dir: Path) -> dict[str, Any]:
         "has_skill_md": True,
         "has_references": refs_dir.is_dir() if (refs_dir := skill_dir / "references") else False,
         "has_scripts": scripts_dir.is_dir() if (scripts_dir := skill_dir / "scripts") else False,
-        "reference_files": sorted(f.name for f in (skill_dir / "references").iterdir() if f.suffix == ".md") if (skill_dir / "references").is_dir() else [],
+        "reference_files": sorted(f.relative_to(skill_dir / "references").as_posix() for f in (skill_dir / "references").rglob("*.md") if _is_file(f)) if (skill_dir / "references").is_dir() else [],
         "script_files": sorted(f.name for f in (skill_dir / "scripts").iterdir() if f.suffix in (".py", ".sh", ".js", ".ts")) if (skill_dir / "scripts").is_dir() else [],
     }
 
