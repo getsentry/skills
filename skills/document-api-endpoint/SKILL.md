@@ -41,7 +41,7 @@ Do the workflow above, then on the concrete endpoint only (leave siblings PRIVAT
 - If the endpoint is redundant or being renamed, delete or deprecate the old version in its own change first, then stack the publish on top.
 - Note in the PR if scopes widen (`event:read` → `event:{admin,read,write}`) — that's drf-spectacular regenerating from `permission_classes`, documentation-only.
 
-The change reaches the `@sentry/api` SDK / MCP only after `sentry-api-schema` regenerates downstream.
+The change reaches the `@sentry/api` SDK / MCP with the next `api@` release of getsentry/sentry's `static/packages/api`, which `openapi.yml` cuts on master when the spec changes.
 
 ## Validate
 
