@@ -217,3 +217,20 @@ def test_check_validates_qualified_symbols(repo: Path) -> None:
     (repo / "SECURITY_MODEL.md").write_text("`CacheKey::from_scoped_file` and `CacheKey::no_such_fn()`\n")
     out = run("check", "--repo", str(repo))
     assert [line.split("`")[1] for line in out.stdout.splitlines()] == ["CacheKey::no_such_fn()"]
+
+
+def test_check_normalizes_dot_segments_at_ref(repo: Path) -> None:
+    (repo / "src/api/SECURITY_MODEL.md").write_text("`./v1/handler.py`, `../api/v1/` and `./v1/missing.py`\n")
+    git(repo, "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qam", "relative paths")
+    for extra in ((), ("--ref", "main")):
+        out = run("check", "--repo", str(repo), *extra)
+        assert [line.split("`")[1] for line in out.stdout.splitlines()] == ["./v1/missing.py"], extra
+
+
+def test_check_dot_paths_do_not_match_by_trailing_segment(repo: Path) -> None:
+    # `src/api/handler.py` does not exist; only `src/api/v1/handler.py` does.
+    (repo / "src/api/SECURITY_MODEL.md").write_text("`./handler.py` and `./v1/handler.py`\n")
+    git(repo, "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qam", "anchored paths")
+    for extra in ((), ("--ref", "main")):
+        out = run("check", "--repo", str(repo), *extra)
+        assert [line.split("`")[1] for line in out.stdout.splitlines()] == ["./handler.py"], extra
