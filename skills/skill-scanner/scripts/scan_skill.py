@@ -320,7 +320,7 @@ def check_secrets(content: str, filepath: str) -> list[dict[str, Any]]:
     return findings
 
 
-def check_scripts(script_path: Path) -> list[dict[str, Any]]:
+def check_scripts(script_path: Path, scripts_root: Path | None = None) -> list[dict[str, Any]]:
     """Analyze a script file for dangerous patterns."""
     findings: list[dict[str, Any]] = []
     try:
@@ -329,6 +329,8 @@ def check_scripts(script_path: Path) -> list[dict[str, Any]]:
         return findings
 
     relative = script_path.name
+    if scripts_root is not None:
+        relative = script_path.relative_to(scripts_root).as_posix()
     lines = content.split("\n")
 
     for line_num, line in enumerate(lines, 1):
@@ -534,6 +536,82 @@ def compute_description_body_overlap(frontmatter: dict[str, Any] | None, body: s
     return len(overlap) / len(desc_words)
 
 
+def find_supported_files(directory: Path, suffixes: tuple[str, ...]) -> list[Path]:
+    """Find supported files recursively without following discovered directory links."""
+    files: list[Path] = []
+    if not directory.is_dir():
+        return files
+
+    for path in directory.iterdir():
+        if path.is_dir():
+            if not path.is_symlink():
+                files.extend(find_supported_files(path, suffixes))
+        elif path.is_file() and path.suffix in suffixes:
+            files.append(path)
+
+    return sorted(files, key=lambda path: path.relative_to(directory).as_posix())
+
+
+def scan_reference_files(
+    reference_files: list[Path], refs_dir: Path
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Scan selected references in their supplied order."""
+    findings: list[dict[str, Any]] = []
+    urls: list[dict[str, Any]] = []
+    for ref_file in reference_files:
+        try:
+            ref_content = ref_file.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        rel_path = f"references/{ref_file.relative_to(refs_dir).as_posix()}"
+        findings.extend(check_prompt_injection(ref_content, rel_path))
+        findings.extend(check_obfuscation(ref_content, rel_path))
+        findings.extend(check_secrets(ref_content, rel_path))
+        urls.extend(extract_urls(ref_content, rel_path))
+    return findings, urls
+
+
+def scan_script_files(
+    script_files: list[Path], scripts_dir: Path
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Scan selected scripts, deferring dangerous findings until content checks finish."""
+    findings: list[dict[str, Any]] = []
+    urls: list[dict[str, Any]] = []
+    script_findings: list[dict[str, Any]] = []
+    for script_file in script_files:
+        sf = check_scripts(script_file, scripts_dir)
+        script_findings.extend(sf)
+        try:
+            script_content = script_file.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        rel_path = f"scripts/{script_file.relative_to(scripts_dir).as_posix()}"
+        findings.extend(check_secrets(script_content, rel_path))
+        findings.extend(check_obfuscation(script_content, rel_path))
+        urls.extend(extract_urls(script_content, rel_path))
+    findings.extend(script_findings)
+    return findings, urls
+
+
+def get_tools_info(frontmatter: dict[str, Any] | None) -> dict[str, Any] | None:
+    """Summarize allowed tools and their capability flags."""
+    tools_info = None
+    if frontmatter and "allowed-tools" in frontmatter:
+        tools_str = frontmatter["allowed-tools"]
+        if isinstance(tools_str, str):
+            tools_list = [t.strip() for t in tools_str.replace(",", " ").split() if t.strip()]
+            tools_info = {
+                "tools": tools_list,
+                "has_bash": "Bash" in tools_list,
+                "has_write": "Write" in tools_list,
+                "has_edit": "Edit" in tools_list,
+                "has_webfetch": "WebFetch" in tools_list,
+                "has_task": "Task" in tools_list,
+                "unrestricted": tools_str.strip() == "*",
+            }
+    return tools_info
+
+
 def scan_skill(skill_dir: Path) -> dict[str, Any]:
     """Run full scan on a skill directory."""
     skill_md = skill_dir / "SKILL.md"
@@ -567,37 +645,17 @@ def scan_skill(skill_dir: Path) -> dict[str, Any]:
 
     # 6. Scan reference files
     refs_dir = skill_dir / "references"
-    if refs_dir.is_dir():
-        for ref_file in sorted(refs_dir.iterdir()):
-            if ref_file.suffix == ".md":
-                try:
-                    ref_content = ref_file.read_text(encoding="utf-8", errors="replace")
-                except OSError:
-                    continue
-                rel_path = f"references/{ref_file.name}"
-                all_findings.extend(check_prompt_injection(ref_content, rel_path))
-                all_findings.extend(check_obfuscation(ref_content, rel_path))
-                all_findings.extend(check_secrets(ref_content, rel_path))
-                all_urls.extend(extract_urls(ref_content, rel_path))
+    reference_files = find_supported_files(refs_dir, (".md",))
+    reference_findings, reference_urls = scan_reference_files(reference_files, refs_dir)
+    all_findings.extend(reference_findings)
+    all_urls.extend(reference_urls)
 
     # 7. Scan scripts
     scripts_dir = skill_dir / "scripts"
-    script_findings: list[dict[str, Any]] = []
-    if scripts_dir.is_dir():
-        for script_file in sorted(scripts_dir.iterdir()):
-            if script_file.suffix in (".py", ".sh", ".js", ".ts"):
-                sf = check_scripts(script_file)
-                script_findings.extend(sf)
-                try:
-                    script_content = script_file.read_text(encoding="utf-8", errors="replace")
-                except OSError:
-                    continue
-                rel_path = f"scripts/{script_file.name}"
-                all_findings.extend(check_secrets(script_content, rel_path))
-                all_findings.extend(check_obfuscation(script_content, rel_path))
-                all_urls.extend(extract_urls(script_content, rel_path))
-
+    script_files = find_supported_files(scripts_dir, (".py", ".sh", ".js", ".ts"))
+    script_findings, script_urls = scan_script_files(script_files, scripts_dir)
     all_findings.extend(script_findings)
+    all_urls.extend(script_urls)
 
     # 8. Structural attacks (symlinks, hooks, !command, test files, npm, image metadata)
     all_findings.extend(check_structural_attacks(skill_dir, content, frontmatter))
@@ -608,10 +666,10 @@ def scan_skill(skill_dir: Path) -> dict[str, Any]:
     # Build structure info
     structure = {
         "has_skill_md": True,
-        "has_references": refs_dir.is_dir() if (refs_dir := skill_dir / "references") else False,
-        "has_scripts": scripts_dir.is_dir() if (scripts_dir := skill_dir / "scripts") else False,
-        "reference_files": sorted(f.name for f in (skill_dir / "references").iterdir() if f.suffix == ".md") if (skill_dir / "references").is_dir() else [],
-        "script_files": sorted(f.name for f in (skill_dir / "scripts").iterdir() if f.suffix in (".py", ".sh", ".js", ".ts")) if (skill_dir / "scripts").is_dir() else [],
+        "has_references": refs_dir.is_dir(),
+        "has_scripts": scripts_dir.is_dir(),
+        "reference_files": [f.relative_to(refs_dir).as_posix() for f in reference_files],
+        "script_files": [f.relative_to(scripts_dir).as_posix() for f in script_files],
     }
 
     # Summary counts
@@ -623,20 +681,7 @@ def scan_skill(skill_dir: Path) -> dict[str, Any]:
     untrusted_urls = [u for u in all_urls if not u["trusted"]]
 
     # Allowed tools analysis
-    tools_info = None
-    if frontmatter and "allowed-tools" in frontmatter:
-        tools_str = frontmatter["allowed-tools"]
-        if isinstance(tools_str, str):
-            tools_list = [t.strip() for t in tools_str.replace(",", " ").split() if t.strip()]
-            tools_info = {
-                "tools": tools_list,
-                "has_bash": "Bash" in tools_list,
-                "has_write": "Write" in tools_list,
-                "has_edit": "Edit" in tools_list,
-                "has_webfetch": "WebFetch" in tools_list,
-                "has_task": "Task" in tools_list,
-                "unrestricted": tools_str.strip() == "*",
-            }
+    tools_info = get_tools_info(frontmatter)
 
     return {
         "skill_name": frontmatter.get("name", "unknown") if frontmatter else "unknown",
